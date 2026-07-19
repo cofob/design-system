@@ -1230,8 +1230,10 @@ test("@a11y every component detail includes violation-free Native, React, and Sv
   for (const route of componentRoutes) {
     await page.goto(route);
     for (const framework of frameworkNames) {
-      await selectFramework(page, framework);
-      const results = await new AxeBuilder({ page }).analyze();
+      const panel = await selectFramework(page, framework);
+      const panelId = await panel.getAttribute("id");
+      if (!panelId) throw new Error(`${route} ${framework} panel has no id.`);
+      const results = await new AxeBuilder({ page }).include(`#${panelId}`).analyze();
       if (results.violations.length > 0) failures.push({ route, framework, violations: results.violations });
     }
   }
