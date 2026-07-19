@@ -1,8 +1,6 @@
 # Releases and deployment
 
-Repository metadata points at `https://github.com/cofob/design-system`. Creating that public remote and
-connecting the local checkout are intentional one-time external steps; no workflow attempts to create the
-repository.
+The public repository is hosted at `https://github.com/cofob/design-system`.
 
 ## GitHub Packages
 
@@ -18,18 +16,27 @@ The three packages are a fixed group. On `main`, `changesets/action` maintains a
 
 ## Showroom
 
-The Astro site is a static build in `apps/showroom/dist`. Create the direct-upload Pages project once while authenticated:
+The Astro site is a static build in `apps/showroom/dist`. Cloudflare Pages is connected directly to the
+GitHub repository, so Cloudflare owns production and preview builds rather than GitHub Actions.
+
+Use these Pages build settings:
+
+- Production branch: `main`
+- Build command: `npm run build`
+- Build output directory: `apps/showroom/dist`
+
+For a one-time project setup or a manual recovery deployment, Wrangler remains available:
 
 ```sh
 npx wrangler pages project create cofob-design-system --production-branch main
 ```
 
-Production deploys use:
+Manual production deploys use:
 
 ```sh
 npm run deploy:showroom
 ```
 
-GitHub Actions requires `CLOUDFLARE_API_TOKEN` and `CLOUDFLARE_ACCOUNT_ID`. The workflow deploys `main` as production and same-repository pull requests as branch previews.
-
-After the first successful deployment, associate `design.cofob.dev` with the `cofob-design-system` Pages project in Cloudflare Pages. Domain association is a one-time control-plane step; ongoing asset deployment remains a Wrangler command.
+`design.cofob.dev` is associated with the `cofob-design-system` Pages project. Domain association is a
+one-time control-plane step; ongoing production and branch-preview deployments are triggered by the
+Cloudflare Git integration.
