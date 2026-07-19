@@ -37,7 +37,7 @@
     "check:publint": "publint packages/design-system-css && publint packages/design-system-react && publint packages/design-system-svelte",
     "check:exports": "attw --pack packages/design-system-css --profile esm-only --entrypoints . ./types && attw --pack packages/design-system-react --profile esm-only --entrypoints . ./static ./client ./types && attw --pack packages/design-system-svelte --profile esm-only --ignore-rules internal-resolution-error",
     "check:packages": "npm run pack:check && npm run check:publint && npm run check:exports",
-    "check": "npm run check:styles && npm run check:manifest && npm run check:docs && npm run check:public-api && npm run typecheck && npm run build && npm run test:unit && npm run check:packages",
+    "check": "npm run check:styles && npm run check:manifest && npm run check:docs && npm run check:public-api && npm run build && npm run typecheck && npm run test:unit && npm run check:packages",
     "changeset": "changeset",
     "version-packages": "changeset version",
     "release": "npm run build && changeset publish",
