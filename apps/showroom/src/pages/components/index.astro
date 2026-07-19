@@ -1,0 +1,31 @@
+---
+import ComponentCard from "../../components/ComponentCard.astro";
+import PageHeader from "../../components/PageHeader.astro";
+import groups from "../../data/components.json";
+import Layout from "../../layouts/Layout.astro";
+---
+
+<Layout title="Components" description="Native CSS, React, and Svelte components in the cofob design system.">
+  <PageHeader
+    eyebrow="Components"
+    title="One visual contract, three ways to build."
+    description="Every adapter renders the same cf-* class and data-state vocabulary. Choose the idioms of your framework without forking the design language."
+  />
+  {
+    groups.map((group) => (
+      <section class="astro-section">
+        <div class="astro-section-header">
+          <>
+            <h2>{group.category}</h2>
+            <p>{group.description}</p>
+          </>
+        </div>
+        <div class="astro-component-grid">
+          {group.components.map((component) => (
+            <ComponentCard component={component} />
+          ))}
+        </div>
+      </section>
+    ))
+  }
+</Layout>

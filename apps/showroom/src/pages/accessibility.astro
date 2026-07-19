@@ -1,0 +1,47 @@
+---
+import Layout from "../layouts/Layout.astro";
+import PageHeader from "../components/PageHeader.astro";
+---
+
+<Layout title="Accessibility" description="Accessibility requirements for cofob design system components.">
+  <PageHeader
+    eyebrow="Accessibility"
+    title="The default path is the accessible path."
+    description="Components target WCAG 2.2 AA and use semantic HTML, visible keyboard focus, and platform behavior before custom interaction."
+  />
+
+  <div class="cf-prose">
+    <h2>Keyboard and focus</h2>
+    <p>
+      Every action is reachable without a pointer. Dialog returns focus to its trigger; menus use arrow keys,
+      Home, End, and typeahead; tabs support automatic and manual activation.
+    </p>
+    <h2>Color and state</h2>
+    <p>
+      Text and interactive boundaries meet AA contrast in both themes. Errors, success, selection, and
+      disabled states combine color with copy, shape, native state, or an icon.
+    </p>
+    <h2>Motion</h2>
+    <p>
+      Animation is brief and functional. Under <code>prefers-reduced-motion: reduce</code>, movement collapses
+      to an effectively instant state change while content remains understandable.
+    </p>
+    <h2>Content</h2>
+    <p>
+      Links describe their destination, headings retain hierarchy, images require contextual alternative text,
+      and Sticker requires visible source attribution.
+    </p>
+    <h2>Overlays</h2>
+    <p>
+      Dialog uses the modal dialog API. Popover and DropdownMenu use the Popover API with controller
+      fallbacks. Tooltip content is supplementary and is exposed through <code>aria-describedby</code>.
+    </p>
+    <h2>Testing contract</h2>
+    <ul>
+      <li>Automated axe scans in light and dark themes at mobile and desktop widths.</li>
+      <li>Keyboard Playwright scenarios for every stateful pattern.</li>
+      <li>Forced-colors and reduced-motion assertions.</li>
+      <li>Manual screen-reader review before a stable 1.0 release.</li>
+    </ul>
+  </div>
+</Layout>

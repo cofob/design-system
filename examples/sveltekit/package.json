@@ -1,0 +1,25 @@
+{
+  "name": "@cofob/example-sveltekit",
+  "version": "0.0.0",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "build": "svelte-kit sync && vite build",
+    "typecheck": "svelte-kit sync && svelte-check --tsconfig ./tsconfig.json",
+    "postinstall": "svelte-kit sync"
+  },
+  "dependencies": {
+    "@cofob/design-system-css": "0.1.0",
+    "@cofob/design-system-svelte": "0.1.0",
+    "@lucide/svelte": "^1.25.0",
+    "svelte": "^5.56.4"
+  },
+  "devDependencies": {
+    "@sveltejs/adapter-node": "^5.5.7",
+    "@sveltejs/kit": "^2.69.2",
+    "@sveltejs/vite-plugin-svelte": "^7.2.0",
+    "svelte-check": "^4.7.2",
+    "typescript": "^6.0.3",
+    "vite": "^8.1.4"
+  }
+}

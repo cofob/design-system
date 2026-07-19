@@ -1,0 +1,23 @@
+---
+import FrameworkPreview from "./FrameworkPreview.astro";
+
+interface Props {
+  component: {
+    name: string;
+    description: string;
+    interactive: boolean;
+  };
+}
+
+const { component } = Astro.props;
+const slug = component.name.replaceAll(/([a-z0-9])([A-Z])/g, "$1-$2").toLowerCase();
+---
+
+<article class="astro-component-card" id={slug}>
+  <FrameworkPreview
+    name={component.name}
+    description={component.description}
+    compact
+    linkHref={`/components/${slug}/`}
+  />
+</article>

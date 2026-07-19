@@ -1,0 +1,73 @@
+---
+import NativeCaptcha from "./NativeCaptcha.astro";
+---
+
+<section
+  class="cf-card"
+  data-padding="lg"
+  data-variant="elevated"
+  data-captcha-interactive
+  aria-labelledby="captcha-simulation-title"
+>
+  <div class="cf-stack" data-gap="md">
+    <div class="cf-stack" data-gap="sm">
+      <p class="cf-section__eyebrow">Showroom simulation</p>
+      <h3 class="cf-heading" id="captcha-simulation-title" data-size="xl">Try the visual flow</h3>
+      <p class="cf-text" data-tone="muted">
+        Click the control to simulate verification. The result appears after about 1.4 seconds; click again to
+        retry.
+      </p>
+    </div>
+
+    <NativeCaptcha state="idle" />
+
+    <div class="cf-alert" data-tone="info">
+      <div class="cf-alert__content">
+        <strong class="cf-alert__title">No verification is performed</strong>
+        <p class="cf-alert__description">
+          This showroom wrapper changes visual state only. Production apps must connect their own trusted
+          verification implementation.
+        </p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<script>
+  const captchaLabels = {
+    idle: "Verify you are human",
+    verifying: "Verifying…",
+    success: "Verification complete",
+    error: "Verification failed",
+  } as const;
+
+  type CaptchaDemoState = keyof typeof captchaLabels;
+
+  function setCaptchaDemoState(root: HTMLElement, state: CaptchaDemoState) {
+    const button = root.querySelector<HTMLButtonElement>(".cf-captcha");
+    const componentStatus = button?.querySelector<HTMLElement>(".cf-visually-hidden");
+    if (!button || !componentStatus) return;
+
+    button.dataset.state = state;
+    button.setAttribute("aria-label", captchaLabels[state]);
+    if (state === "verifying") button.setAttribute("aria-busy", "true");
+    else button.removeAttribute("aria-busy");
+    componentStatus.textContent = captchaLabels[state];
+  }
+
+  for (const root of document.querySelectorAll<HTMLElement>("[data-captcha-interactive]")) {
+    if (root.dataset.initialized === "true") continue;
+    root.dataset.initialized = "true";
+    const button = root.querySelector<HTMLButtonElement>(".cf-captcha");
+    if (!button) continue;
+
+    button.addEventListener("click", () => {
+      if (button.dataset.state === "verifying") return;
+      setCaptchaDemoState(root, "verifying");
+
+      const delay = 1200 + Math.floor(Math.random() * 401);
+      const outcome = Math.random() < 0.5 ? "success" : "error";
+      window.setTimeout(() => setCaptchaDemoState(root, outcome), delay);
+    });
+  }
+</script>

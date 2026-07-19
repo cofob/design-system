@@ -1,0 +1,77 @@
+{
+  "name": "@cofob/design-system-css",
+  "version": "0.1.0",
+  "description": "CSS foundation, design tokens, and framework-agnostic controllers for the cofob design system.",
+  "type": "module",
+  "license": "SEE LICENSE IN LICENSE",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/cofob/design-system.git",
+    "directory": "packages/design-system-css"
+  },
+  "homepage": "https://github.com/cofob/design-system#readme",
+  "bugs": {
+    "url": "https://github.com/cofob/design-system/issues"
+  },
+  "publishConfig": {
+    "registry": "https://npm.pkg.github.com",
+    "access": "public"
+  },
+  "sideEffects": [
+    "*.css",
+    "src/styles/*.css",
+    "dist/*.css"
+  ],
+  "files": [
+    "dist",
+    "src/styles",
+    "LICENSE",
+    "LICENSES",
+    "README.md"
+  ],
+  "main": "./dist/index.js",
+  "module": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "import": "./dist/index.js",
+      "default": "./dist/index.js"
+    },
+    "./types": {
+      "types": "./dist/types.d.ts",
+      "import": "./dist/types.js",
+      "default": "./dist/types.js"
+    },
+    "./index.css": "./dist/index.css",
+    "./tokens.css": "./dist/tokens.css",
+    "./fonts.css": "./dist/fonts.css",
+    "./base.css": "./dist/base.css",
+    "./components.css": "./dist/components.css",
+    "./postcss": "./dist/postcss.css",
+    "./postcss.css": "./dist/postcss.css",
+    "./font/manrope.woff2": "./dist/fonts/Manrope.woff2",
+    "./package.json": "./package.json"
+  },
+  "engines": {
+    "node": ">=24.11.0"
+  },
+  "scripts": {
+    "build": "npm run clean && tsc -p tsconfig.build.json && node ./scripts/build-css.mjs",
+    "build:css": "node ./scripts/build-css.mjs",
+    "clean": "node ./scripts/clean.mjs",
+    "test": "vitest run",
+    "typecheck": "tsc -p tsconfig.json --noEmit"
+  },
+  "devDependencies": {
+    "autoprefixer": "^10.4.21",
+    "cssnano": "^7.1.1",
+    "jsdom": "^26.1.0",
+    "postcss": "^8.5.6",
+    "postcss-custom-media": "^11.0.6",
+    "postcss-import": "^16.1.1",
+    "postcss-nesting": "^13.0.2",
+    "typescript": "^5.9.2",
+    "vitest": "^3.2.4"
+  }
+}

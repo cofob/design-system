@@ -1,0 +1,90 @@
+@layer cf.reset, cf.base;
+
+@layer cf.reset {
+  *,
+  *::before,
+  *::after {
+    box-sizing: border-box;
+  }
+
+  :where(html, body, h1, h2, h3, h4, h5, h6, p, figure, blockquote, dl, dd) {
+    margin: 0;
+  }
+
+  :where(ul, ol)[class^="cf-"],
+  :where(ul, ol)[class*=" cf-"] {
+    margin: 0;
+    padding: 0;
+    list-style: none;
+  }
+
+  :where(button, input, textarea, select) {
+    color: inherit;
+    font: inherit;
+  }
+
+  :where(img, picture, svg, video, canvas) {
+    display: block;
+    max-inline-size: 100%;
+  }
+}
+
+@layer cf.base {
+  html {
+    background: var(--cf-color-canvas);
+    color: var(--cf-color-text);
+    font-family: var(--cf-font-sans);
+    line-height: var(--cf-line-height-normal);
+    overflow-wrap: break-word;
+    scrollbar-gutter: stable;
+    text-rendering: optimizelegibility;
+    -webkit-font-smoothing: antialiased;
+  }
+
+  body {
+    min-block-size: 100vh;
+    background: var(--cf-color-canvas);
+    color: var(--cf-color-text);
+  }
+
+  :where(a) {
+    color: inherit;
+  }
+
+  :where(:focus-visible) {
+    outline: 3px solid var(--cf-color-focus);
+    outline-offset: 3px;
+  }
+
+  :where([hidden]) {
+    display: none !important;
+  }
+
+  :where(::selection) {
+    background: var(--cf-color-accent-soft-hover);
+    color: var(--cf-color-text-strong);
+  }
+
+  @media (prefers-reduced-motion: no-preference) {
+    html:focus-within {
+      scroll-behavior: smooth;
+    }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    *,
+    *::before,
+    *::after {
+      scroll-behavior: auto !important;
+      transition-duration: 0.01ms !important;
+      animation-duration: 0.01ms !important;
+      animation-iteration-count: 1 !important;
+    }
+  }
+
+  @media (forced-colors: active) {
+    :where(:focus-visible) {
+      outline-color: Highlight;
+    }
+  }
+}

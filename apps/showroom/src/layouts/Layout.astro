@@ -1,0 +1,202 @@
+---
+import "@cofob/design-system-css/index.css";
+import { getThemeScript } from "@cofob/design-system-css";
+import "../styles/showroom.css";
+
+interface Props {
+  title?: string;
+  description?: string;
+}
+
+const {
+  title = "cofob Design System",
+  description = "A content-first design language and component system for cofob.dev sites.",
+} = Astro.props;
+const pathname = Astro.url.pathname;
+const pageTitle = title === "cofob Design System" ? title : `${title} — cofob Design System`;
+const canonicalUrl = new URL(pathname, Astro.site);
+const socialImagePath = pathname === "/" ? "/og/index.png" : `/og${pathname.replace(/\/$/, "")}.png`;
+const socialImageUrl = new URL(socialImagePath, Astro.site);
+const themeScript = getThemeScript();
+
+const links = [
+  { href: "/foundations/", label: "Foundations" },
+  { href: "/components/", label: "Components" },
+  { href: "/api/", label: "API" },
+  { href: "/accessibility/", label: "Accessibility" },
+  { href: "/installation/", label: "Installation" },
+  { href: "/migration/", label: "Migration" },
+];
+---
+
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="description" content={description} />
+    <meta name="theme-color" content="#ffffff" />
+    <link rel="canonical" href={canonicalUrl} />
+    <meta property="og:type" content="website" />
+    <meta property="og:site_name" content="cofob Design System" />
+    <meta property="og:title" content={pageTitle} />
+    <meta property="og:description" content={description} />
+    <meta property="og:url" content={canonicalUrl} />
+    <meta property="og:image" content={socialImageUrl} />
+    <meta property="og:image:type" content="image/png" />
+    <meta property="og:image:width" content="1200" />
+    <meta property="og:image:height" content="630" />
+    <meta property="og:image:alt" content={`${pageTitle} social preview`} />
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:title" content={pageTitle} />
+    <meta name="twitter:description" content={description} />
+    <meta name="twitter:image" content={socialImageUrl} />
+    <meta name="twitter:image:alt" content={`${pageTitle} social preview`} />
+    <title>{pageTitle}</title>
+    <script is:inline set:html={themeScript} />
+  </head>
+  <body>
+    <a class="cf-skip-link" href="#content">Skip to content</a>
+    <div class="astro-shell">
+      <header class="astro-header">
+        <nav
+          class="cf-navbar astro-navbar"
+          data-cf-navbar
+          data-collapse-at="tablet"
+          data-menu-variant="flush"
+          data-surface="translucent"
+          data-state="closed"
+          aria-label="Primary navigation"
+        >
+          <a class="cf-navbar__brand astro-brand" href="/">
+            <span class="cf-blue-line"><span class="cf-blue-line__content">cofob</span></span>
+            design system
+          </a>
+          <details class="cf-navbar__mobile" data-cf-navbar-disclosure>
+            <summary
+              class="cf-navbar__menu-trigger"
+              data-cf-navbar-trigger
+              role="button"
+              aria-expanded="false"
+            >
+              <span class="cf-navbar__menu-icon" aria-hidden="true"></span>
+              <span class="cf-sr-only">Toggle navigation menu</span>
+            </summary>
+          </details>
+          <div class="cf-navbar__navigation" data-cf-navbar-panel>
+            <ul class="cf-navbar__links">
+              {
+                links.map((link) => (
+                  <li>
+                    <a
+                      class="cf-navbar__link"
+                      href={link.href}
+                      aria-current={pathname.startsWith(link.href) ? "page" : undefined}
+                    >
+                      {link.label}
+                    </a>
+                  </li>
+                ))
+              }
+            </ul>
+            <div class="cf-navbar__actions">
+              <button
+                class="cf-theme-toggle astro-theme-toggle"
+                type="button"
+                data-showroom-theme
+                data-preference="system"
+                aria-label="Change color theme"
+              >
+                <span class="cf-theme-toggle__icon" aria-hidden="true" data-cf-theme-icon></span>
+                <span class="astro-theme-toggle__prefix" aria-hidden="true">Theme:</span>
+                <span
+                  class="cf-theme-toggle__label"
+                  aria-hidden="true"
+                  data-cf-theme-label
+                  data-label-system="System"
+                  data-label-light="Light"
+                  data-label-dark="Dark"></span>
+                <span class="cf-sr-only" data-showroom-theme-value>system</span>
+              </button>
+            </div>
+          </div>
+        </nav>
+      </header>
+      <main class="astro-main" id="content" tabindex="-1">
+        <slot />
+      </main>
+      <footer class="astro-footer">
+        <p>
+          © cofob · Built for cofob.dev sites · <a href="https://github.com/cofob/design-system">Source</a>
+        </p>
+        <p>Original work is covered by the cofob.dev License. Manrope is licensed under OFL-1.1.</p>
+      </footer>
+    </div>
+    <script>
+      import { createToastController, initDesignSystem } from "@cofob/design-system-css";
+
+      const designSystem = initDesignSystem(document);
+      const theme = designSystem.theme;
+      const toastControllers = new Map<HTMLElement, ReturnType<typeof createToastController>>();
+      const onToastTrigger = (event: Event) => {
+        const trigger = (event.target as Element | null)?.closest<HTMLElement>("[data-cf-toast-trigger]");
+        const target = trigger?.dataset.cfToastTrigger;
+        const viewport = target ? document.getElementById(target) : null;
+        if (!trigger || !(viewport instanceof HTMLElement)) return;
+        let controller = toastControllers.get(viewport);
+        if (!controller) {
+          controller = createToastController(viewport);
+          toastControllers.set(viewport, controller);
+        }
+        controller.toast({
+          title: trigger.dataset.toastTitle ?? "Notification",
+          description: trigger.dataset.toastDescription ?? "The native toast controller is live.",
+          tone:
+            trigger.dataset.toastTone === "success" ||
+            trigger.dataset.toastTone === "info" ||
+            trigger.dataset.toastTone === "warning" ||
+            trigger.dataset.toastTone === "danger"
+              ? trigger.dataset.toastTone
+              : "neutral",
+          duration: 4000,
+        });
+      };
+      document.addEventListener("click", onToastTrigger);
+
+      const button = document.querySelector<HTMLButtonElement>("[data-showroom-theme]");
+      const value = button?.querySelector<HTMLElement>("[data-showroom-theme-value]");
+      const preferences = ["system", "light", "dark"] as const;
+      const themeNames = { system: "System", light: "Light", dark: "Dark" } as const;
+      const unsubscribe = theme.subscribe(({ preference, resolvedTheme }) => {
+        if (!button) return;
+        const next = preferences[(preferences.indexOf(preference) + 1) % preferences.length] ?? "system";
+        button.dataset.preference = preference;
+        button.dataset.theme = resolvedTheme;
+        if (value) value.textContent = preference;
+        button.setAttribute(
+          "aria-label",
+          `${themeNames[preference]} theme. Switch to ${themeNames[next].toLowerCase()} theme.`,
+        );
+      });
+      button?.addEventListener("click", () => {
+        const active = theme.getPreference();
+        theme.setPreference(
+          preferences[
+            (preferences.indexOf(active as (typeof preferences)[number]) + 1) % preferences.length
+          ] ?? "system",
+        );
+      });
+
+      window.addEventListener(
+        "pagehide",
+        () => {
+          unsubscribe();
+          document.removeEventListener("click", onToastTrigger);
+          for (const controller of toastControllers.values()) controller.destroy();
+          designSystem.destroy();
+        },
+        { once: true },
+      );
+    </script>
+  </body>
+</html>

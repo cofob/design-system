@@ -1,0 +1,12 @@
+@import "@cofob/design-system-css/postcss";
+
+@layer fixture {
+  .fixture-shell {
+    max-inline-size: var(--cf-content-narrow);
+    margin-inline: auto;
+
+    & > * + * {
+      margin-block-start: var(--cf-space-4);
+    }
+  }
+}

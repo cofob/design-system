@@ -1,0 +1,116 @@
+---
+import Layout from "../layouts/Layout.astro";
+import PageHeader from "../components/PageHeader.astro";
+import Table from "../components/Table.astro";
+
+const mappings = [
+  ["bg-white text-zinc-800", "Canvas and text semantic tokens / base.css"],
+  ["text-sky-700 hover:underline", ".cf-link"],
+  ["rounded-lg border-2 px-3 py-2", ".cf-button or .cf-input"],
+  ["rounded-full bg-zinc-100", ".cf-tag or .cf-badge"],
+  ["max-w-screen-lg mx-auto", ".cf-container"],
+  ["flex flex-col gap-*", ".cf-stack with data-gap"],
+  ["flex flex-wrap gap-*", ".cf-inline with data-gap"],
+  ["border-sky-300 bg-sky-50", ".cf-alert[data-tone=info]"],
+  ["border-amber-400 bg-amber-50", ".cf-alert[data-tone=warning]"],
+  ["blog-prose descendant utilities", ".cf-prose"],
+];
+
+const componentMappings = [
+  ["Navbar.svelte", "Navbar"],
+  ["Footer.svelte", "Footer"],
+  ["Section.svelte", "Section"],
+  ["Heading.svelte", "Heading"],
+  ["BlueLine.svelte", "BlueLine"],
+  ["blog/PostCard.svelte", "PostCard"],
+  ["blog/LatestPostLink.svelte", "LatestPostCard"],
+  ["blog/ResponsiveImage.svelte", "ResponsiveImage"],
+  ["blog/ChatThread.svelte", "ChatThread"],
+  ["blog/Sticker.svelte", "Sticker"],
+  ["blog/RichText.svelte", "Prose"],
+  ["blog/NoticeBlock.svelte", "Alert with info tone"],
+  ["blog/WarningBlock.svelte", "Alert with warning tone"],
+];
+---
+
+<Layout
+  title="Migration from cofob.dev"
+  description="Move cofob.dev from local utility styling to the shared design system."
+>
+  <PageHeader
+    eyebrow="Migration"
+    title="Move intent, not utility strings."
+    description="The original repository remains unchanged in v1. This guide defines a later, page-by-page migration to the Svelte adapter and shared CSS."
+  />
+
+  <div class="cf-prose astro-doc-content">
+    <h2>Recommended sequence</h2>
+    <ol>
+      <li>Authenticate GitHub Packages and install the CSS and Svelte packages.</li>
+      <li>
+        Import <code>index.css</code> once in the root layout, then add ThemeScript before first paint.
+      </li>
+      <li>
+        Replace global palette, font, focus, and reduced-motion rules; verify that the page remains visually
+        unchanged in light mode.
+      </li>
+      <li>Migrate shell components: SkipLink, Navbar, Container/Section, and Footer.</li>
+      <li>Migrate fields, tags, pagination, alerts, and cards.</li>
+      <li>Replace article descendant utilities with Prose and content components.</li>
+      <li>Remove the legacy utility pipeline only after repository-wide searches find no old directives.</li>
+    </ol>
+
+    <h2 id="utility-mapping">Utility mapping</h2>
+    <Table label="Utility mapping" minWidth="36rem">
+      <thead><tr><th>Current cofob.dev pattern</th><th>Design-system replacement</th></tr></thead>
+      <tbody
+        >{
+          mappings.map(([before, after]) => (
+            <tr>
+              <>
+                <td>
+                  <code>{before}</code>
+                </td>
+                <td>{after}</td>
+              </>
+            </tr>
+          ))
+        }</tbody
+      >
+    </Table>
+
+    <h2 id="component-mapping">Local component mapping</h2>
+    <Table label="Local component mapping" minWidth="36rem">
+      <thead><tr><th>Current local component</th><th>Package replacement</th></tr></thead>
+      <tbody
+        >{
+          componentMappings.map(([before, after]) => (
+            <tr>
+              <td>
+                <code>{before}</code>
+              </td>
+              <td>
+                <code>{after}</code>
+              </td>
+            </tr>
+          ))
+        }</tbody
+      >
+    </Table>
+
+    <h2>Components that intentionally stay in the site</h2>
+    <p>
+      SEO metadata, structured data, feed rendering, Fediverse fetching and sanitization, blog asset
+      processing, CommentThread, Comments, CommentMedia, and the Asciinema player remain application concerns.
+      They may compose design-system primitives but are not package APIs.
+    </p>
+
+    <h2>Acceptance checks</h2>
+    <ul>
+      <li>Light-mode screenshots match the existing site’s visual identity.</li>
+      <li>Dark mode works before hydration and across every route.</li>
+      <li>Node, static/IPFS, and Cloudflare builds remain supported.</li>
+      <li>The existing accessibility, feed, and portable-render tests remain green.</li>
+    </ul>
+  </div>
+</Layout>

@@ -1,0 +1,179 @@
+---
+import Layout from "../layouts/Layout.astro";
+import PageHeader from "../components/PageHeader.astro";
+
+const colors = [
+  ["canvas", "var(--cf-color-canvas)"],
+  ["surface", "var(--cf-color-surface)"],
+  ["surface-raised", "var(--cf-color-surface-raised)"],
+  ["surface-muted", "var(--cf-color-surface-muted)"],
+  ["surface-inverse", "var(--cf-color-surface-inverse)"],
+  ["text", "var(--cf-color-text)"],
+  ["text-strong", "var(--cf-color-text-strong)"],
+  ["text-muted", "var(--cf-color-text-muted)"],
+  ["text-subtle", "var(--cf-color-text-subtle)"],
+  ["border", "var(--cf-color-border)"],
+  ["border-strong", "var(--cf-color-border-strong)"],
+  ["focus", "var(--cf-color-focus)"],
+  ["accent", "var(--cf-color-accent)"],
+  ["accent-soft", "var(--cf-color-accent-soft)"],
+  ["info", "var(--cf-color-info)"],
+  ["success", "var(--cf-color-success)"],
+  ["warning", "var(--cf-color-warning)"],
+  ["danger", "var(--cf-color-danger)"],
+];
+
+const tokenGroups = [
+  {
+    title: "Spacing",
+    description: "A 4px-rooted rhythm with half steps only where compact controls need them.",
+    tokens: ["0", "0-5", "1", "1-5", "2", "3", "4", "5", "6", "8", "10", "12", "16", "20", "24"].map(
+      (name) => `--cf-space-${name}`,
+    ),
+  },
+  {
+    title: "Radii",
+    description: "Controls stay precise; content surfaces become progressively softer.",
+    tokens: ["xs", "sm", "md", "lg", "xl", "2xl", "full"].map((name) => `--cf-radius-${name}`),
+  },
+  {
+    title: "Shadows",
+    description: "Elevation is reserved for raised content, popovers, and modal context.",
+    tokens: ["xs", "sm", "md", "lg"].map((name) => `--cf-shadow-${name}`),
+  },
+  {
+    title: "Motion",
+    description: "Durations and easing are semantic, and collapse under reduced-motion preferences.",
+    tokens: [
+      "--cf-duration-fast",
+      "--cf-duration-normal",
+      "--cf-duration-slow",
+      "--cf-ease-standard",
+      "--cf-ease-emphasized",
+    ],
+  },
+  {
+    title: "Z-index",
+    description: "A deliberately small layer scale prevents local stacking-context inflation.",
+    tokens: ["base", "sticky", "popover", "toast", "dialog"].map((name) => `--cf-z-${name}`),
+  },
+];
+---
+
+<Layout title="Foundations" description="Design tokens and principles for the cofob design system.">
+  <PageHeader
+    eyebrow="Foundations"
+    title="A small vocabulary with room to breathe."
+    description="Semantic tokens encode intent, so components can change theme, framework, and context without changing meaning."
+  />
+
+  <section class="astro-section">
+    <div class="astro-section-header">
+      <h2>Color</h2><p>
+        Sky carries action and identity. Zinc provides calm structure. Feedback colors never carry meaning
+        alone.
+      </p>
+    </div>
+    <div class="astro-token-grid">
+      {
+        colors.map(([name, value]) => (
+          <article class="astro-token">
+            <>
+              <div class="astro-token-swatch" style={`--cf-demo-token-color:${value}`} />
+              <code>--cf-color-{name}</code>
+            </>
+          </article>
+        ))
+      }
+    </div>
+  </section>
+
+  <section class="astro-section">
+    <div class="astro-section-header">
+      <h2>Token scales</h2><p>
+        Applications consume named decisions instead of literal lengths, shadows, durations, or arbitrary
+        stacking values.
+      </p>
+    </div>
+    <div class="astro-component-grid">
+      {
+        tokenGroups.map((group) => (
+          <article class="cf-card" data-padding="md">
+            <h3>{group.title}</h3>
+            <p>{group.description}</p>
+            <ul class="cf-stack" data-gap="xs">
+              {group.tokens.map((token) => (
+                <li>
+                  <code>{token}</code>
+                </li>
+              ))}
+            </ul>
+          </article>
+        ))
+      }
+    </div>
+  </section>
+
+  <section class="astro-section">
+    <div class="astro-section-header">
+      <h2>Typography</h2><p>
+        Manrope is geometric without becoming cold. The scale gives long-form content a strong, readable
+        rhythm.
+      </p>
+    </div>
+    <div class="cf-stack" data-gap="lg">
+      <h1 class="cf-heading">Heading one</h1><h2 class="cf-heading">Heading two</h2><h3 class="cf-heading">
+        Heading three
+      </h3>
+      <p class="cf-text" data-variant="lead">Lead text introduces a page without competing with its title.</p>
+      <p class="cf-text">Body text stays comfortable across long articles and compact interfaces.</p>
+      <p class="cf-text" data-tone="muted">Muted text is reserved for supporting metadata.</p>
+      <p><code>Inline code uses a system monospace stack.</code></p>
+    </div>
+  </section>
+
+  <section class="astro-section">
+    <div class="astro-section-header">
+      <h2>Shape and rhythm</h2><p>
+        Spacing follows a compact 4px-rooted scale. Soft radii group related content without turning every
+        surface into a pill.
+      </p>
+    </div>
+    <div class="astro-component-grid">
+      <article class="cf-card">
+        <h3>Spacing</h3><p>
+          Use Stack and Inline before one-off margins. Sections create page rhythm; fields own internal
+          rhythm.
+        </p>
+      </article>
+      <article class="cf-card">
+        <h3>Radius</h3><p>
+          Small for controls, large for content surfaces, full only for tags, avatars, and compact status.
+        </p>
+      </article>
+      <article class="cf-card">
+        <h3>Motion</h3><p>
+          150–240ms transitions clarify state. Reduced-motion removes movement without hiding feedback.
+        </p>
+      </article>
+    </div>
+  </section>
+
+  <section class="astro-section">
+    <div class="astro-section-header">
+      <h2>Themes</h2><p>
+        Light preserves the original cofob.dev palette. Dark uses purpose-built surfaces and contrast rather
+        than color inversion.
+      </p>
+    </div>
+    <div class="cf-alert" data-tone="info">
+      <div class="cf-alert__content">
+        <strong class="cf-alert__title">System by default</strong>
+        <p class="cf-alert__description">
+          The saved preference can be light, dark, or system. ThemeScript resolves it before paint and
+          ThemeProvider listens for OS changes.
+        </p>
+      </div>
+    </div>
+  </section>
+</Layout>

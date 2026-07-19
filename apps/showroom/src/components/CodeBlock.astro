@@ -1,0 +1,57 @@
+---
+import { Code } from "astro:components";
+
+interface Props {
+  code: string;
+  lang?: "bash" | "css" | "html" | "ini" | "svelte" | "tsx" | "typescript";
+  label?: string;
+  showLanguage?: boolean;
+  copyable?: boolean;
+}
+
+const { code, lang = "typescript", label, showLanguage = true, copyable = true } = Astro.props;
+---
+
+<div
+  class="cf-code-block astro-code-block"
+  role={label ? "region" : undefined}
+  aria-label={label}
+  data-language={lang}
+  data-copyable={copyable || undefined}
+  data-cf-copy-scope
+>
+  {
+    (showLanguage || copyable) && (
+      <div class="cf-code-block__toolbar">
+        {showLanguage ? <span class="cf-code-block__language">{lang}</span> : <span />}
+        {copyable && (
+          <button
+            class="cf-code-copy"
+            type="button"
+            data-cf-copy-button
+            data-copy-label="Copy"
+            data-copied-label="Copied"
+            data-copy-error-label="Try again"
+            data-copy-aria-label={`Copy ${lang} code`}
+            data-copied-aria-label="Code copied to clipboard"
+            aria-label={`Copy ${lang} code`}
+          >
+            <span data-cf-copy-label>Copy</span>
+          </button>
+        )}
+      </div>
+    )
+  }
+  <Code
+    {code}
+    {lang}
+    class="cf-code-block__pre astro-code"
+    role="region"
+    aria-label={`${lang} code`}
+    tabindex="0"
+    data-cf-copy-source
+    themes={{ light: "github-light-default", dark: "github-dark-default" }}
+    defaultColor={false}
+  />
+  <span class="cf-visually-hidden" aria-live="polite" data-cf-copy-status></span>
+</div>

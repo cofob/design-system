@@ -1,0 +1,9 @@
+@layer cf.fonts {
+  @font-face {
+    font-family: Manrope;
+    src: url("./fonts/Manrope.woff2") format("woff2");
+    font-style: normal;
+    font-weight: 100 1000;
+    font-display: swap;
+  }
+}

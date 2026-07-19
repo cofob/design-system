@@ -1,0 +1,81 @@
+---
+import { tokenizeBashCommand } from "@cofob/design-system-css";
+import type { TerminalCodeEntry } from "@cofob/design-system-css";
+
+interface Props {
+  entries: readonly TerminalCodeEntry[];
+  label?: string;
+  prompt?: string;
+  copyable?: boolean;
+  copyLabel?: string;
+  outputLabel?: string;
+}
+
+const {
+  entries,
+  label = "Terminal",
+  prompt = "$",
+  copyable = true,
+  copyLabel = "Copy command",
+  outputLabel = "Command output",
+} = Astro.props;
+const escapeHtml = (value: string) =>
+  value.replaceAll("&", "&amp;").replaceAll("<", "&lt;").replaceAll(">", "&gt;").replaceAll('"', "&quot;");
+const renderBashCommand = (command: string) =>
+  tokenizeBashCommand(command)
+    .map((token) =>
+      token.kind === "plain"
+        ? escapeHtml(token.value)
+        : `<span class="cf-syntax-token" data-token="${token.kind}">${escapeHtml(token.value)}</span>`,
+    )
+    .join("");
+const renderBashCode = (command: string) =>
+  `<code data-cf-copy-source data-language="bash">${renderBashCommand(command)}</code>`;
+const renderTerminalOutput = (output: string) => `<code>${escapeHtml(output)}</code>`;
+---
+
+<div class="cf-terminal-code-block" role="region" aria-label={label}>
+  <div class="cf-terminal-code-block__toolbar">
+    <span class="cf-terminal-code-block__label">{label}</span>
+  </div>
+  <div class="cf-terminal-code-block__entries">
+    {
+      entries.map((entry, index) => (
+        <div class="cf-terminal-code-block__entry" data-cf-copy-scope>
+          <div class="cf-terminal-code-block__command-row">
+            <span class="cf-terminal-code-block__prompt" aria-hidden="true">
+              {prompt}
+            </span>
+            <pre class="cf-terminal-code-block__command" set:html={renderBashCode(entry.command)} />
+            {copyable && (
+              <button
+                class="cf-code-copy"
+                type="button"
+                data-cf-copy-button
+                data-copy-label={copyLabel}
+                data-copied-label="Copied"
+                data-copy-error-label="Try again"
+                data-copy-aria-label={`Copy command ${index + 1}`}
+                data-copied-aria-label={`Command ${index + 1} copied to clipboard`}
+                data-copy-error-aria-label={`Could not copy command ${index + 1}. Try again`}
+                aria-label={`Copy command ${index + 1}`}
+              >
+                <span data-cf-copy-label>{copyLabel}</span>
+              </button>
+            )}
+          </div>
+          {entry.output !== undefined && (
+            <pre
+              class="cf-terminal-code-block__output"
+              role="region"
+              tabindex="0"
+              aria-label={`${outputLabel} ${index + 1}`}
+              set:html={renderTerminalOutput(entry.output)}
+            />
+          )}
+          <span class="cf-visually-hidden" aria-live="polite" data-cf-copy-status />
+        </div>
+      ))
+    }
+  </div>
+</div>

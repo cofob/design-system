@@ -1,0 +1,89 @@
+---
+import ComponentCard from "../components/ComponentCard.astro";
+import { ReactFrameworkDemo } from "../components/ReactFrameworkDemo";
+import SvelteFrameworkDemo from "../components/SvelteFrameworkDemo.svelte";
+import Layout from "../layouts/Layout.astro";
+import groups from "../data/components.json";
+---
+
+<Layout>
+  <div class="astro-home-circle" aria-hidden="true"></div>
+  <header class="astro-hero">
+    <p class="astro-eyebrow">cofob Design System v1</p>
+    <h1>Quiet structure. Clear content.</h1>
+    <p>
+      A framework-independent design language for cofob.dev sites, with one semantic CSS contract and native,
+      React, and Svelte implementations.
+    </p>
+    <div class="astro-actions">
+      <a class="cf-button" href="/installation/">Install the packages</a>
+      <a class="cf-button" data-variant="secondary" href="/components/">Browse components</a>
+    </div>
+  </header>
+
+  <section class="astro-section" aria-labelledby="principles-heading">
+    <div class="astro-section-header astro-principles-header">
+      <h2 id="principles-heading">
+        <span class="cf-blue-line"><span class="cf-blue-line__content">Design principles</span></span>
+      </h2>
+      <p>
+        The visual language preserves the original cofob.dev character while making its decisions explicit.
+      </p>
+    </div>
+    <div class="astro-component-grid astro-principle-grid">
+      <article class="cf-card">
+        <p class="astro-eyebrow">01</p><h3>Content first</h3><p>
+          Typography and rhythm carry hierarchy before decoration does.
+        </p>
+      </article>
+      <article class="cf-card">
+        <p class="astro-eyebrow">02</p><h3>Calm confidence</h3><p>
+          Sky accents, zinc surfaces, and soft geometry support rather than compete.
+        </p>
+      </article>
+      <article class="cf-card">
+        <p class="astro-eyebrow">03</p><h3>Platform aligned</h3><p>
+          Semantic HTML and native browser behavior are the foundation of interaction.
+        </p>
+      </article>
+      <article class="cf-card">
+        <p class="astro-eyebrow">04</p><h3>Accessible by default</h3><p>
+          Every state remains visible by keyboard, contrast, motion, and assistive technology.
+        </p>
+      </article>
+    </div>
+  </section>
+
+  <section class="astro-section" aria-labelledby="adapters-heading">
+    <div class="astro-section-header">
+      <h2 id="adapters-heading">Framework adapters</h2>
+      <p>
+        Both implementations below are rendered and hydrated on this Astro page, not recreated as
+        showroom-only HTML.
+      </p>
+    </div>
+    <div class="astro-component-grid">
+      <ReactFrameworkDemo client:load />
+      <SvelteFrameworkDemo client:load />
+    </div>
+  </section>
+
+  {
+    groups.map((group) => (
+      <section
+        class="astro-section"
+        aria-labelledby={`group-${group.category.replaceAll(" ", "-").toLowerCase()}`}
+      >
+        <div class="astro-section-header">
+          <h2 id={`group-${group.category.replaceAll(" ", "-").toLowerCase()}`}>{group.category}</h2>
+          <p>{group.description}</p>
+        </div>
+        <div class="astro-component-grid">
+          {group.components.map((component) => (
+            <ComponentCard component={component} />
+          ))}
+        </div>
+      </section>
+    ))
+  }
+</Layout>

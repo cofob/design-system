@@ -1,0 +1,50 @@
+---
+import { CAPTCHA_LABELS } from "@cofob/design-system-css";
+import type { CaptchaState } from "@cofob/design-system-css";
+
+interface Props {
+  state?: CaptchaState;
+  disabled?: boolean;
+}
+
+const { state = "idle", disabled = false } = Astro.props;
+const visualState = disabled ? "idle" : state;
+const states = ["idle", "verifying", "success", "error"] as const;
+---
+
+<button
+  type="button"
+  class="cf-captcha"
+  data-state={visualState}
+  data-disabled={disabled || undefined}
+  disabled={disabled}
+  aria-label={CAPTCHA_LABELS[visualState]}
+  aria-busy={visualState === "verifying" ? "true" : undefined}
+>
+  <span class="cf-captcha__indicator" aria-hidden="true">
+    <svg class="cf-captcha__progress" viewBox="0 0 32 32">
+      <circle class="cf-captcha__progress-track" cx="16" cy="16" r="12"></circle>
+      <circle class="cf-captcha__progress-value" cx="16" cy="16" r="12"></circle>
+    </svg>
+    <svg class="cf-captcha__status cf-captcha__status--success" viewBox="0 0 24 24">
+      <path pathLength="1" d="m5 12 4.5 4.5L19 7"></path>
+    </svg>
+    <svg class="cf-captcha__status cf-captcha__status--error" viewBox="0 0 24 24">
+      <path pathLength="1" d="M7 7l10 10M17 7 7 17"></path>
+    </svg>
+  </span>
+
+  <span class="cf-captcha__copy" aria-hidden="true">
+    {
+      states.map((labelState) => (
+        <span class="cf-captcha__label" data-captcha-label={labelState}>
+          {CAPTCHA_LABELS[labelState]}
+        </span>
+      ))
+    }
+  </span>
+
+  <span class="cf-visually-hidden" aria-live="polite" aria-atomic="true">
+    {CAPTCHA_LABELS[visualState]}
+  </span>
+</button>

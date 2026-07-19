@@ -1,0 +1,1155 @@
+---
+import { tokenizeBashCommand } from "@cofob/design-system-css";
+import NativeCaptcha from "./NativeCaptcha.astro";
+
+interface Props {
+  name: string;
+  compact?: boolean;
+}
+
+const { name, compact = false } = Astro.props;
+const id = `demo-${name.toLowerCase().replaceAll(/[^a-z0-9]+/g, "-")}`;
+const lightImage =
+  "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 640 360'%3E%3Crect width='640' height='360' fill='%230ea5e9'/%3E%3Ccircle cx='490' cy='90' r='150' fill='%237dd3fc'/%3E%3Cpath d='M0 300 220 110l170 150 90-85 160 145v40H0z' fill='%23e0f2fe'/%3E%3C/svg%3E";
+const darkImage =
+  "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 640 360'%3E%3Crect width='640' height='360' fill='%23090f1e'/%3E%3Ccircle cx='490' cy='90' r='150' fill='%230c4a6e'/%3E%3Cpath d='M0 300 220 110l170 150 90-85 160 145v40H0z' fill='%231e3a5f'/%3E%3Cpath d='M0 330 180 205l120 88 90-64 160 111v20H0z' fill='%230ea5e9' opacity='.55'/%3E%3C/svg%3E";
+const codeBlockExample = `const preference = "system";
+applyTheme(preference);`;
+const terminalEntries = [
+  { command: "npm install @cofob/design-system-css", output: "added 1 package in 842ms" },
+  { command: "npm run build -- --mode production", output: "✓ 51 pages built" },
+] as const;
+const escapeHtml = (value: string) =>
+  value.replaceAll("&", "&amp;").replaceAll("<", "&lt;").replaceAll(">", "&gt;").replaceAll('"', "&quot;");
+const renderBashCommand = (command: string) =>
+  tokenizeBashCommand(command)
+    .map((token) =>
+      token.kind === "plain"
+        ? escapeHtml(token.value)
+        : `<span class="cf-syntax-token" data-token="${token.kind}">${escapeHtml(token.value)}</span>`,
+    )
+    .join("");
+const renderBashCode = (command: string) =>
+  `<code data-cf-copy-source data-language="bash">${renderBashCommand(command)}</code>`;
+const renderTerminalOutput = (output: string) => `<code>${escapeHtml(output)}</code>`;
+---
+
+<div class:list={["astro-demo", compact && "astro-demo-compact"]} data-component-preview={name}>
+  {
+    name === "ThemeProvider" && (
+      <div class="astro-theme-context">
+        <div class="astro-theme-context__heading">
+          <span class="astro-theme-context__mark" aria-hidden="true" />
+          <div>
+            <span class="astro-theme-context__eyebrow">Theme context</span>
+            <strong>One preference, resolved before paint.</strong>
+          </div>
+        </div>
+        <div class="astro-theme-context__footer">
+          <span class="astro-theme-context__status" aria-hidden="true">
+            <span class="astro-theme-context__preference" />
+            <span class="astro-theme-context__arrow">→</span>
+            <span class="astro-theme-context__resolved" />
+          </span>
+          <button
+            class="cf-theme-toggle"
+            type="button"
+            data-cf-theme-toggle
+            data-cf-theme-label-auto
+            aria-label="System theme. Switch to Light theme."
+          >
+            <span class="cf-theme-toggle__icon" aria-hidden="true" data-cf-theme-icon />
+            <span
+              class="cf-theme-toggle__label"
+              aria-hidden="true"
+              data-cf-theme-label
+              data-label-system="System theme"
+              data-label-light="Light theme"
+              data-label-dark="Dark theme"
+            />
+          </button>
+        </div>
+      </div>
+    )
+  }
+  {name === "ThemeScript" && <code>&lt;ThemeScript /&gt;</code>}
+  {
+    name === "ThemeToggle" && (
+      <button
+        class="cf-theme-toggle"
+        type="button"
+        data-cf-theme-toggle
+        data-cf-theme-label-auto
+        aria-label="System theme. Switch to Light theme."
+      >
+        <span class="cf-theme-toggle__icon" aria-hidden="true" data-cf-theme-icon />
+        <span
+          class="cf-theme-toggle__label"
+          aria-hidden="true"
+          data-cf-theme-label
+          data-label-system="System theme"
+          data-label-light="Light theme"
+          data-label-dark="Dark theme"
+        />
+      </button>
+    )
+  }
+  {
+    name === "SkipLink" && (
+      <div class="astro-skip-demo" tabindex="0">
+        <p class="cf-text" data-size="sm" data-tone="muted">
+          Focus this frame, then press Tab.
+        </p>
+        <div class="astro-skip-demo__stage">
+          <a class="cf-skip-link" href={`#${id}`}>
+            Skip to preview content
+          </a>
+          <p id={id} tabindex="-1">
+            Preview content target
+          </p>
+        </div>
+      </div>
+    )
+  }
+
+  {
+    name === "Heading" && (
+      <h3 class="cf-heading" data-size="2xl">
+        Content comes first.
+      </h3>
+    )
+  }
+  {
+    name === "Text" && (
+      <div class="cf-stack astro-preview-copy" data-gap="sm">
+        <p class="cf-text" data-size="lg">
+          Readable body text for long-form content.
+        </p>
+        <p class="cf-text" data-size="sm" data-tone="muted">
+          Supporting metadata stays quiet.
+        </p>
+      </div>
+    )
+  }
+  {
+    name === "Link" && (
+      <a class="cf-link" href="#installation">
+        Read the installation guide
+      </a>
+    )
+  }
+  {
+    name === "Prose" && (
+      <div class="cf-prose astro-preview-copy">
+        <h3>Long-form rhythm</h3>
+        <p>
+          Headings, paragraphs, links, and inline <code>code</code> share a comfortable reading measure.
+        </p>
+      </div>
+    )
+  }
+
+  {
+    name === "CodeBlock" && (
+      <div class="cf-code-block" data-language="typescript" data-copyable="true" data-cf-copy-scope>
+        <div class="cf-code-block__toolbar">
+          <span class="cf-code-block__language">typescript</span>
+          <button
+            class="cf-code-copy"
+            type="button"
+            data-cf-copy-button
+            data-copy-label="Copy"
+            data-copied-label="Copied"
+            data-copy-error-label="Try again"
+            data-copy-aria-label="Copy typescript code"
+            data-copied-aria-label="Code copied to clipboard"
+            aria-label="Copy typescript code"
+          >
+            <span data-cf-copy-label>Copy</span>
+          </button>
+        </div>
+        <pre class="cf-code-block__pre" role="region" aria-label="typescript code" tabindex="0">
+          <code data-cf-copy-source set:text={codeBlockExample} />
+        </pre>
+        <span class="cf-visually-hidden" aria-live="polite" data-cf-copy-status />
+      </div>
+    )
+  }
+  {
+    name === "TerminalCodeBlock" && (
+      <div class="cf-terminal-code-block" role="region" aria-label="Terminal">
+        <div class="cf-terminal-code-block__toolbar">
+          <span class="cf-terminal-code-block__label">Terminal</span>
+        </div>
+        <div class="cf-terminal-code-block__entries">
+          <div class="cf-terminal-code-block__entry" data-cf-copy-scope>
+            <div class="cf-terminal-code-block__command-row">
+              <span class="cf-terminal-code-block__prompt" aria-hidden="true">
+                $
+              </span>
+              <pre
+                class="cf-terminal-code-block__command"
+                set:html={renderBashCode(terminalEntries[0].command)}
+              />
+              <button
+                class="cf-code-copy"
+                type="button"
+                data-cf-copy-button
+                data-copy-label="Copy command"
+                data-copied-label="Copied"
+                data-copy-error-label="Try again"
+                data-copy-aria-label="Copy command 1"
+                data-copied-aria-label="Command 1 copied to clipboard"
+                aria-label="Copy command 1"
+              >
+                <span data-cf-copy-label>Copy command</span>
+              </button>
+            </div>
+            <pre
+              class="cf-terminal-code-block__output"
+              role="region"
+              tabindex="0"
+              aria-label="Command output 1"
+              set:html={renderTerminalOutput(terminalEntries[0].output)}
+            />
+            <span class="cf-visually-hidden" aria-live="polite" data-cf-copy-status />
+          </div>
+          <div class="cf-terminal-code-block__entry" data-cf-copy-scope>
+            <div class="cf-terminal-code-block__command-row">
+              <span class="cf-terminal-code-block__prompt" aria-hidden="true">
+                $
+              </span>
+              <pre
+                class="cf-terminal-code-block__command"
+                set:html={renderBashCode(terminalEntries[1].command)}
+              />
+              <button
+                class="cf-code-copy"
+                type="button"
+                data-cf-copy-button
+                data-copy-label="Copy command"
+                data-copied-label="Copied"
+                data-copy-error-label="Try again"
+                data-copy-aria-label="Copy command 2"
+                data-copied-aria-label="Command 2 copied to clipboard"
+                aria-label="Copy command 2"
+              >
+                <span data-cf-copy-label>Copy command</span>
+              </button>
+            </div>
+            <pre
+              class="cf-terminal-code-block__output"
+              role="region"
+              tabindex="0"
+              aria-label="Command output 2"
+              set:html={renderTerminalOutput(terminalEntries[1].output)}
+            />
+            <span class="cf-visually-hidden" aria-live="polite" data-cf-copy-status />
+          </div>
+        </div>
+      </div>
+    )
+  }
+  {
+    name === "Table" && (
+      <div
+        class="cf-table-container"
+        role="region"
+        aria-label="Package comparison"
+        tabindex="0"
+        style="--cf-table-min-width:28rem"
+      >
+        <table class="cf-table" data-density="compact" data-header-tone="strong" data-striped="true">
+          <thead>
+            <tr>
+              <>
+                <th scope="col">Package</th>
+                <th scope="col">Adapter</th>
+                <th scope="col">Status</th>
+              </>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <>
+                <th scope="row">CSS</th>
+                <td>Native</td>
+                <td>Ready</td>
+              </>
+            </tr>
+            <tr>
+              <>
+                <th scope="row">React</th>
+                <td>React 19</td>
+                <td>Ready</td>
+              </>
+            </tr>
+            <tr>
+              <>
+                <th scope="row">Svelte</th>
+                <td>Svelte 5</td>
+                <td>Ready</td>
+              </>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    )
+  }
+
+  {
+    name === "Container" && (
+      <div class="cf-container astro-preview-container" data-size="narrow">
+        <div class="cf-card" data-padding="sm" data-variant="outlined">
+          A centered, narrow content container.
+        </div>
+      </div>
+    )
+  }
+  {
+    name === "Section" && (
+      <section class="cf-section astro-preview-section" data-spacing="sm">
+        <header class="cf-section__header">
+          <p class="cf-section__eyebrow">Foundation</p>
+          <h3 class="cf-heading" data-size="xl">
+            A clear section
+          </h3>
+          <p class="cf-text" data-tone="muted">
+            Semantic page rhythm.
+          </p>
+        </header>
+        <p class="cf-text">Section content follows its optional header.</p>
+      </section>
+    )
+  }
+  {
+    name === "Stack" && (
+      <div class="cf-stack astro-preview-flow" data-gap="sm">
+        <span class="cf-badge">First</span>
+        <span class="cf-badge" data-tone="accent">
+          Second
+        </span>
+        <span class="cf-badge" data-tone="success">
+          Third
+        </span>
+      </div>
+    )
+  }
+  {
+    name === "Inline" && (
+      <div class="cf-inline astro-preview-flow" data-gap="sm" data-wrap="true">
+        <span class="cf-badge">One</span>
+        <span class="cf-badge" data-tone="accent">
+          Two
+        </span>
+        <span class="cf-badge" data-tone="success">
+          Three
+        </span>
+      </div>
+    )
+  }
+
+  {
+    name === "Button" && (
+      <div class="cf-inline" data-gap="sm" data-wrap="true">
+        <>
+          <button class="cf-button" type="button">
+            Primary
+          </button>
+          <button class="cf-button" type="button" data-variant="secondary">
+            Secondary
+          </button>
+          <button class="cf-button" type="button" data-variant="ghost">
+            Ghost
+          </button>
+          <button class="cf-button" type="button" data-variant="danger">
+            Danger
+          </button>
+          <button class="cf-button" type="button" data-size="sm">
+            Small
+          </button>
+          <button class="cf-button" type="button" data-size="lg">
+            Large
+          </button>
+          <button class="cf-button" type="button" data-loading="true" aria-busy="true" disabled>
+            <span class="cf-button__spinner" aria-hidden="true" />
+            <span class="cf-button__label">Loading</span>
+          </button>
+          <button class="cf-button" type="button" disabled>
+            Disabled
+          </button>
+        </>
+      </div>
+    )
+  }
+  {
+    name === "IconButton" && (
+      <div class="cf-inline" data-gap="sm">
+        <button class="cf-icon-button" type="button" aria-label="Add item">
+          <svg
+            class="cf-icon"
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            stroke-width="2"
+            stroke-linecap="round"
+            aria-hidden="true"
+          >
+            <path d="M5 12h14M12 5v14" />
+          </svg>
+        </button>
+        <button
+          class="cf-icon-button"
+          type="button"
+          data-loading="true"
+          aria-label="Loading item"
+          aria-busy="true"
+          disabled
+        >
+          <span class="cf-button__spinner" aria-hidden="true" />
+        </button>
+      </div>
+    )
+  }
+  {
+    name === "Field" && (
+      <div class="astro-preview-form-grid">
+        <div class="cf-field">
+          <label class="cf-field__label" for={`${id}-project`}>
+            Project name
+            <span class="cf-field__required" aria-hidden="true">
+              *
+            </span>
+          </label>
+          <input class="cf-input" id={`${id}-project`} value="cofob.dev" required />
+          <p class="cf-field__hint">Use a short, recognizable name.</p>
+        </div>
+        <div class="cf-field" data-invalid="true">
+          <label class="cf-field__label" for={`${id}-slug`}>
+            Slug
+          </label>
+          <input
+            class="cf-input"
+            id={`${id}-slug`}
+            value=""
+            aria-invalid="true"
+            aria-describedby={`${id}-slug-error`}
+          />
+          <p class="cf-field__error" id={`${id}-slug-error`} role="alert">
+            A slug is required.
+          </p>
+        </div>
+      </div>
+    )
+  }
+  {
+    name === "TextField" && (
+      <div class="cf-stack" data-gap="sm">
+        <label class="cf-field">
+          <span class="cf-field__label">Email</span>
+          <input class="cf-input" type="email" value="hello@cofob.dev" />
+          <span class="cf-field__hint">We only use this for replies.</span>
+        </label>
+        <label class="cf-field" data-invalid="true">
+          <span class="cf-field__label">Email with error</span>
+          <input class="cf-input" type="email" value="not-an-email" aria-invalid="true" />
+          <span class="cf-field__error" role="alert">
+            Enter a valid address.
+          </span>
+        </label>
+        <label class="cf-field">
+          <span class="cf-field__label">Disabled</span>
+          <input class="cf-input" type="email" value="locked@cofob.dev" disabled />
+        </label>
+      </div>
+    )
+  }
+  {
+    name === "Textarea" && (
+      <div class="astro-preview-form-grid">
+        <label class="cf-field">
+          <span class="cf-field__label">Note</span>
+          <textarea class="cf-textarea" rows="3" set:text="Content comes first." />
+          <span class="cf-field__hint">20 characters</span>
+        </label>
+        <label class="cf-field" data-invalid="true">
+          <span class="cf-field__label">Required summary</span>
+          <textarea class="cf-textarea" rows="2" aria-invalid="true" />
+          <span class="cf-field__error" role="alert">
+            A summary is required.
+          </span>
+        </label>
+        <label class="cf-field">
+          <span class="cf-field__label">Disabled</span>
+          <textarea class="cf-textarea" rows="2" disabled set:text="Unavailable" />
+        </label>
+      </div>
+    )
+  }
+  {
+    name === "Select" && (
+      <div class="astro-preview-form-grid">
+        <label class="cf-field">
+          <span class="cf-field__label">Theme preference</span>
+          <span class="cf-select" data-size="md">
+            <select value="system">
+              <option value="system">System</option>
+              <option value="light">Light</option>
+              <option value="dark">Dark</option>
+            </select>
+          </span>
+          <span class="cf-field__hint">Choose how the interface resolves color.</span>
+        </label>
+        <label class="cf-field" data-invalid="true">
+          <span class="cf-field__label">Invalid selection</span>
+          <span class="cf-select" data-size="md" data-invalid="true">
+            <select value="" aria-invalid="true">
+              <option value="" disabled selected>
+                Choose one
+              </option>
+              <option value="ready">Ready</option>
+            </select>
+          </span>
+          <span class="cf-field__error" role="alert">
+            Choose an available option.
+          </span>
+        </label>
+        <label class="cf-field">
+          <span class="cf-field__label">Disabled</span>
+          <span class="cf-select" data-size="md" data-disabled="true">
+            <select value="system" disabled>
+              <option value="system">System</option>
+            </select>
+          </span>
+        </label>
+      </div>
+    )
+  }
+  {
+    name === "Checkbox" && (
+      <div class="cf-stack" data-gap="sm">
+        <label class="cf-checkbox">
+          <input type="checkbox" checked />
+          <span class="cf-checkbox__control" aria-hidden="true" />
+          <span class="cf-checkbox__content">
+            <span class="cf-checkbox__label">Include drafts</span>
+            <span class="cf-checkbox__description">Show unpublished notes.</span>
+          </span>
+        </label>
+        <label class="cf-checkbox" data-disabled="true">
+          <input type="checkbox" disabled />
+          <span class="cf-checkbox__control" aria-hidden="true" />
+          <span class="cf-checkbox__content">
+            <span class="cf-checkbox__label">Unavailable option</span>
+          </span>
+        </label>
+      </div>
+    )
+  }
+  {
+    name === "Switch" && (
+      <div class="cf-stack" data-gap="sm">
+        <label class="cf-switch">
+          <input class="cf-switch__control" type="checkbox" role="switch" checked />
+          <span class="cf-switch__track" aria-hidden="true">
+            <span class="cf-switch__thumb" />
+          </span>
+          <span class="cf-switch__content">
+            <span class="cf-switch__label">Enable notifications</span>
+            <span class="cf-switch__description">Receive updates when a build finishes.</span>
+          </span>
+        </label>
+        <label class="cf-switch" data-disabled="true">
+          <input class="cf-switch__control" type="checkbox" role="switch" checked disabled />
+          <span class="cf-switch__track" aria-hidden="true">
+            <span class="cf-switch__thumb" />
+          </span>
+          <span class="cf-switch__content">
+            <span class="cf-switch__label">Managed by your organization</span>
+          </span>
+        </label>
+      </div>
+    )
+  }
+  {
+    name === "Captcha" && (
+      <div class="astro-captcha-grid">
+        <NativeCaptcha state="idle" />
+        <NativeCaptcha state="verifying" />
+        <NativeCaptcha state="success" />
+        <NativeCaptcha state="error" />
+        <NativeCaptcha state="idle" disabled />
+      </div>
+    )
+  }
+
+  {
+    name === "Badge" && (
+      <div class="cf-inline" data-gap="sm" data-wrap="true">
+        <>
+          <span class="cf-badge">Neutral</span>
+          <span class="cf-badge" data-tone="accent">
+            Accent
+          </span>
+          <span class="cf-badge" data-tone="info">
+            Info
+          </span>
+          <span class="cf-badge" data-tone="success">
+            Success
+          </span>
+          <span class="cf-badge" data-tone="warning">
+            Warning
+          </span>
+          <span class="cf-badge" data-tone="danger">
+            Danger
+          </span>
+        </>
+      </div>
+    )
+  }
+  {
+    name === "Tag" && (
+      <div class="cf-inline astro-preview-flow" data-gap="sm" data-wrap="true">
+        <span class="cf-tag" data-tone="neutral">
+          taxonomy
+        </span>
+        <span class="cf-tag" data-tone="accent">
+          <span class="cf-tag__label">design systems</span>
+          <button class="cf-tag__remove" type="button" aria-label="Remove design systems tag">
+            ×
+          </button>
+        </span>
+      </div>
+    )
+  }
+  {
+    name === "Alert" && (
+      <div class="cf-stack" data-gap="sm">
+        <>
+          <aside class="cf-alert" data-tone="info">
+            <div class="cf-alert__content">
+              <strong class="cf-alert__title">Note</strong>
+              <p class="cf-alert__description">Shared contract.</p>
+            </div>
+          </aside>
+          <aside class="cf-alert" data-tone="success">
+            <div class="cf-alert__content">
+              <strong class="cf-alert__title">Saved</strong>
+              <p class="cf-alert__description">The update is live.</p>
+            </div>
+            <button class="cf-alert__dismiss" type="button" aria-label="Dismiss saved alert">
+              <span aria-hidden="true">×</span>
+            </button>
+          </aside>
+          <aside class="cf-alert" data-tone="warning">
+            <div class="cf-alert__content">
+              <strong class="cf-alert__title">Review</strong>
+              <p class="cf-alert__description">Check this value.</p>
+            </div>
+          </aside>
+          <aside class="cf-alert" data-tone="danger">
+            <div class="cf-alert__content">
+              <strong class="cf-alert__title">Failed</strong>
+              <p class="cf-alert__description">Try again.</p>
+            </div>
+          </aside>
+        </>
+      </div>
+    )
+  }
+  {
+    name === "Card" && (
+      <div class="astro-preview-card-grid">
+        <article class="cf-card" data-padding="sm" data-variant="default">
+          <strong>Default</strong>
+          <p>Quiet structure.</p>
+        </article>
+        <article class="cf-card" data-padding="sm" data-variant="elevated">
+          <strong>Elevated</strong>
+          <p>Raised context.</p>
+        </article>
+        <article class="cf-card" data-padding="sm" data-variant="outlined">
+          <strong>Outlined</strong>
+          <p>Defined boundary.</p>
+        </article>
+        <a class="cf-card" data-padding="sm" data-variant="interactive" href="#interactive-card">
+          <strong>Interactive</strong>
+          <p>Linked surface.</p>
+        </a>
+      </div>
+    )
+  }
+  {
+    name === "EmptyState" && (
+      <div class="cf-empty-state">
+        <h2 class="cf-empty-state__title">No posts yet</h2>
+        <p class="cf-empty-state__description">Publish the first note when it is ready.</p>
+        <div class="cf-empty-state__action">
+          <button class="cf-button" type="button" data-size="sm">
+            Create a post
+          </button>
+        </div>
+      </div>
+    )
+  }
+
+  {
+    name === "Pagination" && (
+      <nav class="cf-pagination" aria-label="Pagination">
+        <button class="cf-pagination__link" type="button">
+          Previous
+        </button>
+        <button class="cf-pagination__link" type="button" aria-label="Page 1">
+          1
+        </button>
+        <button class="cf-pagination__link" type="button" aria-label="Page 2" aria-current="page">
+          2
+        </button>
+        <button class="cf-pagination__link" type="button" aria-label="Page 3">
+          3
+        </button>
+        <button class="cf-pagination__link" type="button">
+          Next
+        </button>
+      </nav>
+    )
+  }
+  {
+    name === "Dialog" && (
+      <div>
+        <>
+          <button class="cf-button" type="button" data-variant="secondary" data-cf-dialog-trigger={id}>
+            Open dialog
+          </button>
+          <dialog class="cf-dialog" id={id}>
+            <div class="cf-dialog__surface">
+              <header class="cf-dialog__header">
+                <div>
+                  <h3 class="cf-dialog__title">Confirm change</h3>
+                  <p class="cf-dialog__description">Review the details before continuing.</p>
+                </div>
+                <button class="cf-dialog__close" type="button" data-cf-dialog-close aria-label="Close dialog">
+                  <span aria-hidden="true">×</span>
+                </button>
+              </header>
+              <div class="cf-dialog__body">
+                <p class="cf-text">This uses the platform dialog element.</p>
+              </div>
+              <footer class="cf-dialog__footer">
+                <button class="cf-button" type="button" data-variant="secondary" data-cf-dialog-close>
+                  Cancel
+                </button>
+                <button class="cf-button" type="button" data-cf-dialog-close>
+                  Confirm
+                </button>
+              </footer>
+            </div>
+          </dialog>
+        </>
+      </div>
+    )
+  }
+  {
+    name === "Popover" && (
+      <div>
+        <>
+          <button class="cf-button" type="button" data-variant="secondary" data-cf-popover-trigger={id}>
+            Open popover
+          </button>
+          <div class="cf-popover" id={id} popover="auto" data-cf-popover>
+            <div class="cf-stack" data-gap="sm">
+              <strong>Semantic details</strong>
+              <span class="cf-text" data-size="sm">
+                Helpful contextual content.
+              </span>
+            </div>
+          </div>
+        </>
+      </div>
+    )
+  }
+  {
+    name === "DropdownMenu" && (
+      <div>
+        <>
+          <button class="cf-button" type="button" data-variant="secondary" data-cf-menu-trigger={id}>
+            Actions
+          </button>
+          <div class="cf-menu" id={id} popover="auto" role="menu" data-cf-menu>
+            <>
+              <button class="cf-menu__item" type="button" role="menuitem">
+                Edit
+              </button>
+              <button class="cf-menu__item" type="button" role="menuitem">
+                Duplicate
+              </button>
+              <button class="cf-menu__item" type="button" role="menuitem" data-tone="danger">
+                Archive
+              </button>
+              <button class="cf-menu__item" type="button" role="menuitem" disabled aria-disabled="true">
+                Unavailable
+              </button>
+            </>
+          </div>
+        </>
+      </div>
+    )
+  }
+  {
+    name === "Tabs" && (
+      <div class="cf-tabs" data-cf-tabs>
+        <>
+          <div role="tablist">
+            <>
+              <button type="button" role="tab" aria-selected="true" aria-controls={`${id}-one`}>
+                Overview
+              </button>
+              <button type="button" role="tab" aria-selected="false" aria-controls={`${id}-two`}>
+                React
+              </button>
+              <button type="button" role="tab" aria-selected="false" aria-controls={`${id}-three`}>
+                Svelte
+              </button>
+            </>
+          </div>
+          <div role="tabpanel" id={`${id}-one`}>
+            A shared semantic class contract.
+          </div>
+          <div role="tabpanel" id={`${id}-two`} hidden>
+            Typed React adapters.
+          </div>
+          <div role="tabpanel" id={`${id}-three`} hidden>
+            Svelte 5 adapter.
+          </div>
+        </>
+      </div>
+    )
+  }
+  {
+    name === "Accordion" && (
+      <div class="cf-accordion" data-cf-accordion>
+        <>
+          <details class="cf-accordion__item" open>
+            <>
+              <summary class="cf-accordion__trigger">
+                What is shared?
+                <span class="cf-accordion__icon" aria-hidden="true" />
+              </summary>
+              <p class="cf-accordion__content">Tokens, classes, states, and behavior.</p>
+            </>
+          </details>
+          <details class="cf-accordion__item">
+            <>
+              <summary class="cf-accordion__trigger">
+                Which frameworks?
+                <span class="cf-accordion__icon" aria-hidden="true" />
+              </summary>
+              <p class="cf-accordion__content">Native, React, and Svelte.</p>
+            </>
+          </details>
+        </>
+      </div>
+    )
+  }
+  {
+    name === "Tooltip" && (
+      <span class="cf-tooltip-root">
+        <button
+          class="cf-icon-button"
+          type="button"
+          aria-label="More information"
+          aria-describedby={id}
+          data-cf-tooltip-trigger={id}
+          data-cf-tooltip-click={id}
+        >
+          ?
+        </button>
+        <span class="cf-tooltip" role="tooltip" id={id} data-cf-tooltip data-cf-tooltip-delay="1000">
+          More information
+        </span>
+      </span>
+    )
+  }
+  {
+    name === "ToastProvider" && (
+      <div>
+        <button
+          class="cf-button"
+          type="button"
+          data-cf-toast-trigger={`${id}-viewport`}
+          data-toast-title="Saved"
+          data-toast-description="Your preferences are up to date."
+          data-toast-tone="success"
+        >
+          Show toast
+        </button>
+        <div
+          id={`${id}-viewport`}
+          class="cf-toast-viewport"
+          data-position="bottom-right"
+          data-cf-toast-viewport
+        />
+      </div>
+    )
+  }
+  {
+    name === "ToastViewport" && (
+      <div>
+        <button
+          class="cf-button"
+          type="button"
+          data-cf-toast-trigger={`${id}-viewport`}
+          data-toast-title="Saved"
+          data-toast-description="Your preferences are up to date."
+          data-toast-tone="success"
+        >
+          Show toast
+        </button>
+        <div
+          id={`${id}-viewport`}
+          class="cf-toast-viewport"
+          data-position="bottom-right"
+          data-cf-toast-viewport
+        />
+      </div>
+    )
+  }
+
+  {
+    name === "BlueLine" && (
+      <h3 class="cf-heading astro-blue-line-preview" data-level="3" data-size="xl">
+        Hello,{" "}
+        <span class="cf-blue-line" data-animate="true">
+          <span class="cf-blue-line__content">cofob.dev.</span>
+        </span>
+      </h3>
+    )
+  }
+  {
+    name === "Navbar" && (
+      <nav
+        class="cf-navbar"
+        data-cf-navbar
+        data-collapse-at="mobile"
+        data-menu-variant="floating"
+        data-surface="solid"
+        data-state="closed"
+      >
+        <a class="cf-navbar__brand" href="#home" aria-label="cofob home">
+          <span class="cf-blue-line">
+            <span class="cf-blue-line__content">cofob</span>
+          </span>
+        </a>
+        <details class="cf-navbar__mobile" data-cf-navbar-disclosure>
+          <summary class="cf-navbar__menu-trigger" data-cf-navbar-trigger aria-expanded="false">
+            <span class="cf-navbar__menu-icon" aria-hidden="true" />
+            <span class="cf-visually-hidden">Menu</span>
+          </summary>
+        </details>
+        <div class="cf-navbar__navigation" data-cf-navbar-panel>
+          <ul class="cf-navbar__links">
+            <li>
+              <a class="cf-navbar__link" href="#blog" aria-current="page">
+                Blog
+              </a>
+            </li>
+            <li>
+              <a class="cf-navbar__link" href="#pgp">
+                PGP
+              </a>
+            </li>
+          </ul>
+        </div>
+      </nav>
+    )
+  }
+  {
+    name === "Footer" && (
+      <footer class="cf-footer">
+        <div class="cf-footer__main">
+          <div class="cf-footer__brand">
+            <strong>cofob.</strong>
+            <p>Independent notes and software.</p>
+          </div>
+          <nav class="cf-footer__group" aria-label="Explore">
+            <h2>Explore</h2>
+            <ul>
+              <li>
+                <a href="#rss">RSS</a>
+              </li>
+              <li>
+                <a href="#license">License</a>
+              </li>
+            </ul>
+          </nav>
+        </div>
+        <div class="cf-footer__meta">
+          <p>© cofob 2021–2026</p>
+          <a href="#license">License</a>
+        </div>
+      </footer>
+    )
+  }
+  {
+    name === "PostCard" && (
+      <article class="cf-post-card">
+        <div class="cf-post-card__content">
+          <>
+            <p class="cf-post-card__meta">
+              <span>
+                Published <time datetime="2026-07-19">19 July 2026</time>
+              </span>
+              <span>4 min read</span>
+            </p>
+            <h2 class="cf-post-card__title">
+              <a href="#post">Building a calmer interface</a>
+            </h2>
+            <p class="cf-post-card__excerpt">A practical note about content-first design.</p>
+            <div class="cf-post-card__tags">
+              <>
+                <span class="cf-tag">design</span>
+                <span class="cf-tag">css</span>
+              </>
+            </div>
+          </>
+        </div>
+      </article>
+    )
+  }
+  {
+    name === "LatestPostCard" && (
+      <article class="cf-latest-post-card">
+        <div class="cf-latest-post-card__content">
+          <p class="cf-latest-post-card__eyebrow">Latest post</p>
+          <h2 class="cf-latest-post-card__title">
+            <a href="#post">Building a calmer interface</a>
+          </h2>
+          <p class="cf-latest-post-card__description">A practical note about content-first design.</p>
+          <p class="cf-latest-post-card__meta">
+            <>
+              <time datetime="2026-07-19">19 July 2026</time>
+              <span class="cf-post-meta__separator" aria-hidden="true">
+                ·
+              </span>
+            </>
+            4 min read
+          </p>
+          <a class="cf-link" href="#post">
+            Read article <span aria-hidden="true">→</span>
+          </a>
+        </div>
+      </article>
+    )
+  }
+  {
+    name === "SearchResultCard" && (
+      <article class="cf-search-result-card" data-query="design">
+        <p class="cf-search-result-card__meta">
+          <>
+            <time datetime="2026-07-19">19 July 2026</time>
+            <span class="cf-post-meta__separator" aria-hidden="true">
+              ·
+            </span>
+          </>
+          4 min read
+        </p>
+        <h2 class="cf-search-result-card__title">
+          <a href="#post">Building a calmer interface</a>
+        </h2>
+        <p class="cf-search-result-card__description">
+          A practical note about content-first <mark>design</mark>.
+        </p>
+      </article>
+    )
+  }
+  {
+    name === "ResponsiveImage" && (
+      <figure class="cf-responsive-image" data-has-dark-image="true">
+        <span class="cf-responsive-image__media">
+          <img
+            class="cf-responsive-image__light"
+            src={lightImage}
+            alt="Abstract blue geometric landscape"
+            width="640"
+            height="360"
+          />
+          <img
+            class="cf-responsive-image__dark"
+            src={darkImage}
+            alt="Abstract blue geometric landscape at night"
+            width="640"
+            height="360"
+          />
+        </span>
+        <figcaption>A responsive image with intrinsic dimensions.</figcaption>
+      </figure>
+    )
+  }
+  {
+    name === "ChatThread" && (
+      <ol class="cf-chat-thread" aria-label="Conversation">
+        <li class="cf-chat__row">
+          <span class="cf-chat__avatar" aria-hidden="true">
+            C
+          </span>
+          <div class="cf-chat__message">
+            <p class="cf-chat__author">
+              <>
+                <strong>cofob</strong>
+                <time datetime="19:19">19:19</time>
+              </>
+            </p>
+            <div class="cf-chat__bubble">Ship the semantic contract first.</div>
+          </div>
+        </li>
+        <li class="cf-chat__row" data-own="true">
+          <span class="cf-chat__avatar" aria-hidden="true">
+            R
+          </span>
+          <div class="cf-chat__message">
+            <p class="cf-chat__author">
+              <>
+                <strong>reader</strong>
+                <time datetime="19:20">19:20</time>
+              </>
+            </p>
+            <div class="cf-chat__bubble">Then every adapter stays aligned.</div>
+          </div>
+        </li>
+      </ol>
+    )
+  }
+  {
+    name === "Sticker" && (
+      <div class="astro-sticker-preview">
+        <span
+          class="cf-sticker"
+          data-tone="accent"
+          style="--cf-sticker-rotation:-3deg"
+          role="img"
+          aria-label="Blue fox sticker from cofob.dev"
+        >
+          🦊 cofob.dev
+        </span>
+        <figure class="astro-sticker-figure">
+          <span class="cf-sticker" data-tone="neutral" data-image="true" style="--cf-sticker-rotation:3deg">
+            <img
+              src="/stickers/fox_pack/ya_ahuenen.webp"
+              alt="A fox looking pleased with itself beneath the Russian caption ‘Как же я хорош’"
+              width="192"
+              height="192"
+              loading="lazy"
+              decoding="async"
+            />
+          </span>
+          <figcaption>
+            Source:{" "}
+            <a href="https://t.me/addstickers/PhSilver" target="_blank" rel="noopener noreferrer">
+              PhSilver sticker pack
+            </a>
+          </figcaption>
+        </figure>
+      </div>
+    )
+  }
+</div>

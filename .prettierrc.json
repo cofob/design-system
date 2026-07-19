@@ -1,0 +1,8 @@
+{
+  "plugins": ["prettier-plugin-svelte", "prettier-plugin-astro"],
+  "printWidth": 110,
+  "tabWidth": 2,
+  "useTabs": false,
+  "semi": true,
+  "singleQuote": false
+}

@@ -1,0 +1,23 @@
+{
+  "name": "@cofob/example-vanilla",
+  "version": "0.0.0",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "build": "vite build",
+    "typecheck": "tsc --noEmit"
+  },
+  "dependencies": {
+    "@cofob/design-system-css": "0.1.0",
+    "lucide": "^0.545.0"
+  },
+  "devDependencies": {
+    "autoprefixer": "^10.4.21",
+    "postcss": "^8.5.6",
+    "postcss-custom-media": "^11.0.6",
+    "postcss-import": "^16.1.1",
+    "postcss-nesting": "^13.0.2",
+    "typescript": "^6.0.3",
+    "vite": "^8.1.4"
+  }
+}

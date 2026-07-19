@@ -1,0 +1,76 @@
+---
+import Layout from "../layouts/Layout.astro";
+import PageHeader from "../components/PageHeader.astro";
+import CodeBlock from "../components/CodeBlock.astro";
+import TerminalCodeBlock from "../components/TerminalCodeBlock.astro";
+
+const authSnippet = `@cofob:registry=https://npm.pkg.github.com
+//npm.pkg.github.com/:_authToken=\${GITHUB_PACKAGES_TOKEN}`;
+const nativeSnippet = `import "@cofob/design-system-css/index.css";
+import { initDesignSystem } from "@cofob/design-system-css";
+
+initDesignSystem(document);`;
+const reactSnippet = `import "@cofob/design-system-css/index.css";
+import { Button, ThemeProvider } from "@cofob/design-system-react";`;
+const svelteSnippet = `<script>
+  import "@cofob/design-system-css/index.css";
+  import { Button, ThemeProvider } from "@cofob/design-system-svelte";
+</script>`;
+const granularSnippet = `@import "@cofob/design-system-css/tokens.css";
+@import "@cofob/design-system-css/fonts.css";
+@import "@cofob/design-system-css/base.css";
+@import "@cofob/design-system-css/components.css";`;
+---
+
+<Layout title="Installation" description="Install the cofob design system from GitHub Packages.">
+  <PageHeader
+    eyebrow="Installation"
+    title="Start with the shared CSS contract."
+    description="Packages are public on GitHub Packages, which still requires registry authentication for npm clients."
+  />
+
+  <div class="cf-prose astro-doc-content">
+    <h2>Authenticate npm</h2>
+    <p>
+      Create a classic GitHub token with <code>read:packages</code>, then keep the token in your user-level
+      configuration or environment—not in the repository.
+    </p>
+    <CodeBlock code={authSnippet} lang="ini" label="npm registry configuration" />
+
+    <h2>Native CSS and controllers</h2>
+    <TerminalCodeBlock
+      entries={[{ command: "npm install @cofob/design-system-css lucide" }]}
+      label="Native installation"
+    />
+    <CodeBlock code={nativeSnippet} lang="typescript" label="Native setup" />
+
+    <h2>React</h2>
+    <TerminalCodeBlock
+      entries={[{ command: "npm install @cofob/design-system-react @cofob/design-system-css lucide-react" }]}
+      label="React installation"
+    />
+    <CodeBlock code={reactSnippet} lang="tsx" label="React setup" />
+
+    <h2>Svelte and SvelteKit</h2>
+    <TerminalCodeBlock
+      entries={[
+        { command: "npm install @cofob/design-system-svelte @cofob/design-system-css @lucide/svelte" },
+      ]}
+      label="Svelte installation"
+    />
+    <CodeBlock code={svelteSnippet} lang="svelte" label="Svelte setup" />
+
+    <h2>Granular CSS</h2>
+    <CodeBlock code={granularSnippet} lang="css" label="Granular CSS imports" />
+
+    <div class="cf-alert" data-tone="info">
+      <div class="cf-alert__content">
+        <strong class="cf-alert__title">CSS is included explicitly</strong>
+        <p class="cf-alert__description">
+          The packages publish complete standards-based CSS and a PostCSS authoring entry. Import the full
+          stylesheet or the granular entries once at the application boundary.
+        </p>
+      </div>
+    </div>
+  </div>
+</Layout>

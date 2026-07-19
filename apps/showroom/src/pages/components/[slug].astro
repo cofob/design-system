@@ -1,0 +1,151 @@
+---
+import type { GetStaticPaths } from "astro";
+import FrameworkPreview from "../../components/FrameworkPreview.astro";
+import CodeBlock from "../../components/CodeBlock.astro";
+import Table from "../../components/Table.astro";
+import CaptchaInteractiveDemo from "../../components/CaptchaInteractiveDemo.astro";
+import { getComponentContract, getComponentExample } from "../../data/component-contracts";
+import groups from "../../data/components.json";
+import Layout from "../../layouts/Layout.astro";
+
+export const getStaticPaths = (() =>
+  groups.flatMap((group) =>
+    group.components.map((component) => ({
+      params: { slug: component.name.replaceAll(/([a-z0-9])([A-Z])/g, "$1-$2").toLowerCase() },
+      props: { component, category: group.category },
+    })),
+  )) satisfies GetStaticPaths;
+
+interface Props {
+  component: { name: string; description: string; interactive: boolean };
+  category: string;
+}
+
+const { component, category } = Astro.props;
+const contract = getComponentContract(component.name);
+const reactExample = getComponentExample(component.name, "react", component.interactive);
+const svelteExample = getComponentExample(component.name, "svelte", component.interactive);
+const htmlExample = getComponentExample(component.name, "html", component.interactive);
+---
+
+<Layout title={component.name} description={component.description}>
+  <p><a class="cf-link" href="/components/">← All components</a></p>
+  <header class="astro-hero">
+    <p class="astro-eyebrow">{category}</p>
+    <h1>
+      <span class="cf-blue-line"><span class="cf-blue-line__content">{component.name}</span></span>
+    </h1>
+    <p>{component.description}</p>
+  </header>
+
+  <div class="astro-detail-grid">
+    <section>
+      <h2>Live example</h2>
+      <FrameworkPreview name={component.name} />
+      {
+        component.name === "Captcha" && (
+          <>
+            <h2>Interactive simulation</h2>
+            <CaptchaInteractiveDemo />
+          </>
+        )
+      }
+      {
+        component.name === "Captcha" && (
+          <div class="cf-alert" data-tone="info">
+            <div class="cf-alert__content">
+              <strong class="cf-alert__title">Presentation only</strong>
+              <p class="cf-alert__description">
+                The state and motion contract is informed by the official{" "}
+                <a class="cf-link" href="https://github.com/tiagozip/cap">
+                  Cap widget
+                </a>{" "}
+                (Apache-2.0). This component includes no proof-of-work, network, worker, or token logic.
+              </p>
+            </div>
+          </div>
+        )
+      }
+      <h2>Usage</h2>
+      <p class="astro-section-intro">
+        Each example includes the complete adapter-specific parameter reference. Copy it as a starting point,
+        then remove options your use case does not need.
+      </p>
+      <h3>React</h3>
+      <CodeBlock code={reactExample} lang="tsx" label={`${component.name} React usage`} copyable />
+      <h3>Svelte</h3>
+      <CodeBlock code={svelteExample} lang="svelte" label={`${component.name} Svelte usage`} copyable />
+      <h3>HTML</h3>
+      <CodeBlock code={htmlExample} lang="html" label={`${component.name} HTML usage`} copyable />
+    </section>
+    <aside>
+      <h2>Contract</h2>
+      <Table label={`${component.name} contract`} minWidth="0" density="compact">
+        <tbody>
+          <tr><th scope="row">CSS selector</th><td><code>{contract.selector}</code></td></tr>
+          <tr><th scope="row">Adapters</th><td>Native · React · Svelte</td></tr>
+          <tr><th scope="row">Primary props</th><td>{contract.props.join(" · ")}</td></tr>
+          <tr><th scope="row">Documented states</th><td>{contract.states.join(" · ")}</td></tr>
+          <tr
+            ><th scope="row">Interaction</th><td
+              >{component.interactive ? "Shared controller or native behavior" : "Static and SSR-safe"}</td
+            ></tr
+          >
+          <tr><th scope="row">Theme</th><td>Semantic light and dark tokens</td></tr>
+        </tbody>
+      </Table>
+      <div class="cf-alert" data-tone="info">
+        <div class="cf-alert__content">
+          <strong class="cf-alert__title">Composition</strong>
+          <p class="cf-alert__description">
+            Native attributes and framework props are forwarded. Add custom classes without replacing the
+            semantic contract.
+          </p>
+        </div>
+      </div>
+    </aside>
+  </div>
+
+  <section class="astro-parameter-section" aria-labelledby="parameters-heading">
+    <h2 id="parameters-heading">Parameters</h2>
+    <p class="astro-section-intro">
+      Adapter differences are explicit. Native element attributes are forwarded in React and Svelte and can be
+      written directly in HTML.
+    </p>
+    <Table label={`${component.name} parameters`} minWidth="78rem" class="astro-parameter-table">
+      <thead>
+        <tr>
+          <th scope="col">Parameter</th>
+          <th scope="col">Type</th>
+          <th scope="col">Default</th>
+          <th scope="col">Adapters</th>
+          <th scope="col">Example</th>
+          <th scope="col">Description</th>
+        </tr>
+      </thead>
+      <tbody>
+        {
+          contract.parameters.map((parameter) => (
+            <tr>
+              <th scope="row">
+                <code>{parameter.name}</code>
+                {parameter.required && <span class="astro-required">required</span>}
+              </th>
+              <td>
+                <code>{parameter.type}</code>
+              </td>
+              <td>
+                <code>{parameter.defaultValue}</code>
+              </td>
+              <td>{parameter.adapters.join(" · ")}</td>
+              <td>
+                <code>{parameter.example}</code>
+              </td>
+              <td>{parameter.description}</td>
+            </tr>
+          ))
+        }
+      </tbody>
+    </Table>
+  </section>
+</Layout>

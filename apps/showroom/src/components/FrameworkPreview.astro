@@ -1,0 +1,130 @@
+---
+import NativePreview from "./NativePreview.astro";
+import { ReactComponentPreview } from "./ReactComponentPreview";
+import SvelteComponentPreview from "./SvelteComponentPreview.svelte";
+
+interface Props {
+  name: string;
+  description?: string;
+  compact?: boolean;
+  linkHref?: string;
+}
+
+const { name, description, compact = false, linkHref } = Astro.props;
+const slug = name.replaceAll(/([a-z0-9])([A-Z])/g, "$1-$2").toLowerCase();
+const id = `framework-preview-${slug}`;
+---
+
+<section
+  class:list={["astro-framework-preview", compact && "astro-framework-preview-compact"]}
+  data-framework-preview
+  aria-label={compact ? `${name} implementations` : undefined}
+>
+  <div class="astro-framework-tabs" role="tablist" aria-label={`${name} implementation`}>
+    {
+      ["native", "react", "svelte"].map((adapter, index) => (
+        <button
+          class="cf-button"
+          data-variant={index === 0 ? "primary" : "ghost"}
+          data-size="sm"
+          type="button"
+          role="tab"
+          id={`${id}-tab-${adapter}`}
+          aria-controls={`${id}-panel-${adapter}`}
+          aria-selected={index === 0 ? "true" : "false"}
+          tabindex={index === 0 ? 0 : -1}
+          data-framework-tab={adapter}
+        >
+          {adapter[0]?.toUpperCase() + adapter.slice(1)}
+        </button>
+      ))
+    }
+  </div>
+
+  {
+    compact && (
+      <>
+        <h3>{name}</h3>
+        {description && <p>{description}</p>}
+      </>
+    )
+  }
+
+  <div
+    class="astro-framework-panel"
+    id={`${id}-panel-native`}
+    role="tabpanel"
+    aria-labelledby={`${id}-tab-native`}
+    data-framework-panel="native"
+  >
+    <NativePreview {name} {compact} />
+  </div>
+  <div
+    class="astro-framework-panel"
+    id={`${id}-panel-react`}
+    role="tabpanel"
+    aria-labelledby={`${id}-tab-react`}
+    data-framework-panel="react"
+    hidden
+  >
+    <div class:list={["astro-demo", compact && "astro-demo-compact"]}>
+      <ReactComponentPreview {name} client:idle={{ timeout: 1500 }} />
+    </div>
+  </div>
+  <div
+    class="astro-framework-panel"
+    id={`${id}-panel-svelte`}
+    role="tabpanel"
+    aria-labelledby={`${id}-tab-svelte`}
+    data-framework-panel="svelte"
+    hidden
+  >
+    <div class:list={["astro-demo", compact && "astro-demo-compact"]}>
+      <SvelteComponentPreview {name} client:idle={{ timeout: 1500 }} />
+    </div>
+  </div>
+  {
+    compact && linkHref && (
+      <a href={linkHref} aria-label={`${name} API and examples`}>
+        API and examples →
+      </a>
+    )
+  }
+</section>
+
+<script>
+  const adapters = ["native", "react", "svelte"];
+
+  for (const preview of document.querySelectorAll<HTMLElement>("[data-framework-preview]")) {
+    if (preview.dataset.initialized === "true") continue;
+    preview.dataset.initialized = "true";
+    const tabs = Array.from(preview.querySelectorAll<HTMLButtonElement>("[data-framework-tab]"));
+    const panels = Array.from(preview.querySelectorAll<HTMLElement>("[data-framework-panel]"));
+
+    const select = (adapter: string, focus = false) => {
+      for (const tab of tabs) {
+        const selected = tab.dataset.frameworkTab === adapter;
+        tab.setAttribute("aria-selected", String(selected));
+        tab.tabIndex = selected ? 0 : -1;
+        tab.dataset.variant = selected ? "primary" : "ghost";
+        if (selected && focus) tab.focus();
+      }
+      for (const panel of panels) panel.hidden = panel.dataset.frameworkPanel !== adapter;
+    };
+
+    for (const tab of tabs) {
+      tab.addEventListener("click", () => select(tab.dataset.frameworkTab ?? "native"));
+      tab.addEventListener("keydown", (event) => {
+        const current = adapters.indexOf(tab.dataset.frameworkTab ?? "native");
+        let next = current;
+        if (event.key === "ArrowRight") next = (current + 1) % adapters.length;
+        else if (event.key === "ArrowLeft") next = (current - 1 + adapters.length) % adapters.length;
+        else if (event.key === "Home") next = 0;
+        else if (event.key === "End") next = adapters.length - 1;
+        else return;
+        event.preventDefault();
+        select(adapters[next] ?? "native", true);
+      });
+    }
+  }
+</script>

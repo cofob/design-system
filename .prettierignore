@@ -1,0 +1,10 @@
+node_modules
+dist
+.astro
+.svelte-kit
+build
+coverage
+playwright-report
+test-results
+package-lock.json
+packages/design-system-css/src/fonts/*.woff2

@@ -1,0 +1,1393 @@
+{
+  "packages": [
+    {
+      "id": "css",
+      "name": "@cofob/design-system-css",
+      "label": "CSS and vanilla",
+      "description": "Semantic CSS, browser-safe theme utilities, and framework-independent interaction controllers.",
+      "entrypoints": [
+        {
+          "specifier": ".",
+          "kind": "JavaScript",
+          "summary": "All controllers, theme helpers, and shared types."
+        },
+        {
+          "specifier": "./types",
+          "kind": "TypeScript",
+          "summary": "Shared model and primitive types without runtime exports."
+        },
+        {
+          "specifier": "./index.css",
+          "kind": "CSS",
+          "summary": "Compiled full stylesheet: tokens, fonts, base, and components."
+        },
+        {
+          "specifier": "./tokens.css",
+          "kind": "CSS",
+          "summary": "Semantic tokens and light, dark, and system theme values."
+        },
+        { "specifier": "./fonts.css", "kind": "CSS", "summary": "Bundled Manrope font-face declarations." },
+        {
+          "specifier": "./base.css",
+          "kind": "CSS",
+          "summary": "Baseline document, focus, motion, and forced-colors rules."
+        },
+        {
+          "specifier": "./components.css",
+          "kind": "CSS",
+          "summary": "Public cf-* component class contract."
+        },
+        {
+          "specifier": "./postcss",
+          "kind": "PostCSS",
+          "summary": "Authoring entry with imports for a consumer PostCSS pipeline."
+        },
+        {
+          "specifier": "./postcss.css",
+          "kind": "PostCSS",
+          "summary": "Explicit-file alias of the PostCSS authoring entry."
+        },
+        {
+          "specifier": "./font/manrope.woff2",
+          "kind": "Font",
+          "summary": "Bundled Manrope variable WOFF2 asset."
+        }
+      ],
+      "groups": [
+        {
+          "title": "Initialization",
+          "description": "Initialize every matching controller below a document, element, or shadow root in one pass.",
+          "items": [
+            {
+              "name": "initDesignSystem",
+              "kind": "function",
+              "signature": "initDesignSystem(root?: DesignSystemRoot | null): DesignSystemController",
+              "summary": "Initializes theme, interaction controllers, and theme toggles and returns one cleanup handle.",
+              "entrypoints": ["."]
+            },
+            {
+              "name": "DesignSystemController",
+              "kind": "interface",
+              "signature": "interface DesignSystemController extends Controller { theme: ThemeController }",
+              "summary": "Combined controller returned by initDesignSystem.",
+              "entrypoints": ["."]
+            }
+          ]
+        },
+        {
+          "title": "Theme runtime",
+          "description": "Resolve, apply, persist, and bootstrap the light, dark, or system preference without import-time browser access.",
+          "items": [
+            {
+              "name": "THEME_STORAGE_KEY",
+              "kind": "constant",
+              "signature": "const THEME_STORAGE_KEY = \"cf-theme\"",
+              "summary": "Default localStorage key used by every theme implementation.",
+              "entrypoints": ["."]
+            },
+            {
+              "name": "resolveThemePreference",
+              "kind": "function",
+              "signature": "resolveThemePreference(preference, systemDark): ResolvedTheme",
+              "summary": "Purely resolves a preference against the system dark-mode state.",
+              "entrypoints": ["."]
+            },
+            {
+              "name": "applyThemePreference",
+              "kind": "function",
+              "signature": "applyThemePreference(root, preference, systemDark): ThemeState",
+              "summary": "Writes resolved data attributes and color-scheme to an HTML root.",
+              "entrypoints": ["."]
+            },
+            {
+              "name": "createThemeController",
+              "kind": "function",
+              "signature": "createThemeController(options?: ThemeControllerOptions): ThemeController",
+              "summary": "Creates a persistent theme controller and subscribes to system preference changes.",
+              "entrypoints": ["."]
+            },
+            {
+              "name": "getThemeScript",
+              "kind": "function",
+              "signature": "getThemeScript(storageKey?: string): string",
+              "summary": "Returns the synchronous anti-flash script for server-rendered head markup.",
+              "entrypoints": ["."]
+            },
+            {
+              "name": "ThemeStorage",
+              "kind": "interface",
+              "signature": "interface ThemeStorage { getItem; setItem }",
+              "summary": "Minimal storage contract accepted by the theme controller.",
+              "entrypoints": ["."]
+            },
+            {
+              "name": "ThemeControllerOptions",
+              "kind": "interface",
+              "signature": "interface ThemeControllerOptions",
+              "summary": "Root, initial preference, storage, and storage-key options.",
+              "entrypoints": ["."]
+            },
+            {
+              "name": "ThemeController",
+              "kind": "interface",
+              "signature": "interface ThemeController extends Controller",
+              "summary": "Reads, updates, subscribes to, and cleans up theme state.",
+              "entrypoints": ["."]
+            }
+          ]
+        },
+        {
+          "title": "Dialog and popover controllers",
+          "description": "Imperative overlay primitives with synchronized state, focus return, Escape, and light-dismiss behavior.",
+          "items": [
+            {
+              "name": "createDialogController",
+              "kind": "function",
+              "signature": "createDialogController(dialog, options?): DialogController",
+              "summary": "Enhances a modal dialog and its triggers while retaining native dialog behavior.",
+              "entrypoints": ["."]
+            },
+            {
+              "name": "DialogController",
+              "kind": "interface",
+              "signature": "interface DialogController extends Controller",
+              "summary": "Open, close, toggle, inspect, and destroy operations for a dialog.",
+              "entrypoints": ["."]
+            },
+            {
+              "name": "DialogControllerOptions",
+              "kind": "interface",
+              "signature": "interface DialogControllerOptions",
+              "summary": "Trigger, backdrop, initial-open, and change callback options.",
+              "entrypoints": ["."]
+            },
+            {
+              "name": "createPopoverController",
+              "kind": "function",
+              "signature": "createPopoverController(popover, options?): PopoverController",
+              "summary": "Enhances a Popover API element and supplies a data-state fallback for older browsers.",
+              "entrypoints": ["."]
+            },
+            {
+              "name": "PopoverController",
+              "kind": "interface",
+              "signature": "interface PopoverController extends Controller",
+              "summary": "Open, close, toggle, inspect, and destroy operations for a popover.",
+              "entrypoints": ["."]
+            },
+            {
+              "name": "PopoverControllerOptions",
+              "kind": "interface",
+              "signature": "interface PopoverControllerOptions",
+              "summary": "Trigger, placement, dismissal, focus-return, initial-open, and callback options.",
+              "entrypoints": ["."]
+            }
+          ]
+        },
+        {
+          "title": "Menu and selection controllers",
+          "description": "Keyboard-complete controllers for menus, tabs, and details-based accordions.",
+          "items": [
+            {
+              "name": "createMenuController",
+              "kind": "function",
+              "signature": "createMenuController(menu, options?): MenuController",
+              "summary": "Adds popover state, roving focus, arrows, Home, End, typeahead, and focus return to a menu.",
+              "entrypoints": ["."]
+            },
+            {
+              "name": "MenuController",
+              "kind": "interface",
+              "signature": "interface MenuController extends Controller",
+              "summary": "Open with first or last focus, close, toggle, inspect, and destroy a menu.",
+              "entrypoints": ["."]
+            },
+            {
+              "name": "MenuControllerOptions",
+              "kind": "interface",
+              "signature": "interface MenuControllerOptions",
+              "summary": "Trigger, initial-open, and open-state callback options.",
+              "entrypoints": ["."]
+            },
+            {
+              "name": "createNavbarController",
+              "kind": "function",
+              "signature": "createNavbarController(navbar, options?): NavbarController",
+              "summary": "Enhances a responsive details-based Navbar with synchronized state, dismissal, and breakpoint reset.",
+              "entrypoints": ["."]
+            },
+            {
+              "name": "NavbarController",
+              "kind": "interface",
+              "signature": "interface NavbarController extends Controller",
+              "summary": "Open, close, toggle, inspect, and destroy operations for a responsive Navbar.",
+              "entrypoints": ["."]
+            },
+            {
+              "name": "NavbarControllerOptions",
+              "kind": "interface",
+              "signature": "interface NavbarControllerOptions",
+              "summary": "Initial state, dismissal behavior, navigation closing, and open-state callback options.",
+              "entrypoints": ["."]
+            },
+            {
+              "name": "NavbarCollapseAt",
+              "kind": "type",
+              "signature": "type NavbarCollapseAt = \"mobile\" | \"tablet\" | \"never\"",
+              "summary": "Responsive breakpoint mode for collapsing Navbar navigation.",
+              "entrypoints": ["."]
+            },
+            {
+              "name": "NavbarMenuVariant",
+              "kind": "type",
+              "signature": "type NavbarMenuVariant = \"floating\" | \"flush\"",
+              "summary": "Floating card or edge-aligned presentation for collapsed navigation.",
+              "entrypoints": ["."]
+            },
+            {
+              "name": "NavbarSurface",
+              "kind": "type",
+              "signature": "type NavbarSurface = \"solid\" | \"translucent\"",
+              "summary": "Solid or backdrop-blurred surface for collapsed navigation.",
+              "entrypoints": ["."]
+            },
+            {
+              "name": "createTabsController",
+              "kind": "function",
+              "signature": "createTabsController(root, options?): TabsController",
+              "summary": "Connects tabs to panels with ARIA, orientation-aware keyboard movement, and manual or automatic activation.",
+              "entrypoints": ["."]
+            },
+            {
+              "name": "TabsController",
+              "kind": "interface",
+              "signature": "interface TabsController extends Controller",
+              "summary": "Reads, changes, focuses, and cleans up the selected tab value.",
+              "entrypoints": ["."]
+            },
+            {
+              "name": "TabsControllerOptions",
+              "kind": "interface",
+              "signature": "interface TabsControllerOptions",
+              "summary": "Controlled/default value, orientation, activation, and change callback options.",
+              "entrypoints": ["."]
+            },
+            {
+              "name": "createAccordionController",
+              "kind": "function",
+              "signature": "createAccordionController(root, options?): AccordionController",
+              "summary": "Coordinates details elements, single or multiple expansion, and summary keyboard navigation.",
+              "entrypoints": ["."]
+            },
+            {
+              "name": "AccordionController",
+              "kind": "interface",
+              "signature": "interface AccordionController extends Controller",
+              "summary": "Reads, updates, and cleans up expanded accordion values.",
+              "entrypoints": ["."]
+            },
+            {
+              "name": "AccordionControllerOptions",
+              "kind": "interface",
+              "signature": "interface AccordionControllerOptions",
+              "summary": "Multiple-expansion and value-change callback options.",
+              "entrypoints": ["."]
+            }
+          ]
+        },
+        {
+          "title": "Tooltip and toast controllers",
+          "description": "Supplementary descriptions and live-region notifications with explicit lifecycle cleanup.",
+          "items": [
+            {
+              "name": "createTooltipController",
+              "kind": "function",
+              "signature": "createTooltipController(tooltip, options?): TooltipController",
+              "summary": "Connects triggers through aria-describedby and coordinates hover, focus, delay, and Escape.",
+              "entrypoints": ["."]
+            },
+            {
+              "name": "TooltipController",
+              "kind": "interface",
+              "signature": "interface TooltipController extends Controller",
+              "summary": "Show, hide, inspect, and destroy operations for a tooltip.",
+              "entrypoints": ["."]
+            },
+            {
+              "name": "TooltipControllerOptions",
+              "kind": "interface",
+              "signature": "interface TooltipControllerOptions",
+              "summary": "Trigger and display-delay options.",
+              "entrypoints": ["."]
+            },
+            {
+              "name": "TooltipPlacement",
+              "kind": "type",
+              "signature": "type TooltipPlacement = top | right | bottom | left",
+              "summary": "Preferred side used when positioning a tooltip beside its trigger.",
+              "entrypoints": ["."]
+            },
+            {
+              "name": "createToastController",
+              "kind": "function",
+              "signature": "createToastController(viewport): ToastController",
+              "summary": "Creates and manages accessible notification DOM inside a viewport.",
+              "entrypoints": ["."]
+            },
+            {
+              "name": "ToastController",
+              "kind": "interface",
+              "signature": "interface ToastController extends Controller",
+              "summary": "Creates, dismisses, clears, and destroys vanilla toasts.",
+              "entrypoints": ["."]
+            }
+          ]
+        },
+        {
+          "title": "Clipboard controller",
+          "description": "Framework-independent clipboard behavior for code and terminal command controls.",
+          "items": [
+            {
+              "name": "copyText",
+              "kind": "function",
+              "signature": "copyText(value: string): Promise<void>",
+              "summary": "Copies text through the Clipboard API without import-time browser access.",
+              "entrypoints": ["."]
+            },
+            {
+              "name": "createCopyController",
+              "kind": "function",
+              "signature": "createCopyController(root?, options?): CopyController",
+              "summary": "Enhances delegated native copy buttons and restores their feedback state after a delay.",
+              "entrypoints": ["."]
+            },
+            {
+              "name": "CopyControllerOptions",
+              "kind": "interface",
+              "signature": "interface CopyControllerOptions { copiedDuration?; writeText? }",
+              "summary": "Copy feedback duration and injectable clipboard writer.",
+              "entrypoints": ["."]
+            },
+            {
+              "name": "CopyController",
+              "kind": "interface",
+              "signature": "interface CopyController extends Controller { copy(value): Promise<boolean> }",
+              "summary": "Copies text programmatically and removes delegated listeners on destroy.",
+              "entrypoints": ["."]
+            }
+          ]
+        },
+        {
+          "title": "Shared contracts",
+          "description": "Portable primitives and content models reused by native, React, and Svelte implementations.",
+          "items": [
+            {
+              "name": "Size",
+              "kind": "type",
+              "signature": "type Size = \"sm\" | \"md\" | \"lg\"",
+              "summary": "Shared component size scale.",
+              "entrypoints": [".", "./types"]
+            },
+            {
+              "name": "Tone",
+              "kind": "type",
+              "signature": "type Tone = neutral | accent | info | success | warning | danger",
+              "summary": "Semantic visual and feedback tone scale.",
+              "entrypoints": [".", "./types"]
+            },
+            {
+              "name": "CaptchaState",
+              "kind": "type",
+              "signature": "type CaptchaState = idle | verifying | success | error",
+              "summary": "Controlled visual state for the presentation-only Captcha surface.",
+              "entrypoints": [".", "./types"]
+            },
+            {
+              "name": "CaptchaLabels",
+              "kind": "interface",
+              "signature": "interface CaptchaLabels { idle; verifying; success; error }",
+              "summary": "Localized copy for every Captcha visual state.",
+              "entrypoints": [".", "./types"]
+            },
+            {
+              "name": "TerminalCodeEntry",
+              "kind": "interface",
+              "signature": "interface TerminalCodeEntry { command: string; output?: string }",
+              "summary": "Portable terminal command and optional captured output.",
+              "entrypoints": [".", "./types"]
+            },
+            {
+              "name": "BashTokenKind",
+              "kind": "type",
+              "signature": "type BashTokenKind = plain | command | option | string | variable | operator | comment | number",
+              "summary": "Semantic token categories used to color Bash command text.",
+              "entrypoints": [".", "./types"]
+            },
+            {
+              "name": "BashToken",
+              "kind": "interface",
+              "signature": "interface BashToken { kind: BashTokenKind; value: string }",
+              "summary": "An exact source segment emitted by the Bash presentation tokenizer.",
+              "entrypoints": [".", "./types"]
+            },
+            {
+              "name": "tokenizeBashCommand",
+              "kind": "function",
+              "signature": "tokenizeBashCommand(source: string): BashToken[]",
+              "summary": "Classifies Bash command text for syntax presentation without changing its content.",
+              "entrypoints": ["."]
+            },
+            {
+              "name": "CAPTCHA_LABELS",
+              "kind": "constant",
+              "signature": "const CAPTCHA_LABELS: Readonly<CaptchaLabels>",
+              "summary": "Default English copy shared by the native and framework Captcha examples.",
+              "entrypoints": ["."]
+            },
+            {
+              "name": "ThemePreference",
+              "kind": "type",
+              "signature": "type ThemePreference = \"light\" | \"dark\" | \"system\"",
+              "summary": "Persisted user-facing theme preference.",
+              "entrypoints": [".", "./types"]
+            },
+            {
+              "name": "ResolvedTheme",
+              "kind": "type",
+              "signature": "type ResolvedTheme = \"light\" | \"dark\"",
+              "summary": "Theme after resolving system preference.",
+              "entrypoints": [".", "./types"]
+            },
+            {
+              "name": "ThemeState",
+              "kind": "interface",
+              "signature": "interface ThemeState { preference; resolvedTheme }",
+              "summary": "Snapshot emitted by the theme controller.",
+              "entrypoints": [".", "./types"]
+            },
+            {
+              "name": "LinkModel",
+              "kind": "interface",
+              "signature": "interface LinkModel",
+              "summary": "Portable link label, URL, external, and current-page state.",
+              "entrypoints": [".", "./types"]
+            },
+            {
+              "name": "ResponsiveImageModel",
+              "kind": "interface",
+              "signature": "interface ResponsiveImageModel",
+              "summary": "Portable responsive image source and intrinsic dimensions.",
+              "entrypoints": [".", "./types"]
+            },
+            {
+              "name": "PostModel",
+              "kind": "interface",
+              "signature": "interface PostModel",
+              "summary": "Portable post-card content model.",
+              "entrypoints": [".", "./types"]
+            },
+            {
+              "name": "ChatMessageModel",
+              "kind": "interface",
+              "signature": "interface ChatMessageModel",
+              "summary": "Portable chat message content model.",
+              "entrypoints": [".", "./types"]
+            },
+            {
+              "name": "ChatModel",
+              "kind": "interface",
+              "signature": "interface ChatModel",
+              "summary": "Portable chat thread model.",
+              "entrypoints": [".", "./types"]
+            },
+            {
+              "name": "Controller",
+              "kind": "interface",
+              "signature": "interface Controller { destroy(): void }",
+              "summary": "Common cleanup contract for every vanilla controller.",
+              "entrypoints": [".", "./types"]
+            },
+            {
+              "name": "DesignSystemRoot",
+              "kind": "type",
+              "signature": "type DesignSystemRoot = Document | Element | ShadowRoot",
+              "summary": "Supported initialization boundary.",
+              "entrypoints": [".", "./types"]
+            },
+            {
+              "name": "ToastAction",
+              "kind": "interface",
+              "signature": "interface ToastAction { label; onClick }",
+              "summary": "Portable action attached to a vanilla or React toast.",
+              "entrypoints": [".", "./types"]
+            },
+            {
+              "name": "ToastInput",
+              "kind": "interface",
+              "signature": "interface ToastInput",
+              "summary": "Portable notification title, description, tone, duration, ID, and action.",
+              "entrypoints": [".", "./types"]
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "react",
+      "name": "@cofob/design-system-react",
+      "label": "React",
+      "description": "React 18.3 and 19 adapters with separate server-safe and client entrypoints.",
+      "entrypoints": [
+        {
+          "specifier": ".",
+          "kind": "React",
+          "summary": "Convenience entrypoint containing static and client components, helpers, and types."
+        },
+        {
+          "specifier": "./static",
+          "kind": "React",
+          "summary": "SSR and RSC-friendly static components; no use client directive."
+        },
+        {
+          "specifier": "./client",
+          "kind": "React",
+          "summary": "Interactive components and hooks with an intentional use client boundary."
+        },
+        {
+          "specifier": "./types",
+          "kind": "TypeScript",
+          "summary": "Portable models and React composition types."
+        }
+      ],
+      "groups": [
+        {
+          "title": "Client helpers",
+          "description": "Hooks and imperative notifications live behind the client boundary and require the corresponding provider where noted.",
+          "items": [
+            {
+              "name": "useTheme",
+              "kind": "hook",
+              "signature": "useTheme(): ThemeContextValue",
+              "summary": "Reads the nearest ThemeProvider preference, resolved theme, and setter.",
+              "entrypoints": [".", "./client"]
+            },
+            {
+              "name": "toast",
+              "kind": "function",
+              "signature": "toast(input: ToastInput): string",
+              "summary": "Queues a notification for the active ToastProvider and returns its ID.",
+              "entrypoints": [".", "./client"]
+            },
+            {
+              "name": "useToast",
+              "kind": "hook",
+              "signature": "useToast(): { toast; dismiss }",
+              "summary": "Returns provider-scoped methods to create or dismiss notifications.",
+              "entrypoints": [".", "./client"]
+            }
+          ]
+        },
+        {
+          "title": "Portable and composition types",
+          "description": "Import these contracts from the root or the type-only entrypoint. React-specific models replace portable text fields with ReactNode where composition is expected.",
+          "items": [
+            {
+              "name": "ThemePreference",
+              "kind": "type",
+              "signature": "type ThemePreference = \"light\" | \"dark\" | \"system\"",
+              "summary": "Persisted user theme preference, re-exported from the CSS package.",
+              "entrypoints": [".", "./types"]
+            },
+            {
+              "name": "ResolvedTheme",
+              "kind": "type",
+              "signature": "type ResolvedTheme = \"light\" | \"dark\"",
+              "summary": "Resolved theme, re-exported from the CSS package.",
+              "entrypoints": [".", "./types"]
+            },
+            {
+              "name": "Size",
+              "kind": "type",
+              "signature": "type Size = \"sm\" | \"md\" | \"lg\"",
+              "summary": "Shared component size scale.",
+              "entrypoints": [".", "./types"]
+            },
+            {
+              "name": "Tone",
+              "kind": "type",
+              "signature": "type Tone = neutral | accent | info | success | warning | danger",
+              "summary": "Shared semantic tone scale.",
+              "entrypoints": [".", "./types"]
+            },
+            {
+              "name": "CaptchaState",
+              "kind": "type",
+              "signature": "type CaptchaState = idle | verifying | success | error",
+              "summary": "Controlled visual state re-exported from the CSS package.",
+              "entrypoints": [".", "./types"]
+            },
+            {
+              "name": "CaptchaLabels",
+              "kind": "interface",
+              "signature": "interface CaptchaLabels",
+              "summary": "Localized copy for each Captcha state.",
+              "entrypoints": [".", "./types"]
+            },
+            {
+              "name": "TerminalCodeEntry",
+              "kind": "type",
+              "signature": "type TerminalCodeEntry = CssTerminalCodeEntry",
+              "summary": "Portable terminal command and output entry.",
+              "entrypoints": [".", "./types"]
+            },
+            {
+              "name": "ButtonVariant",
+              "kind": "type",
+              "signature": "type ButtonVariant = primary | secondary | ghost | danger",
+              "summary": "Visual variants accepted by Button and IconButton.",
+              "entrypoints": [".", "./types"]
+            },
+            {
+              "name": "SurfaceVariant",
+              "kind": "type",
+              "signature": "type SurfaceVariant = default | elevated | outlined | interactive",
+              "summary": "Card surface variants; legacy plain, raised, and muted aliases are deprecated.",
+              "entrypoints": [".", "./types"]
+            },
+            {
+              "name": "LucideIcon",
+              "kind": "type",
+              "signature": "type LucideIcon = ComponentType<SVGProps<SVGSVGElement>>",
+              "summary": "React icon component shape used by optional icon props.",
+              "entrypoints": [".", "./types"]
+            },
+            {
+              "name": "LinkModel",
+              "kind": "interface",
+              "signature": "interface LinkModel",
+              "summary": "Portable navigation link model.",
+              "entrypoints": [".", "./types"]
+            },
+            {
+              "name": "LinkItem",
+              "kind": "type",
+              "signature": "type LinkItem = LinkModel",
+              "summary": "React-facing alias for the portable link model.",
+              "entrypoints": [".", "./types"]
+            },
+            {
+              "name": "ResponsiveImageModel",
+              "kind": "interface",
+              "signature": "interface ResponsiveImageModel",
+              "summary": "Portable responsive image model.",
+              "entrypoints": [".", "./types"]
+            },
+            {
+              "name": "ImageSource",
+              "kind": "type",
+              "signature": "type ImageSource = ResponsiveImageModel",
+              "summary": "React-facing alias for a responsive image source.",
+              "entrypoints": [".", "./types"]
+            },
+            {
+              "name": "PostModel",
+              "kind": "interface",
+              "signature": "interface PostModel",
+              "summary": "Portable post-card content model.",
+              "entrypoints": [".", "./types"]
+            },
+            {
+              "name": "PostSummary",
+              "kind": "type",
+              "signature": "type PostSummary = PostModel",
+              "summary": "React-facing alias for portable post summaries.",
+              "entrypoints": [".", "./types"]
+            },
+            {
+              "name": "ChatMessageModel",
+              "kind": "interface",
+              "signature": "interface ChatMessageModel",
+              "summary": "Portable plain-text chat message model.",
+              "entrypoints": [".", "./types"]
+            },
+            {
+              "name": "ChatModel",
+              "kind": "interface",
+              "signature": "interface ChatModel",
+              "summary": "Portable chat thread model.",
+              "entrypoints": [".", "./types"]
+            },
+            {
+              "name": "ChatMessage",
+              "kind": "interface",
+              "signature": "interface ChatMessage",
+              "summary": "React chat message with a ReactNode body for idiomatic composition.",
+              "entrypoints": [".", "./types"]
+            },
+            {
+              "name": "MenuItem",
+              "kind": "interface",
+              "signature": "interface MenuItem",
+              "summary": "Dropdown menu item label, target, and state.",
+              "entrypoints": [".", "./types"]
+            },
+            {
+              "name": "TabItem",
+              "kind": "interface",
+              "signature": "interface TabItem",
+              "summary": "Base tab identifier, label, and disabled state.",
+              "entrypoints": [".", "./types"]
+            },
+            {
+              "name": "AccordionItem",
+              "kind": "interface",
+              "signature": "interface AccordionItem",
+              "summary": "Base accordion identifier, heading, and disabled state.",
+              "entrypoints": [".", "./types"]
+            },
+            {
+              "name": "PaginationItem",
+              "kind": "interface",
+              "signature": "interface PaginationItem",
+              "summary": "Page number, optional URL, and accessible label.",
+              "entrypoints": [".", "./types"]
+            },
+            {
+              "name": "FooterGroup",
+              "kind": "interface",
+              "signature": "interface FooterGroup",
+              "summary": "Footer section title and its portable links.",
+              "entrypoints": [".", "./types"]
+            },
+            {
+              "name": "IconContent",
+              "kind": "interface",
+              "signature": "interface IconContent",
+              "summary": "Accepts either a Lucide component or arbitrary React icon node.",
+              "entrypoints": [".", "./types"]
+            },
+            {
+              "name": "ToastInput",
+              "kind": "interface",
+              "signature": "interface ToastInput",
+              "summary": "React notification input with a ReactNode description.",
+              "entrypoints": [".", "./types"]
+            },
+            {
+              "name": "ToastRecord",
+              "kind": "interface",
+              "signature": "interface ToastRecord",
+              "summary": "Normalized notification record stored by ToastProvider.",
+              "entrypoints": [".", "./types"]
+            }
+          ]
+        },
+        {
+          "title": "Static component prop types",
+          "description": "These prop contracts are exported from the root and static entrypoints; the linked component pages describe their visual states and live behavior.",
+          "items": [
+            {
+              "name": "ThemeScriptProps",
+              "kind": "interface",
+              "signature": "interface ThemeScriptProps",
+              "summary": "Storage key and CSP nonce for ThemeScript.",
+              "entrypoints": [".", "./static"]
+            },
+            {
+              "name": "SkipLinkProps",
+              "kind": "interface",
+              "signature": "interface SkipLinkProps",
+              "summary": "Native anchor props plus the default main-content target.",
+              "entrypoints": [".", "./static"]
+            },
+            {
+              "name": "HeadingProps",
+              "kind": "interface",
+              "signature": "interface HeadingProps",
+              "summary": "Heading level, display size, and native heading attributes.",
+              "entrypoints": [".", "./static"]
+            },
+            {
+              "name": "TextProps",
+              "kind": "interface",
+              "signature": "interface TextProps",
+              "summary": "Polymorphic text element, size, tone, and native attributes.",
+              "entrypoints": [".", "./static"]
+            },
+            {
+              "name": "LinkProps",
+              "kind": "interface",
+              "signature": "interface LinkProps",
+              "summary": "Anchor attributes and external-link presentation.",
+              "entrypoints": [".", "./static"]
+            },
+            {
+              "name": "ContainerProps",
+              "kind": "interface",
+              "signature": "interface ContainerProps",
+              "summary": "Container width and native div attributes.",
+              "entrypoints": [".", "./static"]
+            },
+            {
+              "name": "SectionProps",
+              "kind": "interface",
+              "signature": "interface SectionProps",
+              "summary": "Section spacing, semantic surface, and native attributes.",
+              "entrypoints": [".", "./static"]
+            },
+            {
+              "name": "StackProps",
+              "kind": "interface",
+              "signature": "interface StackProps",
+              "summary": "Vertical gap and alignment contract.",
+              "entrypoints": [".", "./static"]
+            },
+            {
+              "name": "InlineProps",
+              "kind": "interface",
+              "signature": "interface InlineProps",
+              "summary": "Horizontal gap, alignment, justification, and wrapping contract.",
+              "entrypoints": [".", "./static"]
+            },
+            {
+              "name": "ButtonProps",
+              "kind": "interface",
+              "signature": "interface ButtonProps",
+              "summary": "Button variant, size, loading state, icons, and native attributes.",
+              "entrypoints": [".", "./static"]
+            },
+            {
+              "name": "IconButtonProps",
+              "kind": "interface",
+              "signature": "interface IconButtonProps",
+              "summary": "Accessible icon-only Button contract.",
+              "entrypoints": [".", "./static"]
+            },
+            {
+              "name": "FieldProps",
+              "kind": "interface",
+              "signature": "interface FieldProps",
+              "summary": "Label, hint, error, required state, and composed field control.",
+              "entrypoints": [".", "./static"]
+            },
+            {
+              "name": "TextFieldProps",
+              "kind": "interface",
+              "signature": "interface TextFieldProps",
+              "summary": "Input attributes plus integrated field presentation.",
+              "entrypoints": [".", "./static"]
+            },
+            {
+              "name": "TextareaProps",
+              "kind": "interface",
+              "signature": "interface TextareaProps",
+              "summary": "Textarea attributes plus integrated field presentation.",
+              "entrypoints": [".", "./static"]
+            },
+            {
+              "name": "SelectProps",
+              "kind": "interface",
+              "signature": "interface SelectProps",
+              "summary": "Select attributes, options, and integrated field presentation.",
+              "entrypoints": [".", "./static"]
+            },
+            {
+              "name": "CheckboxProps",
+              "kind": "interface",
+              "signature": "interface CheckboxProps",
+              "summary": "Checkbox label, description, size, error, and native attributes.",
+              "entrypoints": [".", "./static"]
+            },
+            {
+              "name": "SwitchProps",
+              "kind": "type",
+              "signature": "type SwitchProps = CheckboxProps",
+              "summary": "Checkbox-compatible props rendered as a switch.",
+              "entrypoints": [".", "./static"]
+            },
+            {
+              "name": "CaptchaProps",
+              "kind": "interface",
+              "signature": "interface CaptchaProps extends ButtonHTMLAttributes<HTMLButtonElement>",
+              "summary": "Controlled visual state, labels, and native button attributes without verification logic.",
+              "entrypoints": [".", "./static"]
+            },
+            {
+              "name": "BadgeProps",
+              "kind": "interface",
+              "signature": "interface BadgeProps",
+              "summary": "Badge tone, size, variant, and span attributes.",
+              "entrypoints": [".", "./static"]
+            },
+            {
+              "name": "TagProps",
+              "kind": "interface",
+              "signature": "interface TagProps",
+              "summary": "Tag tone, size, optional remove action, and span attributes.",
+              "entrypoints": [".", "./static"]
+            },
+            {
+              "name": "AlertProps",
+              "kind": "interface",
+              "signature": "interface AlertProps",
+              "summary": "Alert tone, title, icon, actions, and region attributes.",
+              "entrypoints": [".", "./static"]
+            },
+            {
+              "name": "CardPadding",
+              "kind": "type",
+              "signature": "type CardPadding = none | sm | md | lg",
+              "summary": "Card internal spacing scale.",
+              "entrypoints": [".", "./static"]
+            },
+            {
+              "name": "CardProps",
+              "kind": "type",
+              "signature": "type CardProps = CardDivProps | CardAnchorProps",
+              "summary": "Card surface/padding contract as a div or link.",
+              "entrypoints": [".", "./static"]
+            },
+            {
+              "name": "EmptyStateProps",
+              "kind": "interface",
+              "signature": "interface EmptyStateProps",
+              "summary": "Empty-state title, description, icon, action, and container attributes.",
+              "entrypoints": [".", "./static"]
+            },
+            {
+              "name": "TableProps",
+              "kind": "interface",
+              "signature": "interface TableProps extends TableHTMLAttributes<HTMLTableElement>",
+              "summary": "Accessible scroll container, caption, density, striping, minimum width, and native table attributes.",
+              "entrypoints": [".", "./static"]
+            },
+            {
+              "name": "PaginationProps",
+              "kind": "interface",
+              "signature": "interface PaginationProps",
+              "summary": "Page items, current value, adjacent labels, and nav attributes.",
+              "entrypoints": [".", "./static"]
+            },
+            {
+              "name": "BlueLineProps",
+              "kind": "interface",
+              "signature": "interface BlueLineProps",
+              "summary": "Brand underline animation and rainbow options.",
+              "entrypoints": [".", "./static"]
+            },
+            {
+              "name": "NavbarProps",
+              "kind": "interface",
+              "signature": "interface NavbarProps",
+              "summary": "Brand, links, actions, responsive collapse, menu presentation, state, and native navigation attributes.",
+              "entrypoints": [".", "./static"]
+            },
+            {
+              "name": "FooterProps",
+              "kind": "interface",
+              "signature": "interface FooterProps",
+              "summary": "Footer brand, grouped links, legal content, and native attributes.",
+              "entrypoints": [".", "./static"]
+            },
+            {
+              "name": "ResponsiveImageProps",
+              "kind": "interface",
+              "signature": "interface ResponsiveImageProps",
+              "summary": "Portable source plus loading behavior and native image attributes.",
+              "entrypoints": [".", "./static"]
+            },
+            {
+              "name": "PostCardProps",
+              "kind": "interface",
+              "signature": "interface PostCardProps",
+              "summary": "Post model, heading level, and article attributes.",
+              "entrypoints": [".", "./static"]
+            },
+            {
+              "name": "LatestPostCardProps",
+              "kind": "interface",
+              "signature": "interface LatestPostCardProps",
+              "summary": "Post-card props plus the latest-post label.",
+              "entrypoints": [".", "./static"]
+            },
+            {
+              "name": "SearchResultCardProps",
+              "kind": "interface",
+              "signature": "interface SearchResultCardProps",
+              "summary": "Search result data and post-card presentation props.",
+              "entrypoints": [".", "./static"]
+            },
+            {
+              "name": "ChatThreadProps",
+              "kind": "interface",
+              "signature": "interface ChatThreadProps",
+              "summary": "React chat messages, accessible label, and list attributes.",
+              "entrypoints": [".", "./static"]
+            },
+            {
+              "name": "StickerProps",
+              "kind": "interface",
+              "signature": "interface StickerProps",
+              "summary": "Sticker tone, rotation, custom style, and span attributes.",
+              "entrypoints": [".", "./static"]
+            }
+          ]
+        },
+        {
+          "title": "Client component prop types",
+          "description": "Interactive prop contracts are exported from the root and client entrypoints.",
+          "items": [
+            {
+              "name": "CodeBlockProps",
+              "kind": "interface",
+              "signature": "interface CodeBlockProps",
+              "summary": "Code text, optional language display, copy labels, feedback duration, and div attributes.",
+              "entrypoints": [".", "./client"]
+            },
+            {
+              "name": "TerminalCodeBlockProps",
+              "kind": "interface",
+              "signature": "interface TerminalCodeBlockProps",
+              "summary": "Terminal entries, prompt, per-command copy behavior, output label, and div attributes.",
+              "entrypoints": [".", "./client"]
+            },
+            {
+              "name": "ThemeProviderProps",
+              "kind": "interface",
+              "signature": "interface ThemeProviderProps",
+              "summary": "Controlled or default theme preference, storage key, callback, and children.",
+              "entrypoints": [".", "./client"]
+            },
+            {
+              "name": "ThemeToggleProps",
+              "kind": "interface",
+              "signature": "interface ThemeToggleProps",
+              "summary": "Theme cycle, format callback, size, and button attributes.",
+              "entrypoints": [".", "./client"]
+            },
+            {
+              "name": "DialogProps",
+              "kind": "interface",
+              "signature": "interface DialogProps",
+              "summary": "Controlled/default open state, trigger, title, actions, and dialog attributes.",
+              "entrypoints": [".", "./client"]
+            },
+            {
+              "name": "PopoverProps",
+              "kind": "interface",
+              "signature": "interface PopoverProps",
+              "summary": "Controlled/default open state, trigger, placement, and popover attributes.",
+              "entrypoints": [".", "./client"]
+            },
+            {
+              "name": "DropdownMenuProps",
+              "kind": "interface",
+              "signature": "interface DropdownMenuProps",
+              "summary": "Menu items, selection callback, trigger, and controlled/default open state.",
+              "entrypoints": [".", "./client"]
+            },
+            {
+              "name": "ReactTabItem",
+              "kind": "interface",
+              "signature": "interface ReactTabItem extends TabItem",
+              "summary": "Tab model with ReactNode panel content.",
+              "entrypoints": [".", "./client"]
+            },
+            {
+              "name": "TabsProps",
+              "kind": "interface",
+              "signature": "interface TabsProps",
+              "summary": "Tab items, controlled/default value, orientation, activation, and callback.",
+              "entrypoints": [".", "./client"]
+            },
+            {
+              "name": "ReactAccordionItem",
+              "kind": "interface",
+              "signature": "interface ReactAccordionItem extends AccordionItem",
+              "summary": "Accordion model with ReactNode content.",
+              "entrypoints": [".", "./client"]
+            },
+            {
+              "name": "AccordionProps",
+              "kind": "interface",
+              "signature": "interface AccordionProps",
+              "summary": "Accordion items, controlled/default values, multiple mode, and callback.",
+              "entrypoints": [".", "./client"]
+            },
+            {
+              "name": "TooltipProps",
+              "kind": "interface",
+              "signature": "interface TooltipProps",
+              "summary": "Trigger, tooltip content, delay, placement, and wrapper attributes.",
+              "entrypoints": [".", "./client"]
+            },
+            {
+              "name": "ToastProviderProps",
+              "kind": "interface",
+              "signature": "interface ToastProviderProps",
+              "summary": "Notification limit, default duration, and provider children.",
+              "entrypoints": [".", "./client"]
+            },
+            {
+              "name": "ToastViewportProps",
+              "kind": "interface",
+              "signature": "interface ToastViewportProps",
+              "summary": "Viewport position, label, and ordered-list attributes.",
+              "entrypoints": [".", "./client"]
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "svelte",
+      "name": "@cofob/design-system-svelte",
+      "label": "Svelte",
+      "description": "Svelte 5 components, stores, theme helpers, and portable types for SvelteKit or plain Svelte.",
+      "entrypoints": [
+        {
+          "specifier": ".",
+          "kind": "Svelte",
+          "summary": "All Svelte components, helpers, stores, and public types."
+        }
+      ],
+      "groups": [
+        {
+          "title": "Toast store and helpers",
+          "description": "A framework-native writable store and imperative helpers drive ToastViewport without touching browser globals during module evaluation.",
+          "items": [
+            {
+              "name": "toasts",
+              "kind": "store",
+              "signature": "const toasts: Writable<ToastRecord[]>",
+              "summary": "Readable and writable notification store consumed by ToastViewport.",
+              "entrypoints": ["."]
+            },
+            {
+              "name": "toast",
+              "kind": "function",
+              "signature": "toast(input: ToastInput): string; toast(message, options?): string",
+              "summary": "Adds or replaces a notification and returns its stable ID.",
+              "entrypoints": ["."]
+            },
+            {
+              "name": "dismissToast",
+              "kind": "function",
+              "signature": "dismissToast(id: string): void",
+              "summary": "Dismisses one notification and clears its timer.",
+              "entrypoints": ["."]
+            },
+            {
+              "name": "clearToasts",
+              "kind": "function",
+              "signature": "clearToasts(): void",
+              "summary": "Clears every notification and pending dismissal timer.",
+              "entrypoints": ["."]
+            }
+          ]
+        },
+        {
+          "title": "Theme helpers",
+          "description": "SSR-safe helpers used by the Svelte provider and available for custom integrations.",
+          "items": [
+            {
+              "name": "resolvedTheme",
+              "kind": "function",
+              "signature": "resolvedTheme(preference: ThemePreference): \"light\" | \"dark\"",
+              "summary": "Resolves a preference, returning light during SSR for the system value.",
+              "entrypoints": ["."]
+            },
+            {
+              "name": "applyTheme",
+              "kind": "function",
+              "signature": "applyTheme(preference: ThemePreference, root?: HTMLElement): void",
+              "summary": "Writes theme preference, resolved theme, and color-scheme to a root in the browser.",
+              "entrypoints": ["."]
+            }
+          ]
+        },
+        {
+          "title": "Portable and composition types",
+          "description": "Shared contracts mirror the CSS and React adapters while using Svelte snippets for composable content.",
+          "items": [
+            {
+              "name": "ThemePreference",
+              "kind": "type",
+              "signature": "type ThemePreference = \"light\" | \"dark\" | \"system\"",
+              "summary": "Persisted user theme preference.",
+              "entrypoints": ["."]
+            },
+            {
+              "name": "Size",
+              "kind": "type",
+              "signature": "type Size = \"sm\" | \"md\" | \"lg\"",
+              "summary": "Shared component size scale.",
+              "entrypoints": ["."]
+            },
+            {
+              "name": "Tone",
+              "kind": "type",
+              "signature": "type Tone = neutral | accent | info | success | warning | danger",
+              "summary": "Shared semantic tone scale.",
+              "entrypoints": ["."]
+            },
+            {
+              "name": "CaptchaState",
+              "kind": "type",
+              "signature": "type CaptchaState = idle | verifying | success | error",
+              "summary": "Controlled visual state re-exported from the CSS package.",
+              "entrypoints": ["."]
+            },
+            {
+              "name": "CaptchaLabels",
+              "kind": "interface",
+              "signature": "interface CaptchaLabels",
+              "summary": "Localized copy for each Captcha state.",
+              "entrypoints": ["."]
+            },
+            {
+              "name": "TerminalCodeEntry",
+              "kind": "interface",
+              "signature": "interface TerminalCodeEntry { command: string; output?: string }",
+              "summary": "Portable terminal command and optional captured output.",
+              "entrypoints": ["."]
+            },
+            {
+              "name": "ButtonVariant",
+              "kind": "type",
+              "signature": "type ButtonVariant = primary | secondary | ghost | danger",
+              "summary": "Visual variants accepted by Button and IconButton.",
+              "entrypoints": ["."]
+            },
+            {
+              "name": "LinkModel",
+              "kind": "interface",
+              "signature": "interface LinkModel",
+              "summary": "Portable navigation link model.",
+              "entrypoints": ["."]
+            },
+            {
+              "name": "LinkItem",
+              "kind": "type",
+              "signature": "type LinkItem = LinkModel",
+              "summary": "Svelte-facing alias for the portable link model.",
+              "entrypoints": ["."]
+            },
+            {
+              "name": "ResponsiveImageModel",
+              "kind": "interface",
+              "signature": "interface ResponsiveImageModel",
+              "summary": "Portable responsive image source model.",
+              "entrypoints": ["."]
+            },
+            {
+              "name": "ImageSource",
+              "kind": "type",
+              "signature": "type ImageSource = ResponsiveImageModel",
+              "summary": "Svelte-facing alias for a responsive image source.",
+              "entrypoints": ["."]
+            },
+            {
+              "name": "PostModel",
+              "kind": "interface",
+              "signature": "interface PostModel",
+              "summary": "Portable post-card content model.",
+              "entrypoints": ["."]
+            },
+            {
+              "name": "PostSummary",
+              "kind": "type",
+              "signature": "type PostSummary = PostModel",
+              "summary": "Svelte-facing alias for a portable post summary.",
+              "entrypoints": ["."]
+            },
+            {
+              "name": "ChatMessageModel",
+              "kind": "interface",
+              "signature": "interface ChatMessageModel",
+              "summary": "Portable plain-text chat message model.",
+              "entrypoints": ["."]
+            },
+            {
+              "name": "ChatModel",
+              "kind": "interface",
+              "signature": "interface ChatModel",
+              "summary": "Portable chat thread model.",
+              "entrypoints": ["."]
+            },
+            {
+              "name": "ChatMessage",
+              "kind": "interface",
+              "signature": "interface ChatMessage",
+              "summary": "Svelte chat message with a string or Snippet body.",
+              "entrypoints": ["."]
+            },
+            {
+              "name": "MenuItem",
+              "kind": "interface",
+              "signature": "interface MenuItem",
+              "summary": "Dropdown menu item label, target, and state.",
+              "entrypoints": ["."]
+            },
+            {
+              "name": "TabItem",
+              "kind": "interface",
+              "signature": "interface TabItem",
+              "summary": "Tab model with optional string or Snippet content.",
+              "entrypoints": ["."]
+            },
+            {
+              "name": "AccordionItem",
+              "kind": "interface",
+              "signature": "interface AccordionItem",
+              "summary": "Accordion model with optional string or Snippet content.",
+              "entrypoints": ["."]
+            },
+            {
+              "name": "PaginationItem",
+              "kind": "interface",
+              "signature": "interface PaginationItem",
+              "summary": "Page number, optional URL, and accessible label.",
+              "entrypoints": ["."]
+            },
+            {
+              "name": "SelectOption",
+              "kind": "interface",
+              "signature": "interface SelectOption",
+              "summary": "Select value, label, and disabled state.",
+              "entrypoints": ["."]
+            },
+            {
+              "name": "FooterGroup",
+              "kind": "interface",
+              "signature": "interface FooterGroup",
+              "summary": "Footer section title and portable links.",
+              "entrypoints": ["."]
+            },
+            {
+              "name": "ToastOptions",
+              "kind": "interface",
+              "signature": "interface ToastOptions",
+              "summary": "Options for the string overload of toast, including an optional action.",
+              "entrypoints": ["."]
+            },
+            {
+              "name": "ToastInput",
+              "kind": "interface",
+              "signature": "interface ToastInput",
+              "summary": "Notification input with a string or Snippet description.",
+              "entrypoints": ["."]
+            },
+            {
+              "name": "ToastRecord",
+              "kind": "interface",
+              "signature": "interface ToastRecord",
+              "summary": "Normalized notification record stored in toasts.",
+              "entrypoints": ["."]
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}

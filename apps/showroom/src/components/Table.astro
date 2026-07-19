@@ -1,0 +1,41 @@
+---
+interface Props {
+  label: string;
+  caption?: string;
+  density?: "comfortable" | "compact";
+  headerTone?: "strong" | "muted";
+  striped?: boolean;
+  minWidth?: string;
+  class?: string;
+  containerClass?: string;
+}
+
+const {
+  label,
+  caption,
+  density = "comfortable",
+  headerTone = "strong",
+  striped = true,
+  minWidth = "36rem",
+  class: className,
+  containerClass,
+} = Astro.props;
+---
+
+<div
+  class:list={["cf-table-container", containerClass]}
+  role="region"
+  aria-label={label}
+  tabindex="0"
+  style={`--cf-table-min-width:${minWidth}`}
+>
+  <table
+    class:list={["cf-table", className]}
+    data-density={density}
+    data-header-tone={headerTone}
+    data-striped={striped || undefined}
+  >
+    {caption && <caption>{caption}</caption>}
+    <slot />
+  </table>
+</div>

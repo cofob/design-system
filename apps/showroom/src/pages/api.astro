@@ -1,0 +1,164 @@
+---
+import PageHeader from "../components/PageHeader.astro";
+import CodeBlock from "../components/CodeBlock.astro";
+import Table from "../components/Table.astro";
+import publicApi from "../data/public-api.json";
+import Layout from "../layouts/Layout.astro";
+
+const examples: Record<string, string> = {
+  css: `import "@cofob/design-system-css/index.css";
+import {
+  getThemeScript,
+  initDesignSystem,
+  createDialogController,
+} from "@cofob/design-system-css";
+
+// Render getThemeScript() synchronously in <head> during SSR.
+const designSystem = initDesignSystem(document);
+const dialog = createDialogController(document.querySelector("dialog"));
+
+// Dispose listeners when the application boundary is removed.
+dialog.destroy();
+designSystem.destroy();`,
+  react: `// Server-safe or React Server Component modules
+import { Button, Card, ThemeScript } from "@cofob/design-system-react/static";
+
+// Files already behind a client boundary
+import {
+  ToastProvider,
+  ToastViewport,
+  toast,
+  useToast,
+} from "@cofob/design-system-react/client";
+
+// CSS stays an explicit application-level import.
+import "@cofob/design-system-css/index.css";`,
+  svelte: `<script lang="ts">
+  import "@cofob/design-system-css/index.css";
+  import {
+    ToastProvider,
+    ToastViewport,
+    toast,
+    dismissToast,
+    clearToasts,
+    toasts,
+  } from "@cofob/design-system-svelte";
+
+  const notificationId = toast("Saved", { tone: "success" });
+</script>`,
+};
+
+const importPath = (packageName: string, specifier: string) =>
+  specifier === "." ? packageName : `${packageName}${specifier.slice(1)}`;
+---
+
+<Layout
+  title="API reference"
+  description="Published entrypoints, controllers, helpers, and types for every cofob design system package."
+>
+  <PageHeader
+    eyebrow="API reference"
+    title="One public contract, three ways to use it."
+    description="Every published entrypoint and non-component export is listed here. Component props, variants, states, and live examples remain on the component pages."
+  />
+
+  <nav class="astro-api-jump" aria-label="API packages">
+    {
+      publicApi.packages.map((packageEntry) => (
+        <a class="cf-button" data-variant="secondary" data-size="sm" href={`#${packageEntry.id}`}>
+          {packageEntry.label}
+        </a>
+      ))
+    }
+  </nav>
+
+  <div class="cf-alert" data-tone="info">
+    <div class="cf-alert__content">
+      <strong class="cf-alert__title">CSS is always explicit</strong>
+      <p class="cf-alert__description">
+        React and Svelte never inject styles. Import the full stylesheet or the granular CSS entrypoints once
+        at your application boundary.
+      </p>
+    </div>
+  </div>
+
+  {
+    publicApi.packages.map((packageEntry) => (
+      <section
+        class="astro-section astro-api-package"
+        id={packageEntry.id}
+        aria-labelledby={`${packageEntry.id}-heading`}
+      >
+        <div class="astro-section-header">
+          <h2 id={`${packageEntry.id}-heading`}>{packageEntry.label}</h2>
+          <p>
+            <code>{packageEntry.name}</code> · {packageEntry.description}
+          </p>
+        </div>
+
+        <h3>Published entrypoints</h3>
+        <div class="astro-entrypoint-grid">
+          {packageEntry.entrypoints.map((entrypoint) => (
+            <article class="cf-card" data-variant="outlined">
+              <div class="astro-api-item-heading">
+                <code>{importPath(packageEntry.name, entrypoint.specifier)}</code>
+                <span class="cf-badge" data-tone="neutral" data-size="sm">
+                  {entrypoint.kind}
+                </span>
+              </div>
+              <p>{entrypoint.summary}</p>
+            </article>
+          ))}
+        </div>
+
+        <h3>Import pattern</h3>
+        <CodeBlock
+          code={examples[packageEntry.id]}
+          lang={packageEntry.id === "react" ? "tsx" : packageEntry.id === "svelte" ? "svelte" : "typescript"}
+          label={`${packageEntry.label} import pattern`}
+        />
+
+        {packageEntry.groups.map((group) => (
+          <section
+            class="astro-api-group"
+            aria-labelledby={`${packageEntry.id}-${group.title.replaceAll(/[^a-z0-9]+/gi, "-").toLowerCase()}`}
+          >
+            <h3 id={`${packageEntry.id}-${group.title.replaceAll(/[^a-z0-9]+/gi, "-").toLowerCase()}`}>
+              {group.title}
+            </h3>
+            <p>{group.description}</p>
+            <Table label={`${packageEntry.label} ${group.title}`} minWidth="58rem">
+              <thead>
+                <tr>
+                  <th scope="col">Export</th>
+                  <th scope="col">Contract</th>
+                  <th scope="col">Available from</th>
+                  <th scope="col">Purpose</th>
+                </tr>
+              </thead>
+              <tbody>
+                {group.items.map((item) => (
+                  <tr>
+                    <th scope="row">
+                      <code>{item.name}</code>
+                      <span class="astro-api-kind">{item.kind}</span>
+                    </th>
+                    <td>
+                      <code class="astro-api-signature">{item.signature}</code>
+                    </td>
+                    <td>
+                      {item.entrypoints.map((entrypoint) => (
+                        <code class="astro-api-entrypoint">{importPath(packageEntry.name, entrypoint)}</code>
+                      ))}
+                    </td>
+                    <td>{item.summary}</td>
+                  </tr>
+                ))}
+              </tbody>
+            </Table>
+          </section>
+        ))}
+      </section>
+    ))
+  }
+</Layout>

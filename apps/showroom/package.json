@@ -1,0 +1,31 @@
+{
+  "name": "@cofob/design-system-showroom",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "dev": "ASTRO_TELEMETRY_DISABLED=1 astro dev",
+    "build": "ASTRO_TELEMETRY_DISABLED=1 astro check && ASTRO_TELEMETRY_DISABLED=1 astro build",
+    "typecheck": "ASTRO_TELEMETRY_DISABLED=1 astro check",
+    "preview": "ASTRO_TELEMETRY_DISABLED=1 astro preview"
+  },
+  "dependencies": {
+    "@astrojs/react": "^6.0.1",
+    "@astrojs/svelte": "^9.0.1",
+    "@cofob/design-system-css": "0.1.0",
+    "@cofob/design-system-react": "0.1.0",
+    "@cofob/design-system-svelte": "0.1.0",
+    "astro": "^7.1.1",
+    "lucide": "^0.545.0",
+    "lucide-react": "^0.545.0",
+    "@lucide/svelte": "^1.25.0",
+    "react": "^19.2.0",
+    "react-dom": "^19.2.0",
+    "svelte": "^5.56.4"
+  },
+  "devDependencies": {
+    "@astrojs/check": "^0.9.9",
+    "sharp": "^0.35.3",
+    "typescript": "^6.0.3"
+  }
+}
