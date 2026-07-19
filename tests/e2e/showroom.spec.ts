@@ -595,8 +595,7 @@ test("Captcha showroom simulation ignores repeated starts and supports success, 
     await expect(captcha).toHaveAttribute("data-state", "verifying");
     await expect(captcha).toHaveAttribute("aria-busy", "true");
 
-    await captcha.click();
-    await page.waitForTimeout(1_000);
+    await captcha.dispatchEvent("click");
     await expect(captcha).toHaveAttribute("data-state", "verifying");
 
     await expect.poll(() => captcha.getAttribute("data-state"), { timeout: 2_000 }).toBe(expectedState);

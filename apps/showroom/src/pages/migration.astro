@@ -9,6 +9,7 @@ const mappings = [
   ["rounded-lg border-2 px-3 py-2", ".cf-button or .cf-input"],
   ["rounded-full bg-zinc-100", ".cf-tag or .cf-badge"],
   ["max-w-screen-lg mx-auto", ".cf-container"],
+  ["min-h-screen flex flex-col", ".cf-app-shell"],
   ["flex flex-col gap-*", ".cf-stack with data-gap"],
   ["flex flex-wrap gap-*", ".cf-inline with data-gap"],
   ["border-sky-300 bg-sky-50", ".cf-alert[data-tone=info]"],
@@ -27,6 +28,9 @@ const componentMappings = [
   ["blog/ResponsiveImage.svelte", "ResponsiveImage"],
   ["blog/ChatThread.svelte", "ChatThread"],
   ["blog/Sticker.svelte", "Sticker"],
+  ["comment avatar / fallback", "Avatar"],
+  ["custom emoji image", "InlineEmoji"],
+  ["comment attachment grid", "MediaGrid"],
   ["blog/RichText.svelte", "Prose"],
   ["blog/NoticeBlock.svelte", "Alert with info tone"],
   ["blog/WarningBlock.svelte", "Alert with warning tone"],
@@ -40,7 +44,7 @@ const componentMappings = [
   <PageHeader
     eyebrow="Migration"
     title="Move intent, not utility strings."
-    description="The original repository remains unchanged in v1. This guide defines a later, page-by-page migration to the Svelte adapter and shared CSS."
+    description="Version 0.1.1 supplies the application and publishing primitives for a page-by-page migration to the Svelte adapter and shared CSS."
   />
 
   <div class="cf-prose astro-doc-content">
@@ -54,9 +58,12 @@ const componentMappings = [
         Replace global palette, font, focus, and reduced-motion rules; verify that the page remains visually
         unchanged in light mode.
       </li>
-      <li>Migrate shell components: SkipLink, Navbar, Container/Section, and Footer.</li>
+      <li>Migrate shell components: SkipLink, AppShell, Navbar, Container/Section, and Footer.</li>
       <li>Migrate fields, tags, pagination, alerts, and cards.</li>
-      <li>Replace article descendant utilities with Prose and content components.</li>
+      <li>
+        Replace article descendant utilities with Prose and use Avatar, InlineEmoji, MediaGrid, and ChatThread
+        for comments and transcripts.
+      </li>
       <li>Remove the legacy utility pipeline only after repository-wide searches find no old directives.</li>
     </ol>
 

@@ -6,12 +6,16 @@
   interface Props extends Omit<HTMLAttributes<HTMLElement>, "title"> {
     result: PostSummary;
     query?: string;
+    headingLevel?: 2 | 3 | 4;
   }
 
-  let { result, query, class: className, ...rest }: Props = $props();
+  let { result, query, headingLevel = 2, class: className, ...rest }: Props = $props();
   const dateTime = $derived(result.publishedAt ?? result.published);
   const dateLabel = $derived(result.published ?? result.publishedAt);
+  const updatedDateTime = $derived(result.updatedAt ?? result.updated);
+  const updatedDateLabel = $derived(result.updated ?? result.updatedAt);
   const description = $derived(result.excerpt ?? result.description);
+  const HeadingElement = $derived(`h${headingLevel}` as "h2" | "h3" | "h4");
 
   function parts(value: string): Array<{ value: string; match: boolean }> {
     const normalizedQuery = query?.trim();
@@ -28,24 +32,39 @@
 </script>
 
 <article class={cx("cf-search-result-card", className)} data-query={query || undefined} {...rest}>
-  {#if dateLabel || result.readingTime}
+  {#if dateLabel || updatedDateLabel || result.readingTime}
     <p class="cf-search-result-card__meta">
-      {#if dateLabel}<time datetime={dateTime}>{dateLabel}</time
-        >{/if}{#if dateLabel && result.readingTime}<span class="cf-post-meta__separator" aria-hidden="true"
-          >·</span
+      {#if dateLabel}<span>Published <time datetime={dateTime}>{dateLabel}</time></span
+        >{/if}{#if dateLabel && (updatedDateLabel || result.readingTime)}<span
+          class="cf-post-meta__separator"
+          aria-hidden="true">·</span
+        >{/if}{#if updatedDateLabel}<span
+          >Updated <time datetime={updatedDateTime}>{updatedDateLabel}</time></span
+        >{/if}{#if updatedDateLabel && result.readingTime}<span
+          class="cf-post-meta__separator"
+          aria-hidden="true">·</span
         >{/if}{result.readingTime}
     </p>
   {/if}
-  <h2 class="cf-search-result-card__title">
+  <svelte:element this={HeadingElement} class="cf-search-result-card__title">
     <a href={result.href}
       >{#each parts(result.title) as part}{#if part.match}<mark>{part.value}</mark
           >{:else}{part.value}{/if}{/each}</a
     >
-  </h2>
+  </svelte:element>
   {#if description}
     <p class="cf-search-result-card__description">
       {#each parts(description) as part}{#if part.match}<mark>{part.value}</mark
           >{:else}{part.value}{/if}{/each}
     </p>
+  {/if}
+  {#if result.tags?.length}
+    <div class="cf-search-result-card__tags" aria-label="Tags">
+      {#each result.tags as tag (tag)}
+        <span class="cf-tag">
+          {#each parts(tag) as part}{#if part.match}<mark>{part.value}</mark>{:else}{part.value}{/if}{/each}
+        </span>
+      {/each}
+    </div>
   {/if}
 </article>

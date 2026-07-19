@@ -31,7 +31,7 @@ export type PostSummary = PostModel;
 export interface ChatMessage extends Omit<ChatMessageModel, "id" | "author" | "body"> {
   id: string;
   author: string;
-  body: string | Snippet;
+  body?: string | Snippet;
 }
 
 export interface MenuItem {

@@ -2,6 +2,8 @@
   import {
     Accordion,
     Alert,
+    AppShell,
+    Avatar,
     Badge,
     BlueLine,
     Button,
@@ -19,8 +21,10 @@
     Heading,
     IconButton,
     Inline,
+    InlineEmoji,
     LatestPostCard,
     Link,
+    MediaGrid,
     Navbar,
     Pagination,
     Popover,
@@ -78,6 +82,8 @@
     excerpt: "A practical note about content-first design.",
     published: "19 July 2026",
     publishedAt: "2026-07-19",
+    updated: "20 July 2026",
+    updatedAt: "2026-07-20",
     readingTime: "4 min read",
     tags: ["design", "css"],
   };
@@ -160,6 +166,12 @@ applyTheme(preference);`;
       <p id={skipTargetId} tabindex="-1">Preview content target</p>
     </div>
   </div>
+{:else if name === "AppShell"}
+  <AppShell style="min-block-size: 18rem">
+    <header><Text size="sm" tone="muted">Header</Text></header>
+    <div style="flex: 1 0 auto"><Heading level={3}>Main content grows</Heading></div>
+    <footer><Text size="sm" tone="muted">Sticky footer</Text></footer>
+  </AppShell>
 {:else if name === "Heading"}
   <Heading as="h3" size="2xl">Content comes first.</Heading>
 {:else if name === "Text"}
@@ -438,6 +450,18 @@ applyTheme(preference);`;
     caption="A responsive image with intrinsic dimensions."
     priority
   />
+{:else if name === "Avatar"}
+  <Inline gap="sm">
+    <Avatar {image} name="Ada Lovelace" alt="Ada Lovelace" size="lg" />
+    <Avatar name="Grace Hopper" />
+  </Inline>
+{:else if name === "InlineEmoji"}
+  <Text>Semantic inline image <InlineEmoji {image} alt="Blue landscape" /> stays aligned with text.</Text>
+{:else if name === "MediaGrid"}
+  <MediaGrid>
+    <li><img src={image.src} alt={image.alt} width={image.width} height={image.height} /></li>
+    <li><img src={darkImage.src} alt={darkImage.alt} width={darkImage.width} height={darkImage.height} /></li>
+  </MediaGrid>
 {:else if name === "ChatThread"}
   <ChatThread
     messages={[
@@ -445,7 +469,10 @@ applyTheme(preference);`;
       {
         id: "two",
         author: "reader",
-        body: "Then every adapter stays aligned.",
+        text: "Then every adapter stays aligned.",
+        link: "https://cofob.dev/blog",
+        linkLabel: "Read the implementation notes",
+        linkExternal: true,
         own: true,
         timestamp: "19:20",
       },

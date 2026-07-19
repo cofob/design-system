@@ -10,6 +10,7 @@ const expected = [
   "ThemeScript",
   "ThemeToggle",
   "SkipLink",
+  "AppShell",
   "Heading",
   "Text",
   "Link",
@@ -51,6 +52,9 @@ const expected = [
   "LatestPostCard",
   "SearchResultCard",
   "ResponsiveImage",
+  "Avatar",
+  "InlineEmoji",
+  "MediaGrid",
   "ChatThread",
   "Sticker",
 ];

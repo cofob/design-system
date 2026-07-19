@@ -50,7 +50,10 @@ export interface PostModel {
   published?: string;
   /** Machine-readable date used by the `<time datetime>` attribute. */
   publishedAt?: string;
+  /** Human-readable update date label, for example `20 July 2026`. */
   updated?: string;
+  /** Machine-readable update date used by the `<time datetime>` attribute. */
+  updatedAt?: string;
   lang?: string;
   readingTime?: string;
   tags?: readonly string[];
@@ -65,6 +68,7 @@ export interface ChatMessageModel {
   text?: string;
   link?: string;
   linkLabel?: string;
+  linkExternal?: boolean;
   timestamp?: string;
   own?: boolean;
   avatar?: ResponsiveImageModel;
