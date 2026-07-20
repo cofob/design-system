@@ -1,11 +1,14 @@
-import { forwardRef, Fragment } from "react";
+import { forwardRef, Fragment, useId } from "react";
 import type {
   AnchorHTMLAttributes,
   ButtonHTMLAttributes,
   CSSProperties,
+  FieldsetHTMLAttributes,
+  FormEventHandler,
   HTMLAttributes,
   ImgHTMLAttributes,
   InputHTMLAttributes,
+  ProgressHTMLAttributes,
   ReactNode,
   SelectHTMLAttributes,
   TableHTMLAttributes,
@@ -124,6 +127,40 @@ export interface ProseProps extends HTMLAttributes<HTMLElement> {
 
 export function Prose({ size = "narrow", className, ...props }: ProseProps) {
   return <article className={cx("cf-prose", className)} data-size={size} {...props} />;
+}
+
+export interface BreadcrumbItem {
+  label: ReactNode;
+  href?: string;
+  current?: boolean;
+}
+
+export interface BreadcrumbsProps extends HTMLAttributes<HTMLElement> {
+  items: readonly BreadcrumbItem[];
+  label?: string;
+}
+
+export function Breadcrumbs({ items, label = "Breadcrumb", className, ...props }: BreadcrumbsProps) {
+  return (
+    <nav className={cx("cf-breadcrumbs", className)} aria-label={label} {...props}>
+      <ol className="cf-breadcrumbs__list">
+        {items.map((item, index) => {
+          const current = item.current ?? index === items.length - 1;
+          return (
+            <li className="cf-breadcrumbs__item" key={`${index}-${String(item.href ?? "current")}`}>
+              {item.href && !current ? (
+                <a className="cf-breadcrumbs__link" href={item.href}>
+                  {item.label}
+                </a>
+              ) : (
+                <span aria-current={current ? "page" : undefined}>{item.label}</span>
+              )}
+            </li>
+          );
+        })}
+      </ol>
+    </nav>
+  );
 }
 
 export interface TableProps extends TableHTMLAttributes<HTMLTableElement> {
@@ -603,6 +640,371 @@ export const Switch = forwardRef<HTMLInputElement, SwitchProps>(function Switch(
     </label>
   );
 });
+
+export interface RadioProps extends Omit<InputHTMLAttributes<HTMLInputElement>, "size" | "type"> {
+  label: ReactNode;
+  description?: ReactNode;
+  size?: Size;
+}
+
+export const Radio = forwardRef<HTMLInputElement, RadioProps>(function Radio(
+  { label, description, size = "md", className, disabled, ...props },
+  ref,
+) {
+  return (
+    <label className={cx("cf-radio", className)} data-size={size} data-disabled={disabled || undefined}>
+      <input ref={ref} type="radio" disabled={disabled} {...props} />
+      <span className="cf-radio__control" aria-hidden="true" />
+      <span className="cf-radio__content">
+        <span className="cf-radio__label">{label}</span>
+        {description ? <span className="cf-radio__description">{description}</span> : null}
+      </span>
+    </label>
+  );
+});
+
+export interface RadioOption {
+  value: string;
+  label: ReactNode;
+  description?: ReactNode;
+  disabled?: boolean;
+}
+
+export interface RadioGroupProps extends Omit<FieldsetHTMLAttributes<HTMLFieldSetElement>, "onChange"> {
+  name: string;
+  label: ReactNode;
+  options?: readonly RadioOption[];
+  value?: string;
+  defaultValue?: string;
+  description?: ReactNode;
+  error?: ReactNode;
+  orientation?: "horizontal" | "vertical";
+  onValueChange?: (value: string) => void;
+  onChange?: FormEventHandler<HTMLFieldSetElement>;
+}
+
+export function RadioGroup({
+  name,
+  label,
+  options = [],
+  value,
+  defaultValue,
+  description,
+  error,
+  orientation = "vertical",
+  onValueChange,
+  onChange,
+  className,
+  children,
+  disabled,
+  "aria-describedby": ariaDescribedBy,
+  ...props
+}: RadioGroupProps) {
+  const baseId = `cf-radio-group-${slugId(name) || "options"}`;
+  const descriptionId = description ? `${baseId}-description` : undefined;
+  const errorId = error ? `${baseId}-error` : undefined;
+  return (
+    <fieldset
+      className={cx("cf-radio-group", className)}
+      data-orientation={orientation}
+      data-invalid={Boolean(error) || undefined}
+      disabled={disabled}
+      aria-invalid={Boolean(error) || undefined}
+      aria-describedby={[ariaDescribedBy, errorId ?? descriptionId].filter(Boolean).join(" ") || undefined}
+      onChange={(event) => {
+        onChange?.(event);
+        if (event.defaultPrevented) return;
+        const target = event.target as unknown as HTMLInputElement;
+        if (target.type === "radio" && target.name === name) onValueChange?.(target.value);
+      }}
+      {...props}
+    >
+      <legend className="cf-radio-group__legend">{label}</legend>
+      {description ? (
+        <div className="cf-radio-group__description" id={descriptionId}>
+          {description}
+        </div>
+      ) : null}
+      <div className="cf-radio-group__options">
+        {options.map((option) => (
+          <Radio
+            key={option.value}
+            name={name}
+            value={option.value}
+            label={option.label}
+            description={option.description}
+            disabled={option.disabled}
+            checked={value === undefined ? undefined : value === option.value}
+            defaultChecked={value === undefined ? defaultValue === option.value : undefined}
+          />
+        ))}
+        {children}
+      </div>
+      {error ? (
+        <div className="cf-radio-group__error" id={errorId} role="alert">
+          {error}
+        </div>
+      ) : null}
+    </fieldset>
+  );
+}
+
+export interface ProgressProps extends Omit<ProgressHTMLAttributes<HTMLProgressElement>, "value"> {
+  value?: number;
+  label?: ReactNode;
+  valueLabel?: ReactNode;
+  animated?: boolean;
+  showValue?: boolean;
+}
+
+export const Progress = forwardRef<HTMLProgressElement, ProgressProps>(function Progress(
+  {
+    value,
+    max = 100,
+    label,
+    valueLabel,
+    animated = false,
+    showValue = true,
+    className,
+    id: providedId,
+    ...props
+  },
+  ref,
+) {
+  const generatedId = useId();
+  const progressId = providedId ?? generatedId;
+  const numericMax = typeof max === "number" && max > 0 ? max : 100;
+  const automaticLabel = value === undefined ? "In progress" : `${Math.round((value / numericMax) * 100)}%`;
+  return (
+    <div
+      className={cx("cf-progress", className)}
+      data-state={value === undefined ? "indeterminate" : "determinate"}
+      data-animated={animated || undefined}
+    >
+      {label || showValue ? (
+        <div className="cf-progress__header">
+          {label ? (
+            <label className="cf-progress__label" htmlFor={progressId}>
+              {label}
+            </label>
+          ) : (
+            <span />
+          )}
+          {showValue ? <span className="cf-progress__value">{valueLabel ?? automaticLabel}</span> : null}
+        </div>
+      ) : null}
+      <progress ref={ref} className="cf-progress__track" id={progressId} value={value} max={max} {...props}>
+        {automaticLabel}
+      </progress>
+    </div>
+  );
+});
+
+export interface SpinnerProps extends HTMLAttributes<HTMLSpanElement> {
+  label?: string;
+  size?: Size;
+}
+
+export function Spinner({ label = "Loading", size = "md", className, ...props }: SpinnerProps) {
+  return (
+    <span className={cx("cf-spinner", className)} data-size={size} role="status" {...props}>
+      <span className="cf-visually-hidden">{label}</span>
+    </span>
+  );
+}
+
+export interface CircularProgressProps extends HTMLAttributes<HTMLSpanElement> {
+  value: number;
+  max?: number;
+  label: string;
+  size?: Size;
+  animated?: boolean;
+  showValue?: boolean;
+  formatValue?: (percentage: number, value: number, max: number) => ReactNode;
+}
+
+export function CircularProgress({
+  value,
+  max = 100,
+  label,
+  size = "md",
+  animated = false,
+  showValue = true,
+  formatValue = (percentage) => `${percentage}%`,
+  className,
+  "aria-label": ariaLabel,
+  ...props
+}: CircularProgressProps) {
+  const resolvedMax = Number.isFinite(max) && max > 0 ? max : 100;
+  const resolvedValue = Math.min(resolvedMax, Math.max(0, Number.isFinite(value) ? value : 0));
+  const percentage = Math.round((resolvedValue / resolvedMax) * 100);
+  return (
+    <span
+      className={cx("cf-circular-progress", className)}
+      data-size={size}
+      data-animated={animated || undefined}
+      role="progressbar"
+      aria-label={ariaLabel ?? label}
+      aria-valuemin={0}
+      aria-valuemax={resolvedMax}
+      aria-valuenow={resolvedValue}
+      {...props}
+    >
+      <svg className="cf-circular-progress__graphic" viewBox="0 0 44 44" aria-hidden="true">
+        <circle className="cf-circular-progress__track" cx="22" cy="22" r="18" />
+        <circle
+          className="cf-circular-progress__indicator"
+          cx="22"
+          cy="22"
+          r="18"
+          pathLength="100"
+          strokeDasharray="100"
+          strokeDashoffset={100 - percentage}
+        />
+      </svg>
+      {showValue ? (
+        <span className="cf-circular-progress__value">
+          {formatValue(percentage, resolvedValue, resolvedMax)}
+        </span>
+      ) : null}
+    </span>
+  );
+}
+
+export interface SkeletonProps extends HTMLAttributes<HTMLSpanElement> {
+  variant?: "text" | "rectangle" | "circle";
+  width?: CSSProperties["width"];
+  height?: CSSProperties["height"];
+}
+
+export function Skeleton({
+  variant = "rectangle",
+  width,
+  height,
+  className,
+  style,
+  ...props
+}: SkeletonProps) {
+  return (
+    <span
+      className={cx("cf-skeleton", className)}
+      data-variant={variant}
+      aria-hidden="true"
+      style={{ width, height, ...style }}
+      {...props}
+    />
+  );
+}
+
+export interface SeparatorProps extends HTMLAttributes<HTMLElement> {
+  orientation?: "horizontal" | "vertical";
+  decorative?: boolean;
+}
+
+export function Separator({
+  orientation = "horizontal",
+  decorative = false,
+  className,
+  ...props
+}: SeparatorProps) {
+  if (orientation === "horizontal") {
+    return (
+      <hr
+        className={cx("cf-separator", className)}
+        aria-hidden={decorative || undefined}
+        {...(props as HTMLAttributes<HTMLHRElement>)}
+      />
+    );
+  }
+  return (
+    <span
+      className={cx("cf-separator", className)}
+      role={decorative ? "none" : "separator"}
+      aria-orientation={decorative ? undefined : "vertical"}
+      aria-hidden={decorative || undefined}
+      data-orientation="vertical"
+      {...props}
+    />
+  );
+}
+
+export interface StepperItem {
+  id: string;
+  label: ReactNode;
+  description?: ReactNode;
+  href?: string;
+  disabled?: boolean;
+  state?: "complete" | "current" | "upcoming";
+}
+
+export interface StepperProps extends HTMLAttributes<HTMLElement> {
+  items: readonly StepperItem[];
+  currentStep: string;
+  label?: string;
+  orientation?: "horizontal" | "vertical";
+  onStepChange?: (id: string) => void;
+}
+
+export function Stepper({
+  items,
+  currentStep,
+  label = "Progress",
+  orientation = "horizontal",
+  onStepChange,
+  className,
+  ...props
+}: StepperProps) {
+  const currentIndex = Math.max(
+    0,
+    items.findIndex((item) => item.id === currentStep),
+  );
+  return (
+    <nav className={cx("cf-stepper", className)} aria-label={label} data-orientation={orientation} {...props}>
+      <ol className="cf-stepper__list">
+        {items.map((item, index) => {
+          const state =
+            item.state ??
+            (index < currentIndex ? "complete" : index === currentIndex ? "current" : "upcoming");
+          const content = (
+            <>
+              <span className="cf-stepper__indicator" aria-hidden="true">
+                {state === "complete" ? "✓" : index + 1}
+              </span>
+              <span className="cf-stepper__label">{item.label}</span>
+              {item.description ? <span className="cf-stepper__description">{item.description}</span> : null}
+            </>
+          );
+          return (
+            <li className="cf-stepper__item" data-state={state} key={item.id}>
+              {item.href && !item.disabled ? (
+                <a
+                  className="cf-stepper__trigger"
+                  href={item.href}
+                  aria-current={state === "current" ? "step" : undefined}
+                >
+                  {content}
+                </a>
+              ) : onStepChange && !item.disabled ? (
+                <button
+                  className="cf-stepper__trigger"
+                  type="button"
+                  aria-current={state === "current" ? "step" : undefined}
+                  onClick={() => onStepChange(item.id)}
+                >
+                  {content}
+                </button>
+              ) : (
+                <div className="cf-stepper__trigger" aria-current={state === "current" ? "step" : undefined}>
+                  {content}
+                </div>
+              )}
+            </li>
+          );
+        })}
+      </ol>
+    </nav>
+  );
+}
 
 export interface BadgeProps extends HTMLAttributes<HTMLSpanElement> {
   tone?: Tone;
@@ -1426,12 +1828,12 @@ export function ChatThread({ messages, label = "Conversation", className, ...pro
               </span>
             )}
             <div className="cf-chat__message">
-              {groupStart ? (
-                <p className="cf-chat__author">
-                  <strong>{message.author}</strong>
-                </p>
-              ) : null}
               <div className="cf-chat__bubble">
+                {groupStart ? (
+                  <p className="cf-chat__author">
+                    <strong>{message.author}</strong>
+                  </p>
+                ) : null}
                 {!groupStart ? <span className="cf-visually-hidden">{message.author}: </span> : null}
                 {message.body ?? message.text}
                 {message.link ? (

@@ -477,6 +477,9 @@ test("ChatThread groups consecutive messages from the same sender", async ({ pag
     await expect(rows.nth(3)).not.toHaveAttribute("data-group-start");
     await expect(rows.nth(3)).toHaveAttribute("data-group-end", "true");
     await expect(panel.locator(".cf-chat__author")).toHaveCount(2);
+    await expect(panel.locator(".cf-chat__bubble > .cf-chat__author")).toHaveCount(2);
+    await expect(rows.nth(0).locator(".cf-chat__bubble > :first-child")).toHaveClass("cf-chat__author");
+    await expect(rows.nth(2).locator(".cf-chat__bubble > :first-child")).toHaveClass("cf-chat__author");
     await expect(panel.locator(".cf-chat__timestamp")).toHaveCount(4);
 
     const avatarVisibility = await rows.evaluateAll((items) =>
@@ -1057,6 +1060,7 @@ test("sticker gallery shards packs, lazy-loads WebM, and copies names or framewo
 });
 
 test("BlueLine preserves the original marker geometry and motion in every adapter", async ({ page }) => {
+  await page.addInitScript(() => localStorage.setItem("cf-theme", "light"));
   await page.goto("/components/blue-line/");
   const sizes: Array<{ width: number; height: number }> = [];
 
@@ -1247,6 +1251,7 @@ test("Accordion switches equal-height examples without moving following page con
 });
 
 test("ResponsiveImage swaps to the dark artwork for an explicit dark theme", async ({ page }) => {
+  await page.addInitScript(() => localStorage.setItem("cf-theme", "light"));
   await page.goto("/components/responsive-image/");
   for (const framework of frameworkNames) {
     const panel = await selectFramework(page, framework);
@@ -1333,12 +1338,12 @@ test("ToastProvider and ToastViewport create one matching bottom-right notificat
 test("theme choice persists and updates the resolved theme", async ({ page }) => {
   await page.goto("/");
   const toggle = await visibleShowroomThemeToggle(page);
-  await expect(toggle).toHaveAttribute("data-preference", "system");
+  await expect(toggle).toHaveAttribute("data-preference", "dark");
   await toggle.click();
-  await expect(page.locator("html")).toHaveAttribute("data-theme-preference", "light");
+  await expect(page.locator("html")).toHaveAttribute("data-theme-preference", "system");
   await page.reload();
-  await expect(page.locator("html")).toHaveAttribute("data-theme-preference", "light");
-  await expect(toggle).toHaveAttribute("data-preference", "light");
+  await expect(page.locator("html")).toHaveAttribute("data-theme-preference", "system");
+  await expect(toggle).toHaveAttribute("data-preference", "system");
 });
 
 test("hydrated component previews never overwrite the saved page theme", async ({ page }) => {
@@ -1464,20 +1469,19 @@ test("native Checkbox and Switch use the visual control contract and toggle nati
   await expect(switchInput).not.toBeChecked();
 });
 
-test.describe("CSS-only theme fallback", () => {
+test.describe("CSS-only showroom theme", () => {
   test.use({ javaScriptEnabled: false });
 
   for (const colorScheme of ["light", "dark"] as const) {
-    test(`prefers-color-scheme provides the ${colorScheme} theme without JavaScript`, async ({ page }) => {
+    test(`the original dark design remains active without JavaScript in ${colorScheme} mode`, async ({
+      page,
+    }) => {
       await page.emulateMedia({ colorScheme });
       await page.goto("/");
 
-      expect(await page.locator("html").getAttribute("data-theme")).toBeNull();
-      expect(await page.locator("html").getAttribute("data-theme-preference")).toBeNull();
-      await expect(page.locator("body")).toHaveCSS(
-        "background-color",
-        colorScheme === "dark" ? "rgb(9, 9, 11)" : "rgb(255, 255, 255)",
-      );
+      await expect(page.locator("html")).toHaveAttribute("data-theme", "dark");
+      await expect(page.locator("html")).toHaveAttribute("data-theme-preference", "dark");
+      await expect(page.locator("body")).toHaveCSS("background-color", "rgb(9, 9, 11)");
     });
   }
 });
@@ -1617,8 +1621,172 @@ for (const framework of frameworkNames) {
     panel = await selectFramework(page, framework);
     await panel.locator("button").first().click();
     await expect(page.getByRole("status").or(page.getByRole("alert"))).toBeVisible();
+
+    await page.goto("/components/combobox/");
+    panel = await selectFramework(page, framework);
+    const combobox = panel.getByRole("combobox", { name: "Framework" });
+    await combobox.fill("svelte");
+    await combobox.press("ArrowDown");
+    const activeOption = panel.getByRole("option", { name: /Svelte/ });
+    const activeOptionId = await activeOption.getAttribute("id");
+    if (!activeOptionId) throw new Error(`${framework} combobox active option has no id.`);
+    await expect(combobox).toHaveAttribute("aria-activedescendant", activeOptionId);
+    await combobox.press("Enter");
+    await expect(combobox).toHaveValue("Svelte");
+    await expect(combobox).toHaveAttribute("aria-expanded", "false");
+    await expect(panel.locator('input[type="hidden"][name="framework"]')).toHaveValue("svelte");
+
+    await page.goto("/components/drawer/");
+    panel = await selectFramework(page, framework);
+    const drawerTrigger = panel.getByRole("button", { name: "Open filters" });
+    await drawerTrigger.click();
+    await expect(page.getByRole("dialog", { name: "Filter components" })).toBeVisible();
+    await page.keyboard.press("Escape");
+    await expect(page.getByRole("dialog", { name: "Filter components" })).not.toBeVisible();
+    await expect(drawerTrigger).toBeFocused();
+
+    for (const mediaComponent of ["audio-player", "video-player"] as const) {
+      await page.goto(`/components/${mediaComponent}/`);
+      panel = await selectFramework(page, framework);
+      if (mediaComponent === "video-player") {
+        const player = panel.locator(".cf-video-player");
+        const start = player.locator(".cf-video-player__start");
+        await expect(player).toHaveAttribute("data-started", "false");
+        await expect(start).toBeVisible();
+        await expect(player.locator(".cf-video-player__controls")).toBeHidden();
+        await start.click();
+        await expect(player).toHaveAttribute("data-started", "true");
+        await expect(start).toBeHidden();
+        const controls = player.locator(".cf-video-player__controls");
+        await expect(controls).toBeVisible();
+        await page.mouse.move(0, 0);
+        await expect(controls).toHaveCSS("opacity", "0");
+        await player.hover();
+        await expect(controls).toHaveCSS("opacity", "1");
+      }
+      const timeline = panel.getByRole("slider", { name: "Playback position" });
+      await timeline.focus();
+      await timeline.press("ArrowRight");
+      await expect.poll(async () => Number(await timeline.inputValue())).toBeGreaterThan(0);
+    }
   });
 }
+
+test("CircularProgress loops smoothly across its animation boundary", async ({ page }, testInfo) => {
+  test.skip(testInfo.project.name !== "chromium-desktop", "Animation timing only needs one viewport.");
+  await page.goto("/components/circular-progress/");
+
+  const graphic = page
+    .locator('.cf-circular-progress[data-animated="true"] .cf-circular-progress__graphic')
+    .first();
+  const boundaryDelta = await graphic.evaluate((element) => {
+    const animation = element.getAnimations()[0];
+    if (!animation) throw new Error("CircularProgress has no animation.");
+    animation.pause();
+
+    const angleAt = (time: number) => {
+      animation.currentTime = time;
+      const matrix = new DOMMatrixReadOnly(getComputedStyle(element).transform);
+      return (Math.atan2(matrix.b, matrix.a) * 180) / Math.PI;
+    };
+
+    const before = angleAt(899);
+    const after = angleAt(901);
+    return ((after - before + 540) % 360) - 180;
+  });
+
+  expect(Math.abs(boundaryDelta)).toBeLessThan(2);
+});
+
+test("VideoPlayer fullscreen fills the viewport and supports keyboard shortcuts", async ({
+  page,
+}, testInfo) => {
+  test.skip(testInfo.project.name !== "chromium-desktop", "Fullscreen is verified in a desktop browser.");
+  await page.goto("/components/video-player/");
+
+  for (const framework of frameworkNames) {
+    const panel = await selectFramework(page, framework);
+    const player = panel.locator(".cf-video-player");
+    const start = player.locator(".cf-video-player__start");
+    await expect(player).toHaveAttribute("data-started", "false");
+    await expect(start).toBeVisible();
+    await expect(player.locator(".cf-video-player__controls")).toBeHidden();
+    await start.click();
+    await expect(player).toHaveAttribute("data-started", "true");
+    await expect(start).toBeHidden();
+    await expect(player.locator(".cf-video-player__controls")).toBeVisible();
+    await player.getByRole("button", { name: "Pause video" }).click();
+    const fullscreenButton = panel.getByRole("button", { name: "Enter fullscreen" });
+    await fullscreenButton.focus();
+    await fullscreenButton.press("Enter");
+    await expect.poll(() => page.evaluate(() => document.fullscreenElement !== null)).toBe(true);
+
+    const fullscreenPlayer = page.locator(".cf-video-player:fullscreen");
+    await expect(fullscreenPlayer).toBeFocused();
+    await expect(fullscreenPlayer.locator(".cf-video-player__caption")).toBeHidden();
+    const coverage = await fullscreenPlayer.locator(".cf-video-player__frame").evaluate((frame) => {
+      const rect = frame.getBoundingClientRect();
+      const rootRect = frame.closest(".cf-video-player")?.getBoundingClientRect();
+      return {
+        left: rect.left,
+        top: rect.top,
+        right: rect.right,
+        bottom: rect.bottom,
+        rootLeft: rootRect?.left,
+        rootTop: rootRect?.top,
+        rootRight: rootRect?.right,
+        rootBottom: rootRect?.bottom,
+        viewportWidth: innerWidth,
+        viewportHeight: innerHeight,
+        documentOverflow: getComputedStyle(document.documentElement).overflow,
+        scrollbarGutter: getComputedStyle(document.documentElement).scrollbarGutter,
+      };
+    });
+    expect(coverage).toEqual({
+      left: 0,
+      top: 0,
+      right: coverage.viewportWidth,
+      bottom: coverage.viewportHeight,
+      rootLeft: 0,
+      rootTop: 0,
+      rootRight: coverage.viewportWidth,
+      rootBottom: coverage.viewportHeight,
+      viewportWidth: coverage.viewportWidth,
+      viewportHeight: coverage.viewportHeight,
+      documentOverflow: "hidden",
+      scrollbarGutter: "auto",
+    });
+
+    await page.keyboard.press("Space");
+    await expect(fullscreenPlayer).toHaveAttribute("data-state", "playing");
+    await page.keyboard.press("Space");
+    await expect(fullscreenPlayer).toHaveAttribute("data-state", "paused");
+    await page.keyboard.press("k");
+    await expect(fullscreenPlayer).toHaveAttribute("data-state", "playing");
+    await page.keyboard.press("k");
+    await expect(fullscreenPlayer).toHaveAttribute("data-state", "paused");
+
+    const timeline = fullscreenPlayer.getByRole("slider", { name: "Playback position" });
+    await page.keyboard.press("ArrowRight");
+    await expect.poll(async () => Number(await timeline.inputValue())).toBeGreaterThan(0);
+    await page.keyboard.press("ArrowLeft");
+    await expect.poll(async () => Number(await timeline.inputValue())).toBe(0);
+
+    const muted = await fullscreenPlayer.getAttribute("data-muted");
+    await page.keyboard.press("m");
+    await expect(fullscreenPlayer).not.toHaveAttribute("data-muted", muted ?? "");
+    const volume = fullscreenPlayer.getByRole("slider", { name: "Volume" });
+    const initialVolume = Number(await volume.inputValue());
+    await page.keyboard.press("ArrowDown");
+    await expect.poll(async () => Number(await volume.inputValue())).toBeLessThan(initialVolume);
+    await page.keyboard.press("ArrowUp");
+    await expect.poll(async () => Number(await volume.inputValue())).toBe(initialVolume);
+
+    await page.keyboard.press("f");
+    await expect.poll(() => page.evaluate(() => document.fullscreenElement === null)).toBe(true);
+    await expect(fullscreenButton).toBeFocused();
+  }
+});
 
 for (const route of accessibilityRoutes) {
   for (const theme of ["light", "dark"] as const) {
@@ -1657,6 +1825,7 @@ test("@a11y every component detail includes violation-free Native, React, and Sv
 });
 
 test("@visual component overview remains stable in explicit and system themes", async ({ page }) => {
+  test.setTimeout(120_000);
   await page.goto("/components/");
   await page.evaluate(() => localStorage.setItem("cf-theme", "light"));
   await page.reload();
@@ -1696,6 +1865,7 @@ test("@visual sticker copy card remains stable", async ({ page }) => {
 
 test("@visual AnimatedSticker preserves its first frame under reduced motion", async ({ page }) => {
   await page.emulateMedia({ colorScheme: "light", reducedMotion: "reduce" });
+  await page.addInitScript(() => localStorage.setItem("cf-theme", "light"));
   await page.goto("/components/animated-sticker/");
   const panel = page.locator('[data-framework-panel="native"]');
   const root = panel.getByRole("img", {
@@ -1707,6 +1877,7 @@ test("@visual AnimatedSticker preserves its first frame under reduced motion", a
 });
 
 test("@visual React and Svelte representative states remain stable", async ({ page }) => {
+  test.setTimeout(90_000);
   await page.emulateMedia({ colorScheme: "dark" });
   await page.goto("/");
   await page.evaluate(() => localStorage.setItem("cf-theme", "system"));

@@ -5,12 +5,14 @@ import {
   Alert,
   AppShell,
   Avatar,
+  Breadcrumbs,
   BlueLine,
   Button,
   Captcha,
   Card,
   ChatThread,
   Checkbox,
+  CircularProgress,
   EmptyState,
   IconButton,
   InlineEmoji,
@@ -18,10 +20,16 @@ import {
   Navbar,
   MediaGrid,
   Pagination,
+  Progress,
+  RadioGroup,
   PostCard,
   Prose,
   SearchResultCard,
   Select,
+  Separator,
+  Skeleton,
+  Spinner,
+  Stepper,
   Table,
   ResponsiveImage,
 } from "./static.js";
@@ -62,6 +70,45 @@ describe("static components", () => {
   it("renders native form controls", () => {
     render(<Checkbox label="Updates" defaultChecked />);
     expect(screen.getByRole("checkbox", { name: "Updates" })).toBeChecked();
+  });
+
+  it("renders the additional native-semantic primitives without client state", () => {
+    const { container } = render(
+      <>
+        <Breadcrumbs items={[{ label: "Home", href: "/" }, { label: "Settings" }]} />
+        <RadioGroup
+          name="plan"
+          label="Plan"
+          defaultValue="pro"
+          options={[
+            { value: "free", label: "Free" },
+            { value: "pro", label: "Pro" },
+          ]}
+        />
+        <Progress label="Upload" value={40} />
+        <Spinner label="Loading results" />
+        <CircularProgress label="Indexing" value={64} />
+        <Skeleton width="8rem" />
+        <Separator />
+        <Stepper
+          currentStep="details"
+          items={[
+            { id: "account", label: "Account" },
+            { id: "details", label: "Details" },
+          ]}
+        />
+      </>,
+    );
+
+    expect(screen.getByRole("navigation", { name: "Breadcrumb" })).toHaveClass("cf-breadcrumbs");
+    expect(screen.getByRole("radio", { name: "Pro" })).toBeChecked();
+    expect(screen.getByRole("progressbar", { name: "Upload" })).toHaveAttribute("value", "40");
+    expect(screen.getByRole("status")).toHaveClass("cf-spinner");
+    expect(screen.getByRole("status")).toHaveTextContent("Loading results");
+    expect(screen.getByRole("progressbar", { name: "Indexing" })).toHaveAttribute("aria-valuenow", "64");
+    expect(container.querySelector(".cf-skeleton")).toHaveAttribute("aria-hidden", "true");
+    expect(container.querySelector("hr.cf-separator")).not.toBeNull();
+    expect(screen.getByRole("navigation", { name: "Progress" })).toHaveClass("cf-stepper");
   });
 
   it("renders an accessible responsive table with explicit presentation options", () => {
@@ -327,6 +374,8 @@ describe("static components", () => {
     expect(rows[3]).not.toHaveAttribute("data-group-start");
     expect(rows[3]).toHaveAttribute("data-group-end", "true");
     expect(container.querySelectorAll(".cf-chat__author")).toHaveLength(2);
+    expect(container.querySelectorAll(".cf-chat__bubble > .cf-chat__author")).toHaveLength(2);
+    expect(container.querySelector(".cf-chat__bubble")?.firstElementChild).toHaveClass("cf-chat__author");
     expect(container.querySelectorAll(".cf-chat__timestamp")).toHaveLength(4);
     expect(container.querySelectorAll(".cf-chat__bubble .cf-visually-hidden")).toHaveLength(2);
     expect(container.querySelector("span.cf-chat__avatar")).toHaveTextContent("C");
