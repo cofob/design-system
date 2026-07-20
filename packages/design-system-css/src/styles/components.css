@@ -2345,6 +2345,7 @@
     inline-size: 100%;
     min-inline-size: 0;
     margin-block: var(--cf-space-8) var(--cf-space-4);
+    padding-inline: var(--cf-space-4);
     color: var(--cf-color-text-muted);
     text-align: center;
   }
@@ -2520,6 +2521,7 @@
   }
 
   .cf-latest-post-card:hover,
+  .cf-latest-post-card:focus-visible,
   .cf-latest-post-card:focus-within {
     border-color: var(--cf-color-border-strong);
     background: var(--cf-color-surface);
@@ -2550,13 +2552,8 @@
     overflow-wrap: anywhere;
   }
 
-  .cf-latest-post-card__title a {
-    color: inherit;
-    text-decoration: none;
-  }
-
-  .cf-latest-post-card:hover .cf-latest-post-card__title a,
-  .cf-latest-post-card:focus-within .cf-latest-post-card__title a {
+  .cf-latest-post-card:hover .cf-latest-post-card__title,
+  .cf-latest-post-card:focus-visible .cf-latest-post-card__title {
     text-decoration: underline;
     text-decoration-color: var(--cf-color-marker);
     text-decoration-thickness: 0.16em;
@@ -2707,20 +2704,20 @@
     display: none;
   }
 
-  :root[data-theme="dark"] .cf-responsive-image__light {
+  :root[data-theme="dark"] .cf-responsive-image[data-has-dark-image="true"] .cf-responsive-image__light {
     display: none;
   }
 
-  :root[data-theme="dark"] .cf-responsive-image__dark {
+  :root[data-theme="dark"] .cf-responsive-image[data-has-dark-image="true"] .cf-responsive-image__dark {
     display: block;
   }
 
   @media (prefers-color-scheme: dark) {
-    :root:not([data-theme]) .cf-responsive-image__light {
+    :root:not([data-theme]) .cf-responsive-image[data-has-dark-image="true"] .cf-responsive-image__light {
       display: none;
     }
 
-    :root:not([data-theme]) .cf-responsive-image__dark {
+    :root:not([data-theme]) .cf-responsive-image[data-has-dark-image="true"] .cf-responsive-image__dark {
       display: block;
     }
   }
@@ -2738,7 +2735,6 @@
     flex: 0 0 var(--cf-avatar-size, 2.5rem);
     place-items: center;
     overflow: hidden;
-    border: 1px solid var(--cf-color-border);
     border-radius: var(--cf-radius-full);
     background: var(--cf-color-accent-soft);
     color: var(--cf-color-accent);
@@ -2821,7 +2817,7 @@
     display: grid;
     inline-size: 100%;
     max-inline-size: 44rem;
-    gap: var(--cf-space-3);
+    gap: var(--cf-space-1);
     border-radius: var(--cf-radius-2xl);
     background-color: var(--cf-color-chat-canvas);
     background-image:
@@ -2844,6 +2840,10 @@
     flex-direction: row-reverse;
   }
 
+  .cf-chat__row[data-group-start="true"]:not(:first-child) {
+    margin-block-start: var(--cf-space-2);
+  }
+
   .cf-chat__avatar {
     display: grid;
     inline-size: 2.5rem;
@@ -2851,13 +2851,16 @@
     flex: 0 0 2.5rem;
     place-items: center;
     overflow: hidden;
-    border: 2px solid rgb(255 255 255 / 68%);
     border-radius: 50%;
     background: var(--cf-color-accent);
     color: var(--cf-color-accent-contrast);
     font-size: var(--cf-font-size-sm);
     font-weight: var(--cf-font-weight-bold);
     object-fit: cover;
+  }
+
+  .cf-chat__row:not([data-group-end="true"]) .cf-chat__avatar {
+    visibility: hidden;
   }
 
   .cf-chat__message {
@@ -2892,6 +2895,16 @@
     background: var(--cf-color-accent-soft);
   }
 
+  .cf-chat__row:not([data-group-start="true"]) .cf-chat__bubble {
+    border-start-start-radius: var(--cf-radius-sm);
+    border-start-end-radius: var(--cf-radius-sm);
+  }
+
+  .cf-chat__row:not([data-group-end="true"]) .cf-chat__bubble {
+    border-end-start-radius: var(--cf-radius-sm);
+    border-end-end-radius: var(--cf-radius-sm);
+  }
+
   .cf-chat__author {
     display: flex;
     align-items: baseline;
@@ -2903,10 +2916,14 @@
     font-weight: var(--cf-font-weight-bold);
   }
 
-  .cf-chat__author time {
+  .cf-chat__timestamp {
+    display: block;
+    margin-block-start: var(--cf-space-1);
     color: var(--cf-color-text-muted);
     font-size: var(--cf-font-size-xs);
     font-weight: var(--cf-font-weight-normal);
+    line-height: var(--cf-line-height-snug);
+    text-align: end;
   }
 
   .cf-chat__row[data-own="true"] .cf-chat__author {

@@ -1246,7 +1246,9 @@ export function PostCard({ post, headingLevel = 2, className, ...props }: PostCa
   );
 }
 
-export interface LatestPostCardProps extends PostCardProps {
+export interface LatestPostCardProps extends Omit<AnchorHTMLAttributes<HTMLAnchorElement>, "href" | "title"> {
+  post: PostSummary;
+  headingLevel?: 2 | 3 | 4;
   eyebrow?: ReactNode;
 }
 
@@ -1264,11 +1266,11 @@ export function LatestPostCard({
   const updated = postUpdatedDateLabel(post);
   const description = postDescription(post);
   return (
-    <article className={cx("cf-latest-post-card", className)} {...props}>
+    <a className={cx("cf-latest-post-card", className)} href={post.href} aria-label={post.title} {...props}>
       <div className="cf-latest-post-card__content">
         <p className="cf-latest-post-card__eyebrow">{eyebrow}</p>
         <Heading level={headingLevel} className="cf-latest-post-card__title">
-          <a href={post.href}>{post.title}</a>
+          {post.title}
         </Heading>
         {description ? <p className="cf-latest-post-card__description">{description}</p> : null}
         {published || updated || post.readingTime ? (
@@ -1296,12 +1298,12 @@ export function LatestPostCard({
             {post.readingTime}
           </p>
         ) : null}
-        <a className="cf-link" href={post.href}>
+        <span className="cf-link" aria-hidden="true">
           Read article <span aria-hidden="true">→</span>
-        </a>
+        </span>
       </div>
       {image ? <PostImage image={image} className="cf-latest-post-card__image" loading="eager" /> : null}
-    </article>
+    </a>
   );
 }
 
@@ -1388,42 +1390,63 @@ export interface ChatThreadProps extends HTMLAttributes<HTMLOListElement> {
   label?: string;
 }
 
+function isSameChatSender(left: ChatMessage | undefined, right: ChatMessage | undefined) {
+  return Boolean(left && right && left.author === right.author && Boolean(left.own) === Boolean(right.own));
+}
+
 export function ChatThread({ messages, label = "Conversation", className, ...props }: ChatThreadProps) {
   return (
     <ol className={cx("cf-chat-thread", className)} aria-label={label} {...props}>
-      {messages.map((message) => (
-        <li className="cf-chat__row" data-own={message.own || undefined} key={message.id}>
-          {message.avatar ? (
-            <PostImage image={message.avatar} className="cf-chat__avatar" alt="" />
-          ) : (
-            <span className="cf-chat__avatar" aria-hidden="true">
-              {message.author.slice(0, 1).toLocaleUpperCase()}
-            </span>
-          )}
-          <div className="cf-chat__message">
-            <p className="cf-chat__author">
-              <strong>{message.author}</strong>
-              {message.timestamp ? <time dateTime={message.timestamp}>{message.timestamp}</time> : null}
-            </p>
-            <div className="cf-chat__bubble">
-              {message.body ?? message.text}
-              {message.link ? (
-                <>
-                  {message.body !== undefined || message.text ? <br /> : null}
-                  <a
-                    className="cf-link"
-                    href={message.link}
-                    target={message.linkExternal ? "_blank" : undefined}
-                    rel={message.linkExternal ? "noopener noreferrer" : undefined}
-                  >
-                    {message.linkLabel ?? message.link}
-                  </a>
-                </>
+      {messages.map((message, index) => {
+        const groupStart = !isSameChatSender(messages[index - 1], message);
+        const groupEnd = !isSameChatSender(message, messages[index + 1]);
+        return (
+          <li
+            className="cf-chat__row"
+            data-own={message.own || undefined}
+            data-group-start={groupStart || undefined}
+            data-group-end={groupEnd || undefined}
+            key={message.id}
+          >
+            {message.avatar ? (
+              <PostImage image={message.avatar} className="cf-chat__avatar" alt="" />
+            ) : (
+              <span className="cf-chat__avatar" aria-hidden="true">
+                {message.author.slice(0, 1).toLocaleUpperCase()}
+              </span>
+            )}
+            <div className="cf-chat__message">
+              {groupStart ? (
+                <p className="cf-chat__author">
+                  <strong>{message.author}</strong>
+                </p>
               ) : null}
+              <div className="cf-chat__bubble">
+                {!groupStart ? <span className="cf-visually-hidden">{message.author}: </span> : null}
+                {message.body ?? message.text}
+                {message.link ? (
+                  <>
+                    {message.body !== undefined || message.text ? <br /> : null}
+                    <a
+                      className="cf-link"
+                      href={message.link}
+                      target={message.linkExternal ? "_blank" : undefined}
+                      rel={message.linkExternal ? "noopener noreferrer" : undefined}
+                    >
+                      {message.linkLabel ?? message.link}
+                    </a>
+                  </>
+                ) : null}
+                {message.timestamp ? (
+                  <time className="cf-chat__timestamp" dateTime={message.timestamp}>
+                    {message.timestamp}
+                  </time>
+                ) : null}
+              </div>
             </div>
-          </div>
-        </li>
-      ))}
+          </li>
+        );
+      })}
     </ol>
   );
 }

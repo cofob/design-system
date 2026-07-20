@@ -13,11 +13,22 @@
   function isSnippet(value: ChatMessage["body"]): value is Exclude<ChatMessage["body"], string | undefined> {
     return typeof value === "function";
   }
+
+  function isSameSender(left: ChatMessage | undefined, right: ChatMessage | undefined) {
+    return Boolean(left && right && left.author === right.author && Boolean(left.own) === Boolean(right.own));
+  }
 </script>
 
 <ol class={cx("cf-chat-thread", className)} aria-label={label} {...rest}>
-  {#each messages as message (message.id)}
-    <li class="cf-chat__row" data-own={message.own || undefined}>
+  {#each messages as message, index (message.id)}
+    {@const groupStart = !isSameSender(messages[index - 1], message)}
+    {@const groupEnd = !isSameSender(message, messages[index + 1])}
+    <li
+      class="cf-chat__row"
+      data-own={message.own || undefined}
+      data-group-start={groupStart || undefined}
+      data-group-end={groupEnd || undefined}
+    >
       {#if message.avatar}
         <img
           class="cf-chat__avatar"
@@ -34,12 +45,9 @@
         <span class="cf-chat__avatar" aria-hidden="true">{message.author.slice(0, 1).toUpperCase()}</span>
       {/if}
       <div class="cf-chat__message">
-        <p class="cf-chat__author">
-          <strong>{message.author}</strong>{#if message.timestamp}<time datetime={message.timestamp}
-              >{message.timestamp}</time
-            >{/if}
-        </p>
+        {#if groupStart}<p class="cf-chat__author"><strong>{message.author}</strong></p>{/if}
         <div class="cf-chat__bubble">
+          {#if !groupStart}<span class="cf-visually-hidden">{message.author}: </span>{/if}
           {#if typeof message.body === "string"}
             {message.body}
           {:else if isSnippet(message.body)}
@@ -56,6 +64,9 @@
               >{message.linkLabel ?? message.link}</a
             >
           {/if}
+          {#if message.timestamp}<time class="cf-chat__timestamp" datetime={message.timestamp}
+              >{message.timestamp}</time
+            >{/if}
         </div>
       </div>
     </li>

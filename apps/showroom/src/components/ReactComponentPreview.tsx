@@ -626,13 +626,25 @@ export function ReactComponentPreview({ name, animatedSticker }: Props) {
             { id: "one", author: "cofob", body: "Ship the semantic contract first.", timestamp: "19:19" },
             {
               id: "two",
+              author: "cofob",
+              body: "Then every adapter stays aligned.",
+              timestamp: "19:20",
+            },
+            {
+              id: "three",
               author: "reader",
-              text: "Then every adapter stays aligned.",
+              text: "The consecutive messages read as one group.",
+              own: true,
+              timestamp: "19:21",
+            },
+            {
+              id: "four",
+              author: "reader",
               link: "https://cofob.dev/blog",
               linkLabel: "Read the implementation notes",
               linkExternal: true,
               own: true,
-              timestamp: "19:20",
+              timestamp: "19:22",
             },
           ]}
         />

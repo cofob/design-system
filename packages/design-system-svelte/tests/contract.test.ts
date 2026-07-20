@@ -35,6 +35,7 @@ import IconButton from "../src/lib/components/IconButton.svelte";
 import InlineEmoji from "../src/lib/components/InlineEmoji.svelte";
 import MediaGrid from "../src/lib/components/MediaGrid.svelte";
 import Navbar from "../src/lib/components/Navbar.svelte";
+import LatestPostCard from "../src/lib/components/LatestPostCard.svelte";
 import PostCard from "../src/lib/components/PostCard.svelte";
 import Popover from "../src/lib/components/Popover.svelte";
 import ResponsiveImage from "../src/lib/components/ResponsiveImage.svelte";
@@ -476,6 +477,22 @@ describe("Svelte adapter contract", () => {
     expect(postCard.body).toContain("Portable description");
   });
 
+  it("renders the latest post card as one accessible anchor", () => {
+    const output = render(LatestPostCard, {
+      props: {
+        post: { href: "/post", title: "Canonical post", description: "Portable description" },
+        target: "_blank",
+      },
+    });
+
+    expect(output.body).toContain(
+      '<a class="cf-latest-post-card" href="/post" aria-label="Canonical post" target="_blank">',
+    );
+    expect(output.body).not.toContain("<article");
+    expect(output.body.match(/<a(?:\s|>)/g)).toHaveLength(1);
+    expect(output.body).toContain('<span class="cf-link" aria-hidden="true">Read article');
+  });
+
   it("renders theme-aware image layers and preserves canonical dates", () => {
     const image = { src: "/light.jpg", alt: "Light" };
     const darkImage = { src: "/dark.jpg", alt: "Dark" };
@@ -503,29 +520,41 @@ describe("Svelte adapter contract", () => {
     expect(postCard.body).toContain("4 min read");
   });
 
-  it("renders text and image chat avatars as decorative content", () => {
+  it("groups consecutive chat senders and keeps avatars decorative", () => {
     const output = render(ChatThread, {
       props: {
         messages: [
-          { id: "text", author: "cofob", body: "Text avatar" },
+          { id: "text", author: "cofob", body: "Text avatar", timestamp: "19:19" },
+          { id: "text-two", author: "cofob", body: "Grouped text", timestamp: "19:20" },
           {
             id: "image",
             author: "reader",
             body: "Image avatar",
             avatar: { src: "/avatar.webp", alt: "Reader avatar", width: 40, height: 40 },
+            own: true,
+            timestamp: "19:21",
           },
           {
             id: "link",
-            author: "cofob",
+            author: "reader",
             text: "Source code",
             link: "https://example.com/source",
             linkLabel: "Open source",
             linkExternal: true,
+            avatar: { src: "/avatar.webp", alt: "Reader avatar", width: 40, height: 40 },
+            own: true,
+            timestamp: "19:22",
           },
         ],
       },
     });
 
+    expect(output.body.match(/class="cf-chat__row"/g)).toHaveLength(4);
+    expect(output.body.match(/data-group-start="true"/g)).toHaveLength(2);
+    expect(output.body.match(/data-group-end="true"/g)).toHaveLength(2);
+    expect(output.body.match(/class="cf-chat__author"/g)).toHaveLength(2);
+    expect(output.body.match(/class="cf-chat__timestamp"/g)).toHaveLength(4);
+    expect(output.body.match(/class="cf-visually-hidden"/g)).toHaveLength(2);
     expect(output.body).toContain('aria-hidden="true">C</span>');
     expect(output.body).toContain('class="cf-chat__avatar" src="/avatar.webp" alt=""');
     expect(output.body).toContain(

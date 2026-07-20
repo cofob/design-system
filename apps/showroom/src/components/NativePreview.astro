@@ -1043,12 +1043,10 @@ const renderTerminalOutput = (output: string) => `<code>${escapeHtml(output)}</c
   }
   {
     name === "LatestPostCard" && (
-      <article class="cf-latest-post-card">
+      <a class="cf-latest-post-card" href="#post" aria-label="Building a calmer interface">
         <div class="cf-latest-post-card__content">
           <p class="cf-latest-post-card__eyebrow">Latest post</p>
-          <h2 class="cf-latest-post-card__title">
-            <a href="#post">Building a calmer interface</a>
-          </h2>
+          <h2 class="cf-latest-post-card__title">Building a calmer interface</h2>
           <p class="cf-latest-post-card__description">A practical note about content-first design.</p>
           <p class="cf-latest-post-card__meta">
             Published <time datetime="2026-07-19">19 July 2026</time>
@@ -1061,11 +1059,11 @@ const renderTerminalOutput = (output: string) => `<code>${escapeHtml(output)}</c
             </span>
             4 min read
           </p>
-          <a class="cf-link" href="#post">
+          <span class="cf-link" aria-hidden="true">
             Read article <span aria-hidden="true">→</span>
-          </a>
+          </span>
         </div>
-      </article>
+      </a>
     )
   }
   {
@@ -1163,7 +1161,7 @@ const renderTerminalOutput = (output: string) => `<code>${escapeHtml(output)}</c
   {
     name === "ChatThread" && (
       <ol class="cf-chat-thread" aria-label="Conversation">
-        <li class="cf-chat__row">
+        <li class="cf-chat__row" data-group-start="true">
           <span class="cf-chat__avatar" aria-hidden="true">
             C
           </span>
@@ -1171,13 +1169,31 @@ const renderTerminalOutput = (output: string) => `<code>${escapeHtml(output)}</c
             <p class="cf-chat__author">
               <>
                 <strong>cofob</strong>
-                <time datetime="19:19">19:19</time>
               </>
             </p>
-            <div class="cf-chat__bubble">Ship the semantic contract first.</div>
+            <div class="cf-chat__bubble">
+              Ship the semantic contract first.
+              <time class="cf-chat__timestamp" datetime="19:19">
+                19:19
+              </time>
+            </div>
           </div>
         </li>
-        <li class="cf-chat__row" data-own="true">
+        <li class="cf-chat__row" data-group-end="true">
+          <span class="cf-chat__avatar" aria-hidden="true">
+            C
+          </span>
+          <div class="cf-chat__message">
+            <div class="cf-chat__bubble">
+              <span class="cf-visually-hidden">cofob: </span>
+              Then every adapter stays aligned.
+              <time class="cf-chat__timestamp" datetime="19:20">
+                19:20
+              </time>
+            </div>
+          </div>
+        </li>
+        <li class="cf-chat__row" data-own="true" data-group-start="true">
           <span class="cf-chat__avatar" aria-hidden="true">
             R
           </span>
@@ -1185,15 +1201,29 @@ const renderTerminalOutput = (output: string) => `<code>${escapeHtml(output)}</c
             <p class="cf-chat__author">
               <>
                 <strong>reader</strong>
-                <time datetime="19:20">19:20</time>
               </>
             </p>
             <div class="cf-chat__bubble">
-              Then every adapter stays aligned.
-              <br />
+              The consecutive messages read as one group.
+              <time class="cf-chat__timestamp" datetime="19:21">
+                19:21
+              </time>
+            </div>
+          </div>
+        </li>
+        <li class="cf-chat__row" data-own="true" data-group-end="true">
+          <span class="cf-chat__avatar" aria-hidden="true">
+            R
+          </span>
+          <div class="cf-chat__message">
+            <div class="cf-chat__bubble">
+              <span class="cf-visually-hidden">reader: </span>
               <a class="cf-link" href="https://cofob.dev/blog" target="_blank" rel="noopener noreferrer">
                 Read the implementation notes
               </a>
+              <time class="cf-chat__timestamp" datetime="19:22">
+                19:22
+              </time>
             </div>
           </div>
         </li>

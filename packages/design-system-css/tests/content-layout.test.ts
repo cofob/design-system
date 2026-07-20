@@ -30,4 +30,40 @@ describe("application and publishing CSS contracts", () => {
     expect(componentStyles).toMatch(/\.cf-inline-emoji\s*\{[^}]*inline-size:\s*1\.25em/s);
     expect(componentStyles).toMatch(/\.cf-media-grid :where\(img, video\)\s*\{[^}]*max-block-size:/s);
   });
+
+  it("only swaps responsive image layers when dark artwork is present", () => {
+    expect(componentStyles).toMatch(
+      /:root\[data-theme="dark"\][^{]*\.cf-responsive-image\[data-has-dark-image="true"\][^{]*\.cf-responsive-image__light\s*\{[^}]*display:\s*none/s,
+    );
+    expect(componentStyles).toMatch(
+      /:root\[data-theme="dark"\][^{]*\.cf-responsive-image\[data-has-dark-image="true"\][^{]*\.cf-responsive-image__dark\s*\{[^}]*display:\s*block/s,
+    );
+    expect(componentStyles).not.toMatch(
+      /:root\[data-theme="dark"\]\s+\.cf-responsive-image__light\s*\{[^}]*display:\s*none/s,
+    );
+  });
+
+  it("keeps consecutive chat messages compact and exposes only the final group avatar", () => {
+    expect(componentStyles).toMatch(/\.cf-chat-thread\s*\{[^}]*gap:\s*var\(--cf-space-1\)/s);
+    expect(componentStyles).toMatch(
+      /\.cf-chat__row\[data-group-start="true"\]:not\(:first-child\)\s*\{[^}]*margin-block-start:\s*var\(--cf-space-2\)/s,
+    );
+    expect(componentStyles).toMatch(
+      /\.cf-chat__row:not\(\[data-group-end="true"\]\) \.cf-chat__avatar\s*\{[^}]*visibility:\s*hidden/s,
+    );
+    expect(componentStyles).toContain('.cf-chat__row:not([data-group-start="true"]) .cf-chat__bubble');
+    expect(componentStyles).toContain('.cf-chat__row:not([data-group-end="true"]) .cf-chat__bubble');
+  });
+
+  it("keeps avatar surfaces borderless and the latest post keyboard-visible", () => {
+    const avatarBlock = componentStyles.match(/\.cf-avatar\s*\{([^}]*)\}/s)?.[1] ?? "";
+    const chatAvatarBlock = componentStyles.match(/\.cf-chat__avatar\s*\{([^}]*)\}/s)?.[1] ?? "";
+    expect(avatarBlock).not.toMatch(/(^|\n)\s*border\s*:/);
+    expect(chatAvatarBlock).not.toMatch(/(^|\n)\s*border\s*:/);
+    expect(componentStyles).toContain(".cf-latest-post-card:focus-visible");
+  });
+
+  it("keeps footer content inset from narrow viewport edges", () => {
+    expect(componentStyles).toMatch(/\.cf-footer\s*\{[^}]*padding-inline:\s*var\(--cf-space-4\)/s);
+  });
 });
