@@ -1,6 +1,6 @@
 {
   "name": "@cofob/design-system-react",
-  "version": "0.3.0",
+  "version": "0.4.0",
   "description": "Accessible React components for the cofob design system",
   "type": "module",
   "sideEffects": false,
@@ -40,7 +40,7 @@
     "pack:check": "publint"
   },
   "dependencies": {
-    "@cofob/design-system-css": "0.3.0"
+    "@cofob/design-system-css": "0.4.0"
   },
   "peerDependencies": {
     "lucide-react": ">=0.468.0",

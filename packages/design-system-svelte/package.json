@@ -1,6 +1,6 @@
 {
   "name": "@cofob/design-system-svelte",
-  "version": "0.3.0",
+  "version": "0.4.0",
   "description": "Svelte 5 components for the cofob design system",
   "type": "module",
   "license": "SEE LICENSE IN LICENSE",
@@ -33,7 +33,7 @@
     "prepack": "npm run build"
   },
   "dependencies": {
-    "@cofob/design-system-css": "0.3.0"
+    "@cofob/design-system-css": "0.4.0"
   },
   "peerDependencies": {
     "@lucide/svelte": ">=1.0.0 <2",
