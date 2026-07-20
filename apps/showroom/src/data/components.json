@@ -133,7 +133,7 @@
       },
       {
         "name": "TerminalCodeBlock",
-        "description": "Terminal transcript with commands separated from output and individually copyable.",
+        "description": "Terminal transcript with copyable commands and ANSI-styled output.",
         "interactive": true
       },
       {

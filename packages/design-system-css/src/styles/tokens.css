@@ -93,6 +93,40 @@
     --cf-control-height-sm: 2rem;
     --cf-control-height-md: 2.5rem;
     --cf-control-height-lg: 3rem;
+
+    /* Role-aware ANSI palette. Extended indexed and RGB colors are resolved at runtime. */
+    --cf-terminal-foreground-0: var(--cf-color-text-strong);
+    --cf-terminal-foreground-1: var(--cf-color-danger);
+    --cf-terminal-foreground-2: var(--cf-color-success);
+    --cf-terminal-foreground-3: var(--cf-color-warning);
+    --cf-terminal-foreground-4: var(--cf-color-accent);
+    --cf-terminal-foreground-5: var(--cf-terminal-magenta);
+    --cf-terminal-foreground-6: var(--cf-terminal-cyan);
+    --cf-terminal-foreground-7: var(--cf-color-text-muted);
+    --cf-terminal-foreground-8: var(--cf-color-text-subtle);
+    --cf-terminal-foreground-9: var(--cf-terminal-bright-red);
+    --cf-terminal-foreground-10: var(--cf-terminal-bright-green);
+    --cf-terminal-foreground-11: var(--cf-terminal-bright-yellow);
+    --cf-terminal-foreground-12: var(--cf-terminal-bright-blue);
+    --cf-terminal-foreground-13: var(--cf-terminal-bright-magenta);
+    --cf-terminal-foreground-14: var(--cf-terminal-bright-cyan);
+    --cf-terminal-foreground-15: var(--cf-color-text);
+    --cf-terminal-background-0: var(--cf-color-surface-muted);
+    --cf-terminal-background-1: var(--cf-color-danger-surface);
+    --cf-terminal-background-2: var(--cf-color-success-surface);
+    --cf-terminal-background-3: var(--cf-color-warning-surface);
+    --cf-terminal-background-4: var(--cf-color-info-surface);
+    --cf-terminal-background-5: var(--cf-terminal-magenta-surface);
+    --cf-terminal-background-6: var(--cf-terminal-cyan-surface);
+    --cf-terminal-background-7: var(--cf-color-surface);
+    --cf-terminal-background-8: var(--cf-terminal-bright-neutral-surface);
+    --cf-terminal-background-9: var(--cf-terminal-bright-red-surface);
+    --cf-terminal-background-10: var(--cf-terminal-bright-green-surface);
+    --cf-terminal-background-11: var(--cf-terminal-bright-yellow-surface);
+    --cf-terminal-background-12: var(--cf-color-accent-soft);
+    --cf-terminal-background-13: var(--cf-terminal-bright-magenta-surface);
+    --cf-terminal-background-14: var(--cf-terminal-bright-cyan-surface);
+    --cf-terminal-background-15: var(--cf-color-surface-raised);
   }
 
   :root,
@@ -140,6 +174,22 @@
     --cf-color-chat-canvas: #edf4f8;
     --cf-color-chat-dot: rgb(3 105 161 / 18%);
     --cf-color-chat-dot-soft: rgb(3 105 161 / 12%);
+    --cf-terminal-magenta: #86198f;
+    --cf-terminal-cyan: #0e7490;
+    --cf-terminal-bright-red: #991b1b;
+    --cf-terminal-bright-green: #15803d;
+    --cf-terminal-bright-yellow: #a16207;
+    --cf-terminal-bright-blue: #075985;
+    --cf-terminal-bright-magenta: #a21caf;
+    --cf-terminal-bright-cyan: #155e75;
+    --cf-terminal-magenta-surface: #fdf4ff;
+    --cf-terminal-cyan-surface: #ecfeff;
+    --cf-terminal-bright-neutral-surface: #e4e4e7;
+    --cf-terminal-bright-red-surface: #fee2e2;
+    --cf-terminal-bright-green-surface: #dcfce7;
+    --cf-terminal-bright-yellow-surface: #fef9c3;
+    --cf-terminal-bright-magenta-surface: #fae8ff;
+    --cf-terminal-bright-cyan-surface: #cffafe;
   }
 
   :root[data-theme="dark"] {
@@ -186,6 +236,22 @@
     --cf-color-chat-canvas: #111b22;
     --cf-color-chat-dot: rgb(255 255 255 / 10%);
     --cf-color-chat-dot-soft: rgb(255 255 255 / 8%);
+    --cf-terminal-magenta: #f0abfc;
+    --cf-terminal-cyan: #67e8f9;
+    --cf-terminal-bright-red: #fecaca;
+    --cf-terminal-bright-green: #bbf7d0;
+    --cf-terminal-bright-yellow: #fef08a;
+    --cf-terminal-bright-blue: #bae6fd;
+    --cf-terminal-bright-magenta: #f5d0fe;
+    --cf-terminal-bright-cyan: #cffafe;
+    --cf-terminal-magenta-surface: #4a044e;
+    --cf-terminal-cyan-surface: #083344;
+    --cf-terminal-bright-neutral-surface: #3f3f46;
+    --cf-terminal-bright-red-surface: #7f1d1d;
+    --cf-terminal-bright-green-surface: #14532d;
+    --cf-terminal-bright-yellow-surface: #713f12;
+    --cf-terminal-bright-magenta-surface: #701a75;
+    --cf-terminal-bright-cyan-surface: #164e63;
     --cf-shadow-xs: 0 1px 2px rgb(0 0 0 / 28%);
     --cf-shadow-sm: 0 2px 5px rgb(0 0 0 / 35%);
     --cf-shadow-md: 0 10px 28px rgb(0 0 0 / 42%);
@@ -237,6 +303,22 @@
       --cf-color-chat-canvas: #111b22;
       --cf-color-chat-dot: rgb(255 255 255 / 10%);
       --cf-color-chat-dot-soft: rgb(255 255 255 / 8%);
+      --cf-terminal-magenta: #f0abfc;
+      --cf-terminal-cyan: #67e8f9;
+      --cf-terminal-bright-red: #fecaca;
+      --cf-terminal-bright-green: #bbf7d0;
+      --cf-terminal-bright-yellow: #fef08a;
+      --cf-terminal-bright-blue: #bae6fd;
+      --cf-terminal-bright-magenta: #f5d0fe;
+      --cf-terminal-bright-cyan: #cffafe;
+      --cf-terminal-magenta-surface: #4a044e;
+      --cf-terminal-cyan-surface: #083344;
+      --cf-terminal-bright-neutral-surface: #3f3f46;
+      --cf-terminal-bright-red-surface: #7f1d1d;
+      --cf-terminal-bright-green-surface: #14532d;
+      --cf-terminal-bright-yellow-surface: #713f12;
+      --cf-terminal-bright-magenta-surface: #701a75;
+      --cf-terminal-bright-cyan-surface: #164e63;
     }
   }
 }

@@ -11,5 +11,6 @@ export * from "./toast.js";
 export * from "./copy.js";
 export * from "./navbar.js";
 export * from "./syntax.js";
+export * from "./terminal.js";
 export * from "./animated-sticker.js";
 export * from "./init.js";

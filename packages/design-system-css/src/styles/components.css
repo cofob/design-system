@@ -463,6 +463,52 @@
     white-space: pre;
   }
 
+  .cf-terminal-code-block__output code {
+    --cf-terminal-default-foreground: var(--cf-color-text-muted);
+    --cf-terminal-default-background: var(--cf-color-canvas);
+  }
+
+  .cf-terminal-output__token {
+    color: var(--cf-terminal-token-foreground, inherit);
+    background-color: var(--cf-terminal-token-background, transparent);
+    font-style: normal;
+    text-decoration: var(--cf-terminal-token-decoration-line, none)
+      var(--cf-terminal-token-decoration-style, solid) var(--cf-terminal-token-underline, currentcolor) 0.1em;
+    text-underline-offset: 0.16em;
+  }
+
+  .cf-terminal-output__token[data-bold] {
+    font-weight: var(--cf-font-weight-bold);
+  }
+
+  .cf-terminal-output__token[data-dim] {
+    opacity: 0.82;
+  }
+
+  .cf-terminal-output__token[data-italic] {
+    font-style: italic;
+  }
+
+  .cf-terminal-output__token[data-inverse] {
+    background-color: var(--cf-terminal-token-foreground, var(--cf-terminal-default-foreground));
+    color: var(--cf-terminal-token-background, var(--cf-terminal-default-background));
+  }
+
+  .cf-terminal-output__token[data-concealed] {
+    visibility: hidden;
+  }
+
+  .cf-terminal-output__link {
+    border-radius: var(--cf-radius-xs);
+    color: inherit;
+    text-decoration: underline currentcolor 0.1em;
+    text-underline-offset: 0.16em;
+  }
+
+  .cf-terminal-output__link:hover {
+    text-decoration-thickness: 0.16em;
+  }
+
   .cf-terminal-code-block__command code {
     display: block;
     font: inherit;
@@ -621,6 +667,17 @@
     .cf-code-copy,
     .cf-table-container {
       border-color: CanvasText;
+    }
+
+    .cf-terminal-output__token {
+      background-color: transparent !important;
+      color: CanvasText !important;
+      opacity: 1;
+      text-decoration-color: currentcolor !important;
+    }
+
+    .cf-terminal-output__link {
+      color: LinkText;
     }
   }
 

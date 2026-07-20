@@ -121,6 +121,15 @@ source and optional output, allowing each command to be copied independently. Na
 pass command text through `tokenizeBashCommand()` and map non-plain tokens to `.cf-syntax-token`
 elements with the returned `data-token` value. The tokenizer preserves the original text exactly.
 
+Terminal output accepts ANSI SGR sequences automatically. `tokenizeTerminalOutput()` converts
+standard and bright colors, the xterm 256-color palette, 24-bit RGB, intensity, italic, underline,
+inverse, conceal, strikethrough, and overline state into safe portable tokens. Use
+`terminalColorToCss()` for the token color custom properties when rendering native HTML. OSC 8
+HTTP, HTTPS, and mail links are returned as sanitized `href` values; render them with
+`.cf-terminal-output__link`, `target="_blank"`, and `rel="noopener noreferrer"`. Other terminal
+screen controls are consumed without being emulated. Output remains separate from
+`[data-cf-copy-source]`, so a command copy never includes captured output or escape sequences.
+
 ## Tables
 
 Wrap `.cf-table` in a labelled, keyboard-focusable `.cf-table-container` to provide responsive

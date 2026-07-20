@@ -1,6 +1,7 @@
 ---
 import { tokenizeBashCommand, type AnimatedStickerModel } from "@cofob/design-system-css";
 import NativeCaptcha from "./NativeCaptcha.astro";
+import { renderTerminalOutput } from "./terminal-output";
 
 interface Props {
   name: string;
@@ -17,8 +18,15 @@ const darkImage =
 const codeBlockExample = `const preference = "system";
 applyTheme(preference);`;
 const terminalEntries = [
-  { command: "npm install @cofob/design-system-css", output: "added 1 package in 842ms" },
-  { command: "npm run build -- --mode production", output: "✓ 51 pages built" },
+  {
+    command: "npm install @cofob/design-system-css",
+    output: "\u001b[1;32madded 1 package\u001b[0m in \u001b[4;58;5;208m842ms\u001b[0m",
+  },
+  {
+    command: "npm run build -- --mode production",
+    output:
+      "\u001b[4:3;58:2::125:211:252m✓ 51 pages built\u001b[0m\n\u001b[4:2mReport\u001b[24m: \u001b]8;;https://design.cofob.dev\u0007design.cofob.dev\u001b]8;;\u0007",
+  },
 ] as const;
 const escapeHtml = (value: string) =>
   value.replaceAll("&", "&amp;").replaceAll("<", "&lt;").replaceAll(">", "&gt;").replaceAll('"', "&quot;");
@@ -32,7 +40,6 @@ const renderBashCommand = (command: string) =>
     .join("");
 const renderBashCode = (command: string) =>
   `<code data-cf-copy-source data-language="bash">${renderBashCommand(command)}</code>`;
-const renderTerminalOutput = (output: string) => `<code>${escapeHtml(output)}</code>`;
 ---
 
 <div class:list={["astro-demo", compact && "astro-demo-compact"]} data-component-preview={name}>

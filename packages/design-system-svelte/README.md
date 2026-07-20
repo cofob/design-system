@@ -41,11 +41,13 @@ presentation as the native and React adapters:
 `CodeBlock` displays a language when `language` is provided and includes clipboard feedback by
 default; use `showLanguage={false}` to hide the language or `copyable={false}` to remove the copy
 action. `TerminalCodeBlock` keeps commands and output separate and makes every command copyable by
-default. Commands receive Bash highlighting; captured output stays unhighlighted.
+default. Commands receive Bash syntax highlighting independently from captured output.
+Captured output automatically interprets ANSI standard, 256-color, truecolor, text-style, and safe
+OSC 8 HTTP(S)/mail hyperlink sequences; screen controls are not emulated.
 
 ```svelte
 <CodeBlock code={'const theme = "system";'} language="typescript" />
-<TerminalCodeBlock entries={[{ command: "npm run build", output: "Build complete" }]} />
+<TerminalCodeBlock entries={[{ command: "npm run build", output: "\u001b[1;32mBuild complete\u001b[0m" }]} />
 ```
 
 ## Tables
