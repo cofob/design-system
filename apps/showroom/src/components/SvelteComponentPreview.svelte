@@ -4,21 +4,27 @@
     Alert,
     AnimatedSticker,
     AnimatedStickerToggle,
+    AudioPlayer,
     AppShell,
     Avatar,
     Badge,
     BlueLine,
+    Breadcrumbs,
     Button,
     Card,
     Captcha,
     ChatThread,
     Checkbox,
+    CircularProgress,
+    Combobox,
     CodeBlock,
     Container,
     Dialog,
+    Drawer,
     DropdownMenu,
     EmptyState,
     Field,
+    FileUpload,
     Footer,
     Heading,
     IconButton,
@@ -32,13 +38,21 @@
     Popover,
     PostCard,
     Prose,
+    Progress,
+    Radio,
+    RadioGroup,
     ResponsiveImage,
     SearchResultCard,
     Section,
     Select,
+    Separator,
     SkipLink,
     Stack,
+    Stepper,
     Sticker,
+    Skeleton,
+    Slider,
+    Spinner,
     Switch,
     Table,
     TerminalCodeBlock,
@@ -53,6 +67,7 @@
     ToastProvider,
     ToastViewport,
     Tooltip,
+    VideoPlayer,
     toast,
   } from "@cofob/design-system-svelte";
   import type { AnimatedStickerModel } from "@cofob/design-system-svelte";
@@ -126,8 +141,13 @@ applyTheme(preference);`;
   let selectValue = $state("system");
   let checked = $state(true);
   let switched = $state(true);
+  let radioValue = $state("pro");
+  let comboboxValue = $state("");
+  let uploadFiles = $state<File[]>([]);
+  let sliderValue = $state(64);
   let page = $state(2);
   let dialogOpen = $state(false);
+  let drawerOpen = $state(false);
   let popoverOpen = $state(false);
   let menuOpen = $state(false);
   let tabValue = $state("overview");
@@ -198,6 +218,14 @@ applyTheme(preference);`;
     <h3>Long-form rhythm</h3>
     <p>Headings, paragraphs, links, and inline <code>code</code> share a comfortable reading measure.</p>
   </Prose>
+{:else if name === "Breadcrumbs"}
+  <Breadcrumbs
+    items={[
+      { label: "Home", href: "#home" },
+      { label: "Components", href: "#components" },
+      { label: "Breadcrumbs" },
+    ]}
+  />
 {:else if name === "CodeBlock"}
   <CodeBlock code={codeBlockExample} language="typescript" copyable />
 {:else if name === "TerminalCodeBlock"}
@@ -332,6 +360,59 @@ applyTheme(preference);`;
     />
     <Switch checked label="Managed by your organization" disabled />
   </Stack>
+{:else if name === "Radio"}
+  <Stack gap="sm">
+    <Radio name="svelte-plan-single" value="starter" label="Starter" />
+    <Radio name="svelte-plan-single" value="pro" label="Pro" description="For growing projects." checked />
+    <Radio name="svelte-plan-single" value="enterprise" label="Enterprise" disabled />
+  </Stack>
+{:else if name === "RadioGroup"}
+  <RadioGroup
+    bind:value={radioValue}
+    name="svelte-plan"
+    label="Choose a plan"
+    description="You can change this later."
+    options={[
+      { value: "starter", label: "Starter" },
+      { value: "pro", label: "Pro", description: "For growing projects." },
+      { value: "enterprise", label: "Enterprise", disabled: true },
+    ]}
+  />
+{:else if name === "Combobox"}
+  <Combobox
+    bind:value={comboboxValue}
+    label="Framework"
+    name="framework"
+    placeholder="Search frameworks"
+    hint="Type to filter, then use arrow keys and Enter."
+    options={[
+      { value: "astro", label: "Astro", description: "Content-driven web framework" },
+      { value: "react", label: "React", description: "Component library" },
+      { value: "svelte", label: "Svelte", description: "Compiler-first framework" },
+      { value: "vue", label: "Vue", description: "Progressive framework" },
+    ]}
+  />
+{:else if name === "FileUpload"}
+  <FileUpload
+    bind:files={uploadFiles}
+    label="Attachments"
+    name="attachments"
+    accept="image/*,.pdf"
+    multiple
+    maxFiles={3}
+    maxSize={5 * 1024 * 1024}
+    hint="PNG, JPG, or PDF. Up to 5 MB each."
+  />
+{:else if name === "Slider"}
+  <Slider
+    bind:value={sliderValue}
+    label="Volume"
+    name="volume"
+    min={0}
+    max={100}
+    formatValue={(value) => `${value}%`}
+    hint="Use arrow keys for precise adjustments."
+  />
 {:else if name === "Captcha"}
   <div class="astro-captcha-grid">
     <Captcha state="idle" />
@@ -386,8 +467,64 @@ applyTheme(preference);`;
   <EmptyState title="No posts yet" description="Publish the first note when it is ready.">
     {#snippet action()}<Button size="sm">Create a post</Button>{/snippet}
   </EmptyState>
+{:else if name === "Progress"}
+  <Stack gap="md">
+    <Progress label="Uploading assets" value={64} animated />
+    <Progress label="Preparing preview" showValue={false} />
+  </Stack>
+{:else if name === "Spinner"}
+  <Inline gap="lg">
+    <Spinner size="sm" label="Loading small preview" />
+    <Spinner label="Loading preview" />
+    <Spinner size="lg" label="Loading large preview" />
+  </Inline>
+{:else if name === "CircularProgress"}
+  <Inline gap="lg">
+    <CircularProgress size="sm" value={24} label="Preparing files" />
+    <CircularProgress value={64} label="Uploading assets" animated />
+    <CircularProgress size="lg" value={92} label="Processing complete" animated showValue={false} />
+  </Inline>
+{:else if name === "Skeleton"}
+  <Stack gap="sm" role="status" aria-label="Loading card preview" style="width:100%">
+    <Inline gap="sm" wrap={false}>
+      <Skeleton variant="circle" width="3rem" height="3rem" />
+      <Stack gap="sm" style="flex:1">
+        <Skeleton variant="text" width="45%" />
+        <Skeleton variant="text" width="75%" />
+      </Stack>
+    </Inline>
+    <Skeleton height="6rem" />
+  </Stack>
+{:else if name === "AudioPlayer"}
+  <AudioPlayer src="/stickers/animated-chris/animated-chris.7e882faa1b4d.webm" durationHint={2} />
+{:else if name === "VideoPlayer"}
+  <VideoPlayer
+    src="/stickers/animated-chris/animated-chris.7e882faa1b4d.webm"
+    label="Animated Chris preview"
+    caption="Themed controls remain available to keyboard and assistive technology users."
+    durationHint={2}
+    videoProps={{ muted: true }}
+  />
+{:else if name === "Separator"}
+  <Stack gap="md">
+    <span>Account settings</span>
+    <Separator />
+    <span>Notification settings</span>
+    <Inline gap="md">
+      <span>Light</span><Separator orientation="vertical" decorative /><span>Dark</span>
+    </Inline>
+  </Stack>
 {:else if name === "Pagination"}
   <Pagination bind:page totalPages={3} />
+{:else if name === "Stepper"}
+  <Stepper
+    currentStep="details"
+    items={[
+      { id: "account", label: "Account", description: "Complete" },
+      { id: "details", label: "Details", description: "Current step" },
+      { id: "review", label: "Review", description: "Up next" },
+    ]}
+  />
 {:else if name === "Dialog"}
   <Dialog bind:open={dialogOpen} title="Confirm change" description="Review the details before continuing.">
     {#snippet trigger({ open, expanded, controls })}
@@ -403,6 +540,23 @@ applyTheme(preference);`;
       </Inline>
     {/snippet}
   </Dialog>
+{:else if name === "Drawer"}
+  <Drawer
+    bind:open={drawerOpen}
+    title="Filter components"
+    description="Narrow the component catalog."
+    side="right"
+  >
+    {#snippet trigger({ open, expanded, controls })}
+      <Button variant="secondary" aria-controls={controls} aria-expanded={expanded} onclick={open}
+        >Open filters</Button
+      >
+    {/snippet}
+    {#snippet children()}
+      <Stack gap="md"><Checkbox label="Interactive only" /><Checkbox label="Supports forms" /></Stack>
+    {/snippet}
+    {#snippet footer()}<Button onclick={() => (drawerOpen = false)}>Apply filters</Button>{/snippet}
+  </Drawer>
 {:else if name === "Popover"}
   <Popover bind:open={popoverOpen} label="Open popover" placement="bottom">
     <Stack gap="sm">

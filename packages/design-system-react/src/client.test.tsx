@@ -3,12 +3,18 @@ import { renderToString } from "react-dom/server";
 import { describe, expect, it, vi } from "vitest";
 import {
   Accordion,
+  AudioPlayer,
+  VideoPlayer,
   AnimatedSticker,
   AnimatedStickerToggle,
   CodeBlock,
+  Combobox,
   Dialog,
+  Drawer,
   DropdownMenu,
+  FileUpload,
   Popover,
+  Slider,
   Tabs,
   TerminalCodeBlock,
   ThemeProvider,
@@ -21,6 +27,124 @@ import {
 } from "./client.js";
 
 describe("client components", () => {
+  it("filters and selects combobox options with the keyboard", () => {
+    const onValueChange = vi.fn();
+    render(
+      <Combobox
+        label="Framework"
+        options={[
+          { value: "astro", label: "Astro" },
+          { value: "svelte", label: "Svelte" },
+        ]}
+        onValueChange={onValueChange}
+      />,
+    );
+    const input = screen.getByRole("combobox", { name: "Framework" });
+    fireEvent.change(input, { target: { value: "svel" } });
+    expect(screen.getByRole("option", { name: "Svelte" })).toBeVisible();
+    expect(screen.queryByRole("option", { name: "Astro" })).toBeNull();
+    fireEvent.keyDown(input, { key: "ArrowDown" });
+    fireEvent.keyDown(input, { key: "Enter" });
+    expect(input).toHaveValue("Svelte");
+    expect(onValueChange).toHaveBeenCalledWith("svelte", expect.objectContaining({ label: "Svelte" }));
+  });
+
+  it("updates slider and file-upload state through native inputs", () => {
+    const onValueChange = vi.fn();
+    const onFilesChange = vi.fn();
+    render(
+      <>
+        <Slider label="Volume" defaultValue={25} onValueChange={onValueChange} />
+        <FileUpload label="Attachments" multiple onFilesChange={onFilesChange} />
+      </>,
+    );
+    const slider = screen.getByRole("slider", { name: "Volume" });
+    fireEvent.change(slider, { target: { value: "60" } });
+    expect(slider).toHaveValue("60");
+    expect(onValueChange).toHaveBeenCalledWith(60);
+
+    const file = new File(["content"], "notes.txt", { type: "text/plain" });
+    fireEvent.change(screen.getByLabelText("Attachments"), { target: { files: [file] } });
+    expect(screen.getByRole("list", { name: "Selected files" })).toHaveTextContent("notes.txt");
+    expect(onFilesChange).toHaveBeenCalledWith([file]);
+  });
+
+  it("renders drawer and audio-player controls with localized media state", async () => {
+    const { container } = render(
+      <>
+        <Drawer trigger="Open filters" title="Filters">
+          Content
+        </Drawer>
+        <AudioPlayer src="/sample.ogg" durationHint={90} />
+      </>,
+    );
+    expect(screen.getByRole("button", { name: "Open filters" })).toHaveAttribute("aria-haspopup", "dialog");
+    const audio = container.querySelector("audio")!;
+    let paused = true;
+    Object.defineProperty(audio, "paused", { configurable: true, get: () => paused });
+    Object.defineProperty(audio, "play", {
+      configurable: true,
+      value: async () => {
+        paused = false;
+        fireEvent.play(audio);
+      },
+    });
+    Object.defineProperty(audio, "pause", {
+      configurable: true,
+      value: () => {
+        paused = true;
+        fireEvent.pause(audio);
+      },
+    });
+    fireEvent.click(screen.getByRole("button", { name: "Play audio" }));
+    await waitFor(() => expect(screen.getByRole("button", { name: "Pause audio" })).toBeInTheDocument());
+    expect(screen.getByRole("slider", { name: "Playback position" })).toHaveAttribute(
+      "aria-valuetext",
+      "0:00 of 1:30",
+    );
+  });
+
+  it("renders themed video playback controls and updates play state", async () => {
+    const { container } = render(<VideoPlayer src="/sample.webm" label="Product demo" durationHint={90} />);
+    const video = container.querySelector("video")!;
+    let paused = true;
+    Object.defineProperty(video, "paused", { configurable: true, get: () => paused });
+    Object.defineProperty(video, "play", {
+      configurable: true,
+      value: async () => {
+        paused = false;
+        fireEvent.play(video);
+      },
+    });
+    Object.defineProperty(video, "pause", {
+      configurable: true,
+      value: () => {
+        paused = true;
+        fireEvent.pause(video);
+      },
+    });
+
+    const player = container.querySelector<HTMLElement>(".cf-video-player")!;
+    const start = container.querySelector<HTMLButtonElement>(".cf-video-player__start")!;
+    expect(player).toHaveAttribute("data-started", "false");
+    fireEvent.click(start);
+    await waitFor(() => expect(screen.getByRole("button", { name: "Pause video" })).toBeInTheDocument());
+    expect(player).toHaveAttribute("data-started", "true");
+    expect(screen.getByRole("slider", { name: "Playback position" })).toHaveAttribute(
+      "aria-valuetext",
+      "0:00 of 1:30",
+    );
+    expect(screen.getByRole("button", { name: "Enter fullscreen" })).toBeInTheDocument();
+
+    expect(player).toHaveAttribute("tabindex", "-1");
+    fireEvent.keyDown(player, { key: " " });
+    await waitFor(() => expect(player).toHaveAttribute("data-state", "paused"));
+    fireEvent.keyDown(player, { key: "ArrowRight" });
+    expect(video.currentTime).toBe(5);
+    fireEvent.keyDown(player, { key: "m" });
+    expect(player).toHaveAttribute("data-muted", "true");
+  });
+
   it("server-renders an inline animated-sticker skeleton without a separate image request", () => {
     const sticker = {
       src: "/stickers/chris.123456789abc.webm",

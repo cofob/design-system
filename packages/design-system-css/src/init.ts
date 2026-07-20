@@ -1,9 +1,11 @@
 import { createAccordionController } from "./accordion.js";
+import { createAudioPlayerController } from "./audio-player.js";
 import {
   createAnimatedStickerController,
   createAnimatedStickerToggleController,
 } from "./animated-sticker.js";
 import { createCopyController } from "./copy.js";
+import { createComboboxController } from "./combobox.js";
 import { createDialogController } from "./dialog.js";
 import { addListener, createCleanup, defaultRoot, queryAll } from "./internal/dom.js";
 import { createMenuController } from "./menu.js";
@@ -14,6 +16,7 @@ import { createThemeController, type ThemeController } from "./theme.js";
 import { createToastController } from "./toast.js";
 import { createTooltipController } from "./tooltip.js";
 import type { Controller, DesignSystemRoot, ThemePreference } from "./types.js";
+import { createVideoPlayerController } from "./video-player.js";
 
 export interface DesignSystemController extends Controller {
   theme: ThemeController;
@@ -50,8 +53,26 @@ export function initDesignSystem(root: DesignSystemRoot | null = defaultRoot()):
   for (const element of queryAll<HTMLElement>(root, "[data-cf-navbar]")) {
     if (!element.hasAttribute("data-cf-navbar-managed")) controllers.push(createNavbarController(element));
   }
-  for (const element of queryAll<HTMLDialogElement>(root, "dialog[data-cf-dialog], dialog.cf-dialog")) {
+  for (const element of queryAll<HTMLDialogElement>(
+    root,
+    "dialog[data-cf-dialog], dialog.cf-dialog, dialog[data-cf-drawer], dialog.cf-drawer",
+  )) {
     controllers.push(createDialogController(element));
+  }
+  for (const element of queryAll<HTMLElement>(root, "[data-cf-combobox]")) {
+    if (!element.hasAttribute("data-cf-combobox-managed")) {
+      controllers.push(createComboboxController(element));
+    }
+  }
+  for (const element of queryAll<HTMLElement>(root, "[data-cf-audio-player]")) {
+    if (!element.hasAttribute("data-cf-audio-player-managed")) {
+      controllers.push(createAudioPlayerController(element));
+    }
+  }
+  for (const element of queryAll<HTMLElement>(root, "[data-cf-video-player]")) {
+    if (!element.hasAttribute("data-cf-video-player-managed")) {
+      controllers.push(createVideoPlayerController(element));
+    }
   }
   for (const element of queryAll<HTMLElement>(root, "[data-cf-popover]")) {
     if (!element.matches("[data-cf-menu], [data-cf-tooltip]"))

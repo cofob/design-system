@@ -18,7 +18,8 @@ const pageTitle = title === "cofob Design System" ? title : `${title} — cofob 
 const canonicalUrl = new URL(pathname, Astro.site);
 const socialImagePath = pathname === "/" ? "/og/index.png" : `/og${pathname.replace(/\/$/, "")}.png`;
 const socialImageUrl = new URL(socialImagePath, Astro.site);
-const themeScript = getThemeScript();
+const prehydrateThemeControlsScript = `document.addEventListener("DOMContentLoaded",()=>{const r=document.documentElement,p=r.dataset.themePreference;if(p!=="light"&&p!=="dark"&&p!=="system")return;const b=document.querySelector("[data-showroom-theme]"),v=b?.querySelector("[data-showroom-theme-value]"),m=document.querySelector('meta[name="theme-color"]'),o=["system","light","dark"],n={system:"System",light:"Light",dark:"Dark"},x=o[(o.indexOf(p)+1)%o.length]??"system";if(!b)return;b.dataset.preference=p;b.dataset.theme=r.dataset.theme??"dark";if(v)v.textContent=p;if(m)m.setAttribute("content",r.dataset.theme==="dark"?"#09090b":"#ffffff");b.setAttribute("aria-label",n[p]+" theme. Switch to "+n[x].toLowerCase()+" theme.")},{once:true});`;
+const themeScript = `(()=>{try{const k="cf-theme",v=localStorage.getItem(k);if(v!=="light"&&v!=="dark"&&v!=="system")localStorage.setItem(k,"dark")}catch{}})();${getThemeScript()};${prehydrateThemeControlsScript}`;
 
 const links = [
   { href: "/foundations/", label: "Foundations" },
@@ -32,12 +33,12 @@ const links = [
 ---
 
 <!doctype html>
-<html lang="en">
+<html lang="en" data-theme="dark" data-theme-preference="dark" style="color-scheme:dark">
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <meta name="description" content={description} />
-    <meta name="theme-color" content="#ffffff" />
+    <meta name="theme-color" content="#09090b" />
     <link rel="canonical" href={canonicalUrl} />
     <meta property="og:type" content="website" />
     <meta property="og:site_name" content="cofob Design System" />
@@ -106,7 +107,7 @@ const links = [
                 class="cf-theme-toggle astro-theme-toggle"
                 type="button"
                 data-showroom-theme
-                data-preference="system"
+                data-preference="dark"
                 aria-label="Change color theme"
               >
                 <span class="cf-theme-toggle__icon" aria-hidden="true" data-cf-theme-icon></span>
@@ -118,7 +119,7 @@ const links = [
                   data-label-system="System"
                   data-label-light="Light"
                   data-label-dark="Dark"></span>
-                <span class="cf-sr-only" data-showroom-theme-value>system</span>
+                <span class="cf-sr-only" data-showroom-theme-value>dark</span>
               </button>
             </div>
           </div>
@@ -137,8 +138,16 @@ const links = [
     <script>
       import { createToastController, initDesignSystem } from "@cofob/design-system-css";
 
+      let hasSavedTheme = false;
+      try {
+        const savedTheme = localStorage.getItem("cf-theme");
+        hasSavedTheme = savedTheme === "light" || savedTheme === "dark" || savedTheme === "system";
+      } catch {
+        // The dark showroom default still applies when storage is unavailable.
+      }
       const designSystem = initDesignSystem(document);
       const theme = designSystem.theme;
+      if (!hasSavedTheme) theme.setPreference("dark");
       const toastControllers = new Map<HTMLElement, ReturnType<typeof createToastController>>();
       const onToastTrigger = (event: Event) => {
         const trigger = (event.target as Element | null)?.closest<HTMLElement>("[data-cf-toast-trigger]");
@@ -167,6 +176,7 @@ const links = [
 
       const button = document.querySelector<HTMLButtonElement>("[data-showroom-theme]");
       const value = button?.querySelector<HTMLElement>("[data-showroom-theme-value]");
+      const themeColor = document.querySelector<HTMLMetaElement>('meta[name="theme-color"]');
       const preferences = ["system", "light", "dark"] as const;
       const themeNames = { system: "System", light: "Light", dark: "Dark" } as const;
       const unsubscribe = theme.subscribe(({ preference, resolvedTheme }) => {
@@ -174,6 +184,7 @@ const links = [
         const next = preferences[(preferences.indexOf(preference) + 1) % preferences.length] ?? "system";
         button.dataset.preference = preference;
         button.dataset.theme = resolvedTheme;
+        themeColor?.setAttribute("content", resolvedTheme === "dark" ? "#09090b" : "#ffffff");
         if (value) value.textContent = preference;
         button.setAttribute(
           "aria-label",

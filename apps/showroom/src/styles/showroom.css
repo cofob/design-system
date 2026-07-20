@@ -250,6 +250,11 @@
   max-width: 100%;
 }
 
+.astro-demo .cf-combobox__listbox {
+  position: static;
+  margin-block-start: var(--cf-space-1);
+}
+
 .astro-preview-copy,
 .astro-preview-container,
 .astro-preview-section {

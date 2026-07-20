@@ -1,5 +1,7 @@
 import { afterEach, describe, expect, it, vi } from "vitest";
 import {
+  createAudioPlayerController,
+  createComboboxController,
   createDialogController,
   createMenuController,
   createNavbarController,
@@ -7,6 +9,7 @@ import {
   createTabsController,
   createToastController,
   createTooltipController,
+  createVideoPlayerController,
 } from "../src/index.js";
 
 afterEach(() => {
@@ -21,6 +24,165 @@ function dispatchToggle(element: HTMLElement, newState: "open" | "closed") {
 }
 
 describe("framework-agnostic controllers", () => {
+  it("filters and selects combobox options with active-descendant keyboard behavior", () => {
+    document.body.innerHTML = `
+      <div data-cf-combobox>
+        <input data-cf-combobox-input>
+        <input type="hidden" data-cf-combobox-value>
+        <div data-cf-combobox-listbox>
+          <div role="option" data-value="astro">Astro</div>
+          <div role="option" data-value="svelte">Svelte</div>
+          <div role="option" data-value="vue" aria-disabled="true">Vue</div>
+        </div>
+      </div>
+    `;
+    const root = document.querySelector<HTMLElement>("[data-cf-combobox]")!;
+    const input = root.querySelector<HTMLInputElement>("input")!;
+    const listbox = root.querySelector<HTMLElement>("[data-cf-combobox-listbox]")!;
+    const hidden = root.querySelector<HTMLInputElement>("[data-cf-combobox-value]")!;
+    const onValueChange = vi.fn();
+    const controller = createComboboxController(root, { onValueChange });
+
+    input.focus();
+    input.value = "svel";
+    input.dispatchEvent(new Event("input", { bubbles: true }));
+    expect(listbox.hidden).toBe(false);
+    expect(root.querySelector<HTMLElement>("[data-value='astro']")!.hidden).toBe(true);
+
+    input.dispatchEvent(new KeyboardEvent("keydown", { key: "ArrowDown", bubbles: true }));
+    expect(input.getAttribute("aria-activedescendant")).toMatch(/^cf-combobox-option-/);
+    input.dispatchEvent(new KeyboardEvent("keydown", { key: "Enter", bubbles: true }));
+
+    expect(controller.getValue()).toBe("svelte");
+    expect(input.value).toBe("Svelte");
+    expect(hidden.value).toBe("svelte");
+    expect(input.getAttribute("aria-expanded")).toBe("false");
+    expect(onValueChange).toHaveBeenCalledWith("svelte", "Svelte");
+    controller.destroy();
+    expect(input.hasAttribute("aria-controls")).toBe(false);
+  });
+
+  it("connects native audio playback, seek, mute, and volume controls", async () => {
+    document.body.innerHTML = `
+      <div data-cf-audio-player data-duration-hint="90">
+        <audio></audio>
+        <button data-cf-audio-play data-play-label="Play" data-pause-label="Pause"></button>
+        <input type="range" data-cf-audio-timeline>
+        <span data-cf-audio-time></span>
+        <button data-cf-audio-mute data-mute-label="Mute" data-unmute-label="Unmute"></button>
+        <input type="range" data-cf-audio-volume>
+      </div>
+    `;
+    const root = document.querySelector<HTMLElement>("[data-cf-audio-player]")!;
+    const audio = root.querySelector<HTMLAudioElement>("audio")!;
+    let paused = true;
+    Object.defineProperty(audio, "paused", { configurable: true, get: () => paused });
+    Object.defineProperty(audio, "duration", { configurable: true, get: () => Number.NaN });
+    Object.defineProperty(audio, "play", {
+      configurable: true,
+      value: async () => {
+        paused = false;
+        audio.dispatchEvent(new Event("play"));
+      },
+    });
+    Object.defineProperty(audio, "pause", {
+      configurable: true,
+      value: () => {
+        paused = true;
+        audio.dispatchEvent(new Event("pause"));
+      },
+    });
+    const controller = createAudioPlayerController(root);
+    const play = root.querySelector<HTMLButtonElement>("[data-cf-audio-play]")!;
+    const timeline = root.querySelector<HTMLInputElement>("[data-cf-audio-timeline]")!;
+    const mute = root.querySelector<HTMLButtonElement>("[data-cf-audio-mute]")!;
+    const volume = root.querySelector<HTMLInputElement>("[data-cf-audio-volume]")!;
+
+    expect(timeline.max).toBe("90");
+    expect(root.querySelector("[data-cf-audio-time]")?.textContent).toBe("0:00 / 1:30");
+    play.click();
+    await Promise.resolve();
+    expect(root.dataset.state).toBe("playing");
+    expect(play.getAttribute("aria-label")).toBe("Pause");
+
+    timeline.value = "30";
+    timeline.dispatchEvent(new Event("input", { bubbles: true }));
+    expect(audio.currentTime).toBe(30);
+    expect(timeline.getAttribute("aria-valuetext")).toBe("0:30 of 1:30");
+
+    volume.value = "0.4";
+    volume.dispatchEvent(new Event("input", { bubbles: true }));
+    expect(audio.volume).toBe(0.4);
+    mute.click();
+    expect(audio.muted).toBe(true);
+    expect(mute.getAttribute("aria-label")).toBe("Unmute");
+    controller.destroy();
+    expect(paused).toBe(true);
+  });
+
+  it("enhances native video playback with themed controls and restores fallback controls", async () => {
+    document.body.innerHTML = `
+      <figure data-cf-video-player data-duration-hint="90">
+        <video controls data-cf-video-media></video>
+        <button data-cf-video-start></button>
+        <button data-cf-video-play data-play-label="Play" data-pause-label="Pause"></button>
+        <input type="range" data-cf-video-timeline>
+        <span data-cf-video-time></span>
+        <button data-cf-video-mute data-mute-label="Mute" data-unmute-label="Unmute"></button>
+        <input type="range" data-cf-video-volume>
+        <button data-cf-video-fullscreen></button>
+      </figure>
+    `;
+    const root = document.querySelector<HTMLElement>("[data-cf-video-player]")!;
+    const video = root.querySelector<HTMLVideoElement>("video")!;
+    let paused = true;
+    Object.defineProperty(video, "paused", { configurable: true, get: () => paused });
+    Object.defineProperty(video, "duration", { configurable: true, get: () => Number.NaN });
+    Object.defineProperty(video, "play", {
+      configurable: true,
+      value: async () => {
+        paused = false;
+        video.dispatchEvent(new Event("play"));
+      },
+    });
+    Object.defineProperty(video, "pause", {
+      configurable: true,
+      value: () => {
+        paused = true;
+        video.dispatchEvent(new Event("pause"));
+      },
+    });
+    const controller = createVideoPlayerController(root);
+    const start = root.querySelector<HTMLButtonElement>("[data-cf-video-start]")!;
+    const play = root.querySelector<HTMLButtonElement>("[data-cf-video-play]")!;
+    expect(video.controls).toBe(false);
+    expect(root.dataset.enhanced).toBe("true");
+    expect(root.dataset.started).toBe("false");
+    expect(root.tabIndex).toBe(-1);
+    expect(root.querySelector("[data-cf-video-time]")?.textContent).toBe("0:00 / 1:30");
+
+    start.focus();
+    start.click();
+    await Promise.resolve();
+    expect(root.dataset.state).toBe("playing");
+    expect(root.dataset.started).toBe("true");
+    expect(play.getAttribute("aria-label")).toBe("Pause");
+    expect(play).toBe(document.activeElement);
+
+    root.dispatchEvent(new KeyboardEvent("keydown", { key: " ", bubbles: true }));
+    expect(root.dataset.state).toBe("paused");
+    root.dispatchEvent(new KeyboardEvent("keydown", { key: "ArrowRight", bubbles: true }));
+    expect(video.currentTime).toBe(5);
+    root.dispatchEvent(new KeyboardEvent("keydown", { key: "m", bubbles: true }));
+    expect(video.muted).toBe(true);
+
+    controller.destroy();
+    expect(video.controls).toBe(true);
+    expect(paused).toBe(true);
+    expect(root.hasAttribute("tabindex")).toBe(false);
+    expect(root.hasAttribute("data-started")).toBe(false);
+  });
+
   it("controls responsive navbar dismissal and preserves interactions inside its actions", async () => {
     document.body.innerHTML = `
       <nav data-cf-navbar data-collapse-at="tablet">

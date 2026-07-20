@@ -59,6 +59,11 @@
         "name": "Inline",
         "description": "Wrapping horizontal layout with alignment controls.",
         "interactive": false
+      },
+      {
+        "name": "Separator",
+        "description": "Horizontal or vertical divider for grouping related content.",
+        "interactive": false
       }
     ]
   },
@@ -100,6 +105,31 @@
       {
         "name": "Switch",
         "description": "Immediate boolean setting with switch semantics.",
+        "interactive": true
+      },
+      {
+        "name": "Radio",
+        "description": "Single native radio choice with supporting description.",
+        "interactive": true
+      },
+      {
+        "name": "RadioGroup",
+        "description": "Labelled single-selection group with validation and orientation.",
+        "interactive": true
+      },
+      {
+        "name": "Combobox",
+        "description": "Filterable autocomplete with listbox keyboard navigation.",
+        "interactive": true
+      },
+      {
+        "name": "FileUpload",
+        "description": "Native file picker with drag-and-drop selection and limits.",
+        "interactive": true
+      },
+      {
+        "name": "Slider",
+        "description": "Native range input with bindable value and formatted output.",
         "interactive": true
       },
       {
@@ -145,6 +175,36 @@
         "name": "Table",
         "description": "Accessible responsive data table with explicit surfaces, density, and striped rows.",
         "interactive": false
+      },
+      {
+        "name": "Progress",
+        "description": "Determinate or indeterminate task progress with native semantics.",
+        "interactive": false
+      },
+      {
+        "name": "Spinner",
+        "description": "Compact live loading indicator with an accessible label.",
+        "interactive": false
+      },
+      {
+        "name": "CircularProgress",
+        "description": "Determinate circular loader with an accessible percentage value.",
+        "interactive": false
+      },
+      {
+        "name": "Skeleton",
+        "description": "Slowly pulsing placeholder for text, media, and circular content.",
+        "interactive": false
+      },
+      {
+        "name": "AudioPlayer",
+        "description": "Compact accessible playback, seek, time, mute, and volume controls.",
+        "interactive": true
+      },
+      {
+        "name": "VideoPlayer",
+        "description": "Responsive native video playback with caption and aspect-ratio support.",
+        "interactive": true
       }
     ]
   },
@@ -158,8 +218,23 @@
         "interactive": true
       },
       {
+        "name": "Breadcrumbs",
+        "description": "Hierarchical page trail with a current-page endpoint.",
+        "interactive": true
+      },
+      {
+        "name": "Stepper",
+        "description": "Ordered multi-step progress and optional step navigation.",
+        "interactive": true
+      },
+      {
         "name": "Dialog",
         "description": "Modal dialog using the native dialog element.",
+        "interactive": true
+      },
+      {
+        "name": "Drawer",
+        "description": "Edge-aligned modal sheet using the native dialog element.",
         "interactive": true
       },
       { "name": "Popover", "description": "Light-dismiss non-modal floating content.", "interactive": true },

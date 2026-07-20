@@ -28,6 +28,7 @@ import Button from "../src/lib/components/Button.svelte";
 import Captcha from "../src/lib/components/Captcha.svelte";
 import ChatThread from "../src/lib/components/ChatThread.svelte";
 import Checkbox from "../src/lib/components/Checkbox.svelte";
+import CircularProgress from "../src/lib/components/CircularProgress.svelte";
 import CodeBlock from "../src/lib/components/CodeBlock.svelte";
 import Dialog from "../src/lib/components/Dialog.svelte";
 import DropdownMenu from "../src/lib/components/DropdownMenu.svelte";
@@ -51,6 +52,7 @@ import Textarea from "../src/lib/components/Textarea.svelte";
 import TextField from "../src/lib/components/TextField.svelte";
 import ThemeProvider from "../src/lib/components/ThemeProvider.svelte";
 import Tooltip from "../src/lib/components/Tooltip.svelte";
+import VideoPlayer from "../src/lib/components/VideoPlayer.svelte";
 import { runComposedEventHandlers } from "../src/lib/internal.js";
 
 const componentNames = [
@@ -66,6 +68,13 @@ const componentNames = [
   "CodeBlock",
   "TerminalCodeBlock",
   "Table",
+  "Progress",
+  "Spinner",
+  "CircularProgress",
+  "Skeleton",
+  "AudioPlayer",
+  "VideoPlayer",
+  "Separator",
   "Container",
   "Section",
   "Stack",
@@ -78,6 +87,11 @@ const componentNames = [
   "Select",
   "Checkbox",
   "Switch",
+  "Radio",
+  "RadioGroup",
+  "Combobox",
+  "FileUpload",
+  "Slider",
   "Captcha",
   "Badge",
   "Tag",
@@ -85,7 +99,10 @@ const componentNames = [
   "Card",
   "EmptyState",
   "Pagination",
+  "Breadcrumbs",
+  "Stepper",
   "Dialog",
+  "Drawer",
   "Popover",
   "DropdownMenu",
   "Tabs",
@@ -257,6 +274,24 @@ describe("Svelte adapter contract", () => {
     expect(output.body).toContain('data-density="compact"');
     expect(output.body).toContain('data-header-tone="strong"');
     expect(output.body).toContain('data-striped="true"');
+  });
+
+  it("server-renders circular progress and native video semantics", () => {
+    const progress = render(CircularProgress, {
+      props: { value: 64, label: "Indexing" },
+    });
+    const video = render(VideoPlayer, {
+      props: { src: "/demo.webm", label: "Product demo", caption: "A short walkthrough." },
+    });
+
+    expect(progress.body).toContain('class="cf-circular-progress"');
+    expect(progress.body).toContain('role="progressbar" aria-label="Indexing"');
+    expect(progress.body).toContain('aria-valuenow="64"');
+    expect(video.body).toContain('class="cf-video-player"');
+    expect(video.body).toContain('data-started="false"');
+    expect(video.body).toContain('class="cf-video-player__start"');
+    expect(video.body).toContain('aria-label="Product demo"');
+    expect(video.body).toContain("A short walkthrough.");
   });
 
   it("renders BlueLine as the shared inline text marker", () => {

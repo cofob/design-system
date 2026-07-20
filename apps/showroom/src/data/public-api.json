@@ -292,6 +292,69 @@
               "signature": "interface AccordionControllerOptions",
               "summary": "Multiple-expansion and value-change callback options.",
               "entrypoints": ["."]
+            },
+            {
+              "name": "createComboboxController",
+              "kind": "function",
+              "signature": "createComboboxController(root, options?): ComboboxController",
+              "summary": "Adds filtering, selection, active-descendant state, and keyboard navigation to a combobox listbox.",
+              "entrypoints": ["."]
+            },
+            {
+              "name": "ComboboxController",
+              "kind": "interface",
+              "signature": "interface ComboboxController extends Controller",
+              "summary": "Open, close, select, inspect, and destroy operations for a native combobox.",
+              "entrypoints": ["."]
+            },
+            {
+              "name": "ComboboxControllerOptions",
+              "kind": "interface",
+              "signature": "interface ComboboxControllerOptions",
+              "summary": "Focus-opening and value-change callback options for a native combobox.",
+              "entrypoints": ["."]
+            },
+            {
+              "name": "createAudioPlayerController",
+              "kind": "function",
+              "signature": "createAudioPlayerController(root, options?): AudioPlayerController",
+              "summary": "Connects playback, seek, time, mute, and volume controls to a native audio element.",
+              "entrypoints": ["."]
+            },
+            {
+              "name": "AudioPlayerController",
+              "kind": "interface",
+              "signature": "interface AudioPlayerController extends Controller",
+              "summary": "Playback, seek, volume, mute, and lifecycle operations for an audio player.",
+              "entrypoints": ["."]
+            },
+            {
+              "name": "AudioPlayerControllerOptions",
+              "kind": "interface",
+              "signature": "interface AudioPlayerControllerOptions { durationHint?: number }",
+              "summary": "Known duration fallback used until audio metadata becomes available.",
+              "entrypoints": ["."]
+            },
+            {
+              "name": "createVideoPlayerController",
+              "kind": "function",
+              "signature": "createVideoPlayerController(root, options?): VideoPlayerController",
+              "summary": "Connects themed playback, seek, time, mute, volume, and fullscreen controls to a native video element.",
+              "entrypoints": ["."]
+            },
+            {
+              "name": "VideoPlayerController",
+              "kind": "interface",
+              "signature": "interface VideoPlayerController extends Controller",
+              "summary": "Playback, seek, volume, mute, fullscreen, and lifecycle operations for a video player.",
+              "entrypoints": ["."]
+            },
+            {
+              "name": "VideoPlayerControllerOptions",
+              "kind": "interface",
+              "signature": "interface VideoPlayerControllerOptions { durationHint?: number }",
+              "summary": "Known duration fallback used until video metadata becomes available.",
+              "entrypoints": ["."]
             }
           ]
         },
@@ -1191,6 +1254,90 @@
               "signature": "interface StickerProps",
               "summary": "Sticker tone, rotation, custom style, and span attributes.",
               "entrypoints": [".", "./static"]
+            },
+            {
+              "name": "BreadcrumbItem",
+              "kind": "interface",
+              "signature": "interface BreadcrumbItem { label; href?; current? }",
+              "summary": "One hierarchical navigation ancestor or current-page endpoint.",
+              "entrypoints": [".", "./static"]
+            },
+            {
+              "name": "BreadcrumbsProps",
+              "kind": "interface",
+              "signature": "interface BreadcrumbsProps",
+              "summary": "Ordered breadcrumb items, accessible label, and navigation attributes.",
+              "entrypoints": [".", "./static"]
+            },
+            {
+              "name": "RadioProps",
+              "kind": "interface",
+              "signature": "interface RadioProps",
+              "summary": "Native radio attributes plus visible label, description, and size.",
+              "entrypoints": [".", "./static"]
+            },
+            {
+              "name": "RadioOption",
+              "kind": "interface",
+              "signature": "interface RadioOption { value; label; description?; disabled? }",
+              "summary": "Portable option record rendered by RadioGroup.",
+              "entrypoints": [".", "./static"]
+            },
+            {
+              "name": "RadioGroupProps",
+              "kind": "interface",
+              "signature": "interface RadioGroupProps",
+              "summary": "Labelled options, controlled/default value, validation, orientation, and fieldset attributes.",
+              "entrypoints": [".", "./static"]
+            },
+            {
+              "name": "ProgressProps",
+              "kind": "interface",
+              "signature": "interface ProgressProps",
+              "summary": "Determinate or indeterminate value, labels, maximum, and native progress attributes.",
+              "entrypoints": [".", "./static"]
+            },
+            {
+              "name": "SpinnerProps",
+              "kind": "interface",
+              "signature": "interface SpinnerProps",
+              "summary": "Accessible status label, size, and span attributes for a loading spinner.",
+              "entrypoints": [".", "./static"]
+            },
+            {
+              "name": "CircularProgressProps",
+              "kind": "interface",
+              "signature": "interface CircularProgressProps",
+              "summary": "Determinate circular value, maximum, accessible label, size, formatting, and span attributes.",
+              "entrypoints": [".", "./static"]
+            },
+            {
+              "name": "SkeletonProps",
+              "kind": "interface",
+              "signature": "interface SkeletonProps",
+              "summary": "Placeholder variant, dimensions, style, and span attributes.",
+              "entrypoints": [".", "./static"]
+            },
+            {
+              "name": "SeparatorProps",
+              "kind": "interface",
+              "signature": "interface SeparatorProps",
+              "summary": "Horizontal or vertical orientation, decorative semantics, and native attributes.",
+              "entrypoints": [".", "./static"]
+            },
+            {
+              "name": "StepperItem",
+              "kind": "interface",
+              "signature": "interface StepperItem { id; label; description?; href?; disabled?; state? }",
+              "summary": "One complete, current, or upcoming step with optional navigation.",
+              "entrypoints": [".", "./static"]
+            },
+            {
+              "name": "StepperProps",
+              "kind": "interface",
+              "signature": "interface StepperProps",
+              "summary": "Ordered steps, current ID, orientation, activation callback, and navigation attributes.",
+              "entrypoints": [".", "./static"]
             }
           ]
         },
@@ -1308,6 +1455,69 @@
               "kind": "interface",
               "signature": "interface ToastViewportProps",
               "summary": "Viewport position, label, and ordered-list attributes.",
+              "entrypoints": [".", "./client"]
+            },
+            {
+              "name": "ComboboxOption",
+              "kind": "interface",
+              "signature": "interface ComboboxOption { value; label; description?; disabled? }",
+              "summary": "Filterable listbox option rendered by Combobox.",
+              "entrypoints": [".", "./client"]
+            },
+            {
+              "name": "ComboboxProps",
+              "kind": "interface",
+              "signature": "interface ComboboxProps",
+              "summary": "Options, controlled selection/query, accessible copy, callbacks, and root/input attributes.",
+              "entrypoints": [".", "./client"]
+            },
+            {
+              "name": "DrawerProps",
+              "kind": "interface",
+              "signature": "interface DrawerProps",
+              "summary": "Controlled/default open state, edge, trigger, title, actions, and dialog attributes.",
+              "entrypoints": [".", "./client"]
+            },
+            {
+              "name": "FileUploadProps",
+              "kind": "interface",
+              "signature": "interface FileUploadProps",
+              "summary": "Controlled files, native filters, count/size limits, drop zone copy, and callbacks.",
+              "entrypoints": [".", "./client"]
+            },
+            {
+              "name": "SliderProps",
+              "kind": "interface",
+              "signature": "interface SliderProps",
+              "summary": "Controlled/default range value, output formatting, callback, and input attributes.",
+              "entrypoints": [".", "./client"]
+            },
+            {
+              "name": "AudioPlayerLabels",
+              "kind": "interface",
+              "signature": "interface AudioPlayerLabels",
+              "summary": "Localized playback, timeline, mute, and volume control labels.",
+              "entrypoints": [".", "./client"]
+            },
+            {
+              "name": "AudioPlayerProps",
+              "kind": "interface",
+              "signature": "interface AudioPlayerProps",
+              "summary": "Audio source, duration fallback, localized labels, disabled state, and media/root attributes.",
+              "entrypoints": [".", "./client"]
+            },
+            {
+              "name": "VideoPlayerLabels",
+              "kind": "interface",
+              "signature": "interface VideoPlayerLabels",
+              "summary": "Localized playback, timeline, mute, volume, and fullscreen control labels.",
+              "entrypoints": [".", "./client"]
+            },
+            {
+              "name": "VideoPlayerProps",
+              "kind": "interface",
+              "signature": "interface VideoPlayerProps",
+              "summary": "Video source, caption, aspect ratio, duration fallback, themed controls, media, and figure attributes.",
               "entrypoints": [".", "./client"]
             }
           ]

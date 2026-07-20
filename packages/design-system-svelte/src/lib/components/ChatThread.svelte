@@ -45,8 +45,8 @@
         <span class="cf-chat__avatar" aria-hidden="true">{message.author.slice(0, 1).toUpperCase()}</span>
       {/if}
       <div class="cf-chat__message">
-        {#if groupStart}<p class="cf-chat__author"><strong>{message.author}</strong></p>{/if}
         <div class="cf-chat__bubble">
+          {#if groupStart}<p class="cf-chat__author"><strong>{message.author}</strong></p>{/if}
           {#if !groupStart}<span class="cf-visually-hidden">{message.author}: </span>{/if}
           {#if typeof message.body === "string"}
             {message.body}

@@ -175,6 +175,16 @@ export function ReactComponentPreview({ name, animatedSticker }: Props) {
           </p>
         </DS.Prose>
       );
+    case "Breadcrumbs":
+      return (
+        <DS.Breadcrumbs
+          items={[
+            { label: "Home", href: "#home" },
+            { label: "Components", href: "#components" },
+            { label: "Breadcrumbs" },
+          ]}
+        />
+      );
     case "CodeBlock":
       return <DS.CodeBlock code={codeBlockExample} language="typescript" copyable />;
     case "TerminalCodeBlock":
@@ -399,6 +409,73 @@ export function ReactComponentPreview({ name, animatedSticker }: Props) {
           <DS.Switch label="Managed by your organization" defaultChecked disabled />
         </DS.Stack>
       );
+    case "Radio":
+      return (
+        <DS.Stack gap="sm">
+          <DS.Radio name="react-plan-single" value="starter" label="Starter" />
+          <DS.Radio
+            name="react-plan-single"
+            value="pro"
+            label="Pro"
+            description="For growing projects."
+            defaultChecked
+          />
+          <DS.Radio name="react-plan-single" value="enterprise" label="Enterprise" disabled />
+        </DS.Stack>
+      );
+    case "RadioGroup":
+      return (
+        <DS.RadioGroup
+          name="react-plan"
+          label="Choose a plan"
+          description="You can change this later."
+          defaultValue="pro"
+          options={[
+            { value: "starter", label: "Starter" },
+            { value: "pro", label: "Pro", description: "For growing projects." },
+            { value: "enterprise", label: "Enterprise", disabled: true },
+          ]}
+        />
+      );
+    case "Combobox":
+      return (
+        <DS.Combobox
+          label="Framework"
+          name="framework"
+          placeholder="Search frameworks"
+          hint="Type to filter, then use arrow keys and Enter."
+          options={[
+            { value: "astro", label: "Astro", description: "Content-driven web framework" },
+            { value: "react", label: "React", description: "Component library" },
+            { value: "svelte", label: "Svelte", description: "Compiler-first framework" },
+            { value: "vue", label: "Vue", description: "Progressive framework" },
+          ]}
+        />
+      );
+    case "FileUpload":
+      return (
+        <DS.FileUpload
+          label="Attachments"
+          name="attachments"
+          accept="image/*,.pdf"
+          multiple
+          maxFiles={3}
+          maxSize={5 * 1024 * 1024}
+          hint="PNG, JPG, or PDF. Up to 5 MB each."
+        />
+      );
+    case "Slider":
+      return (
+        <DS.Slider
+          label="Volume"
+          name="volume"
+          defaultValue={64}
+          min={0}
+          max={100}
+          formatValue={(value) => `${value}%`}
+          hint="Use arrow keys for precise adjustments."
+        />
+      );
     case "Captcha":
       return (
         <div className="astro-captcha-grid">
@@ -480,12 +557,86 @@ export function ReactComponentPreview({ name, animatedSticker }: Props) {
           action={<DS.Button size="sm">Create a post</DS.Button>}
         />
       );
+    case "Progress":
+      return (
+        <DS.Stack gap="md">
+          <DS.Progress label="Uploading assets" value={64} animated />
+          <DS.Progress label="Preparing preview" showValue={false} />
+        </DS.Stack>
+      );
+    case "Spinner":
+      return (
+        <DS.Inline gap="lg">
+          <DS.Spinner size="sm" label="Loading small preview" />
+          <DS.Spinner label="Loading preview" />
+          <DS.Spinner size="lg" label="Loading large preview" />
+        </DS.Inline>
+      );
+    case "CircularProgress":
+      return (
+        <DS.Inline gap="lg">
+          <DS.CircularProgress size="sm" value={24} label="Preparing files" />
+          <DS.CircularProgress value={64} label="Uploading assets" animated />
+          <DS.CircularProgress size="lg" value={92} label="Processing complete" animated showValue={false} />
+        </DS.Inline>
+      );
+    case "Skeleton":
+      return (
+        <DS.Stack gap="sm" role="status" aria-label="Loading card preview" style={{ width: "100%" }}>
+          <DS.Inline gap="sm" wrap={false}>
+            <DS.Skeleton variant="circle" width="3rem" height="3rem" />
+            <DS.Stack gap="sm" style={{ flex: 1 }}>
+              <DS.Skeleton variant="text" width="45%" />
+              <DS.Skeleton variant="text" width="75%" />
+            </DS.Stack>
+          </DS.Inline>
+          <DS.Skeleton height="6rem" />
+        </DS.Stack>
+      );
+    case "AudioPlayer":
+      return (
+        <DS.AudioPlayer src="/stickers/animated-chris/animated-chris.7e882faa1b4d.webm" durationHint={2} />
+      );
+    case "VideoPlayer":
+      return (
+        <DS.VideoPlayer
+          src="/stickers/animated-chris/animated-chris.7e882faa1b4d.webm"
+          label="Animated Chris preview"
+          caption="Themed controls remain available to keyboard and assistive technology users."
+          durationHint={2}
+          videoProps={{ muted: true }}
+        />
+      );
+    case "Separator":
+      return (
+        <DS.Stack gap="md">
+          <span>Account settings</span>
+          <DS.Separator />
+          <span>Notification settings</span>
+          <DS.Inline gap="md">
+            <span>Light</span>
+            <DS.Separator orientation="vertical" decorative />
+            <span>Dark</span>
+          </DS.Inline>
+        </DS.Stack>
+      );
     case "Pagination":
       return (
         <DS.Pagination
           currentPage={2}
           items={[{ page: 1 }, { page: 2 }, { page: 3 }]}
           onPageChange={() => undefined}
+        />
+      );
+    case "Stepper":
+      return (
+        <DS.Stepper
+          currentStep="details"
+          items={[
+            { id: "account", label: "Account", description: "Complete" },
+            { id: "details", label: "Details", description: "Current step" },
+            { id: "review", label: "Review", description: "Up next" },
+          ]}
         />
       );
     case "Dialog":
@@ -505,6 +656,21 @@ export function ReactComponentPreview({ name, animatedSticker }: Props) {
         >
           <p className="cf-text">This uses the platform dialog element.</p>
         </DS.Dialog>
+      );
+    case "Drawer":
+      return (
+        <DS.Drawer
+          trigger="Open filters"
+          title="Filter components"
+          description="Narrow the component catalog."
+          side="right"
+          footer={<DS.Button>Apply filters</DS.Button>}
+        >
+          <DS.Stack gap="md">
+            <DS.Checkbox label="Interactive only" />
+            <DS.Checkbox label="Supports forms" />
+          </DS.Stack>
+        </DS.Drawer>
       );
     case "Popover":
       return (

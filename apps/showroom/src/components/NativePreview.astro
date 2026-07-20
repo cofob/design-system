@@ -177,6 +177,27 @@ const renderBashCode = (command: string) =>
       </div>
     )
   }
+  {
+    name === "Breadcrumbs" && (
+      <nav class="cf-breadcrumbs" aria-label="Breadcrumb">
+        <ol class="cf-breadcrumbs__list">
+          <li class="cf-breadcrumbs__item">
+            <a class="cf-breadcrumbs__link" href="#home">
+              Home
+            </a>
+          </li>
+          <li class="cf-breadcrumbs__item">
+            <a class="cf-breadcrumbs__link" href="#components">
+              Components
+            </a>
+          </li>
+          <li class="cf-breadcrumbs__item">
+            <span aria-current="page">Breadcrumbs</span>
+          </li>
+        </ol>
+      </nav>
+    )
+  }
 
   {
     name === "CodeBlock" && (
@@ -647,6 +668,149 @@ const renderBashCode = (command: string) =>
     )
   }
   {
+    name === "Radio" && (
+      <div class="cf-stack" data-gap="sm">
+        <label class="cf-radio">
+          <input type="radio" name="native-plan-single" value="starter" />
+          <span class="cf-radio__control" aria-hidden="true" />
+          <span class="cf-radio__content">
+            <span class="cf-radio__label">Starter</span>
+          </span>
+        </label>
+        <label class="cf-radio">
+          <input type="radio" name="native-plan-single" value="pro" checked />
+          <span class="cf-radio__control" aria-hidden="true" />
+          <span class="cf-radio__content">
+            <span class="cf-radio__label">Pro</span>
+            <span class="cf-radio__description">For growing projects.</span>
+          </span>
+        </label>
+        <label class="cf-radio" data-disabled="true">
+          <input type="radio" name="native-plan-single" value="enterprise" disabled />
+          <span class="cf-radio__control" aria-hidden="true" />
+          <span class="cf-radio__content">
+            <span class="cf-radio__label">Enterprise</span>
+          </span>
+        </label>
+      </div>
+    )
+  }
+  {
+    name === "RadioGroup" && (
+      <fieldset class="cf-radio-group" data-orientation="vertical">
+        <legend class="cf-radio-group__legend">Choose a plan</legend>
+        <div class="cf-radio-group__description">You can change this later.</div>
+        <div class="cf-radio-group__options">
+          <label class="cf-radio">
+            <input type="radio" name="native-plan" value="starter" />
+            <span class="cf-radio__control" aria-hidden="true" />
+            <span class="cf-radio__content">
+              <span class="cf-radio__label">Starter</span>
+            </span>
+          </label>
+          <label class="cf-radio">
+            <input type="radio" name="native-plan" value="pro" checked />
+            <span class="cf-radio__control" aria-hidden="true" />
+            <span class="cf-radio__content">
+              <span class="cf-radio__label">Pro</span>
+              <span class="cf-radio__description">For growing projects.</span>
+            </span>
+          </label>
+          <label class="cf-radio" data-disabled="true">
+            <input type="radio" name="native-plan" value="enterprise" disabled />
+            <span class="cf-radio__control" aria-hidden="true" />
+            <span class="cf-radio__content">
+              <span class="cf-radio__label">Enterprise</span>
+            </span>
+          </label>
+        </div>
+      </fieldset>
+    )
+  }
+  {
+    name === "Combobox" && (
+      <div class="cf-combobox" data-cf-combobox>
+        <label class="cf-combobox__label" for={`${id}-input`}>
+          Framework
+        </label>
+        <div class="cf-combobox__input-wrap">
+          <input
+            class="cf-input cf-combobox__input"
+            id={`${id}-input`}
+            role="combobox"
+            placeholder="Search frameworks"
+            data-cf-combobox-input
+          />
+        </div>
+        <input type="hidden" name="framework" data-cf-combobox-value />
+        <div class="cf-combobox__hint">Type to filter, then use arrow keys and Enter.</div>
+        <div class="cf-combobox__listbox" role="listbox" data-cf-combobox-listbox>
+          <div class="cf-combobox__option" role="option" data-value="astro" data-label="Astro">
+            <>
+              <span>Astro</span>
+              <span class="cf-combobox__option-description">Content-driven web framework</span>
+            </>
+          </div>
+          <div class="cf-combobox__option" role="option" data-value="react" data-label="React">
+            <>
+              <span>React</span>
+              <span class="cf-combobox__option-description">Component library</span>
+            </>
+          </div>
+          <div class="cf-combobox__option" role="option" data-value="svelte" data-label="Svelte">
+            <>
+              <span>Svelte</span>
+              <span class="cf-combobox__option-description">Compiler-first framework</span>
+            </>
+          </div>
+          <div class="cf-combobox__option" role="option" data-value="vue" data-label="Vue">
+            <>
+              <span>Vue</span>
+              <span class="cf-combobox__option-description">Progressive framework</span>
+            </>
+          </div>
+        </div>
+      </div>
+    )
+  }
+  {
+    name === "FileUpload" && (
+      <div class="cf-file-upload">
+        <label class="cf-file-upload__label" for={`${id}-input`}>
+          Attachments
+        </label>
+        <label class="cf-file-upload__dropzone" for={`${id}-input`}>
+          <input
+            class="cf-file-upload__input"
+            id={`${id}-input`}
+            type="file"
+            name="attachments"
+            accept="image/*,.pdf"
+            multiple
+          />
+          <span class="cf-file-upload__prompt">Choose files or drag them here</span>
+          <span class="cf-file-upload__hint">PNG, JPG, or PDF. Up to 5 MB each.</span>
+        </label>
+      </div>
+    )
+  }
+  {
+    name === "Slider" && (
+      <div class="cf-slider">
+        <div class="cf-slider__header">
+          <label class="cf-slider__label" for={`${id}-input`}>
+            Volume
+          </label>
+          <output class="cf-slider__value" for={`${id}-input`}>
+            64%
+          </output>
+        </div>
+        <input class="cf-slider__control" id={`${id}-input`} type="range" min="0" max="100" value="64" />
+        <div class="cf-slider__hint">Use arrow keys for precise adjustments.</div>
+      </div>
+    )
+  }
+  {
     name === "Captcha" && (
       <div class="astro-captcha-grid">
         <NativeCaptcha state="idle" />
@@ -767,6 +931,254 @@ const renderBashCode = (command: string) =>
       </div>
     )
   }
+  {
+    name === "Progress" && (
+      <div class="cf-stack" data-gap="md">
+        <div class="cf-progress" data-state="determinate" data-animated="true">
+          <div class="cf-progress__header">
+            <>
+              <label class="cf-progress__label" for={`${id}-determinate`}>
+                Uploading assets
+              </label>
+              <span class="cf-progress__value">64%</span>
+            </>
+          </div>
+          <progress class="cf-progress__track" id={`${id}-determinate`} value="64" max="100">
+            64%
+          </progress>
+        </div>
+        <div class="cf-progress" data-state="indeterminate">
+          <div class="cf-progress__header">
+            <>
+              <label class="cf-progress__label" for={`${id}-indeterminate`}>
+                Preparing preview
+              </label>
+            </>
+          </div>
+          <progress class="cf-progress__track" id={`${id}-indeterminate`}>
+            In progress
+          </progress>
+        </div>
+      </div>
+    )
+  }
+  {
+    name === "Spinner" && (
+      <div class="cf-inline" data-gap="lg">
+        <span class="cf-spinner" data-size="sm" role="status">
+          <span class="cf-visually-hidden">Loading small preview</span>
+        </span>
+        <span class="cf-spinner" data-size="md" role="status">
+          <span class="cf-visually-hidden">Loading preview</span>
+        </span>
+        <span class="cf-spinner" data-size="lg" role="status">
+          <span class="cf-visually-hidden">Loading large preview</span>
+        </span>
+      </div>
+    )
+  }
+  {
+    name === "CircularProgress" && (
+      <div class="cf-inline" data-gap="lg">
+        {[
+          { value: 24, label: "Preparing files", size: "sm", animated: false, showValue: true },
+          { value: 64, label: "Uploading assets", size: "md", animated: true, showValue: true },
+          { value: 92, label: "Processing complete", size: "lg", animated: true, showValue: false },
+        ].map(({ value, label, size, animated, showValue }) => (
+          <span
+            class="cf-circular-progress"
+            data-size={size}
+            data-animated={animated ? "true" : undefined}
+            role="progressbar"
+            aria-label={label}
+            aria-valuemin="0"
+            aria-valuemax="100"
+            aria-valuenow={value}
+          >
+            <svg class="cf-circular-progress__graphic" viewBox="0 0 44 44" aria-hidden="true">
+              <circle class="cf-circular-progress__track" cx="22" cy="22" r="18" />
+              <circle
+                class="cf-circular-progress__indicator"
+                cx="22"
+                cy="22"
+                r="18"
+                pathLength="100"
+                stroke-dasharray="100"
+                stroke-dashoffset={100 - value}
+              />
+            </svg>
+            {showValue && <span class="cf-circular-progress__value">{value}%</span>}
+          </span>
+        ))}
+      </div>
+    )
+  }
+  {
+    name === "Skeleton" && (
+      <div class="cf-stack" data-gap="sm" role="status" aria-label="Loading card preview" style="width:100%">
+        <div class="cf-inline" data-gap="sm" data-wrap="false">
+          <span class="cf-skeleton" data-variant="circle" style="width:3rem;height:3rem" aria-hidden="true" />
+          <div class="cf-stack" data-gap="sm" style="flex:1">
+            <span class="cf-skeleton" data-variant="text" style="width:45%" aria-hidden="true" />
+            <span class="cf-skeleton" data-variant="text" style="width:75%" aria-hidden="true" />
+          </div>
+        </div>
+        <span class="cf-skeleton" style="height:6rem" aria-hidden="true" />
+      </div>
+    )
+  }
+  {
+    name === "AudioPlayer" && (
+      <div class="cf-audio-player" data-cf-audio-player data-duration-hint="2">
+        <audio src="/stickers/animated-chris/animated-chris.7e882faa1b4d.webm" preload="metadata" />
+        <button
+          class="cf-audio-player__button"
+          type="button"
+          aria-label="Play audio"
+          data-play-label="Play audio"
+          data-pause-label="Pause audio"
+          data-cf-audio-play
+        >
+          <span class="cf-audio-player__icon cf-audio-player__play-icon" aria-hidden="true" />
+        </button>
+        <input
+          class="cf-audio-player__range cf-audio-player__timeline"
+          type="range"
+          min="0"
+          max="3"
+          step="0.01"
+          value="0"
+          aria-label="Playback position"
+          data-cf-audio-timeline
+        />
+        <span class="cf-audio-player__time" data-cf-audio-time>
+          0:00 / 0:03
+        </span>
+        <div class="cf-audio-player__volume">
+          <button
+            class="cf-audio-player__button"
+            type="button"
+            aria-label="Mute audio"
+            data-mute-label="Mute audio"
+            data-unmute-label="Unmute audio"
+            data-cf-audio-mute
+          >
+            <span class="cf-audio-player__icon cf-audio-player__volume-icon" aria-hidden="true" />
+          </button>
+          <input
+            class="cf-audio-player__range"
+            type="range"
+            min="0"
+            max="1"
+            step="0.01"
+            value="1"
+            aria-label="Volume"
+            style="--cf-audio-progress:100%"
+            data-cf-audio-volume
+          />
+        </div>
+      </div>
+    )
+  }
+  {
+    name === "VideoPlayer" && (
+      <figure class="cf-video-player" data-cf-video-player data-duration-hint="2" data-started="false">
+        <div class="cf-video-player__frame">
+          <video
+            class="cf-video-player__media"
+            src="/stickers/animated-chris/animated-chris.7e882faa1b4d.webm"
+            aria-label="Animated Chris preview"
+            preload="metadata"
+            data-cf-video-media
+            controls
+            playsinline
+            muted
+          />
+          <button class="cf-video-player__start" type="button" aria-label="Play video" data-cf-video-start>
+            <span class="cf-video-player__start-icon" aria-hidden="true" />
+          </button>
+          <div class="cf-video-player__controls">
+            <input
+              class="cf-video-player__range cf-video-player__timeline"
+              type="range"
+              min="0"
+              max="3"
+              step="0.01"
+              value="0"
+              aria-label="Playback position"
+              style="--cf-video-progress:0%"
+              data-cf-video-timeline
+            />
+            <button
+              class="cf-video-player__button"
+              type="button"
+              aria-label="Play video"
+              data-play-label="Play video"
+              data-pause-label="Pause video"
+              data-cf-video-play
+            >
+              <span class="cf-video-player__icon cf-video-player__play-icon" aria-hidden="true" />
+            </button>
+            <span class="cf-video-player__time" data-cf-video-time>
+              0:00 / 0:03
+            </span>
+            <div class="cf-video-player__volume">
+              <button
+                class="cf-video-player__button"
+                type="button"
+                aria-label="Mute video"
+                data-mute-label="Mute video"
+                data-unmute-label="Unmute video"
+                data-cf-video-mute
+              >
+                <span class="cf-video-player__icon cf-video-player__volume-icon" aria-hidden="true" />
+              </button>
+              <input
+                class="cf-video-player__range"
+                type="range"
+                min="0"
+                max="1"
+                step="0.01"
+                value="1"
+                aria-label="Volume"
+                style="--cf-video-progress:100%"
+                data-cf-video-volume
+              />
+            </div>
+            <button
+              class="cf-video-player__button cf-video-player__fullscreen"
+              type="button"
+              aria-label="Enter fullscreen"
+              data-fullscreen-label="Enter fullscreen"
+              data-exit-fullscreen-label="Exit fullscreen"
+              data-cf-video-fullscreen
+            >
+              <span class="cf-video-player__icon cf-video-player__fullscreen-icon" aria-hidden="true" />
+            </button>
+          </div>
+        </div>
+        <figcaption class="cf-video-player__caption">
+          Themed controls remain available to keyboard and assistive technology users.
+        </figcaption>
+      </figure>
+    )
+  }
+  {
+    name === "Separator" && (
+      <div class="cf-stack" data-gap="md">
+        <span>Account settings</span>
+        <hr class="cf-separator" />
+        <span>Notification settings</span>
+        <div class="cf-inline" data-gap="md">
+          <>
+            <span>Light</span>
+            <span class="cf-separator" role="none" aria-hidden="true" data-orientation="vertical" />
+            <span>Dark</span>
+          </>
+        </div>
+      </div>
+    )
+  }
 
   {
     name === "Pagination" && (
@@ -786,6 +1198,41 @@ const renderBashCode = (command: string) =>
         <button class="cf-pagination__link" type="button">
           Next
         </button>
+      </nav>
+    )
+  }
+  {
+    name === "Stepper" && (
+      <nav class="cf-stepper" aria-label="Progress" data-orientation="horizontal">
+        <ol class="cf-stepper__list">
+          <li class="cf-stepper__item" data-state="complete">
+            <div class="cf-stepper__trigger">
+              <span class="cf-stepper__indicator" aria-hidden="true">
+                ✓
+              </span>
+              <span class="cf-stepper__label">Account</span>
+              <span class="cf-stepper__description">Complete</span>
+            </div>
+          </li>
+          <li class="cf-stepper__item" data-state="current">
+            <div class="cf-stepper__trigger" aria-current="step">
+              <span class="cf-stepper__indicator" aria-hidden="true">
+                2
+              </span>
+              <span class="cf-stepper__label">Details</span>
+              <span class="cf-stepper__description">Current step</span>
+            </div>
+          </li>
+          <li class="cf-stepper__item" data-state="upcoming">
+            <div class="cf-stepper__trigger">
+              <span class="cf-stepper__indicator" aria-hidden="true">
+                3
+              </span>
+              <span class="cf-stepper__label">Review</span>
+              <span class="cf-stepper__description">Up next</span>
+            </div>
+          </li>
+        </ol>
       </nav>
     )
   }
@@ -821,6 +1268,62 @@ const renderBashCode = (command: string) =>
             </div>
           </dialog>
         </>
+      </div>
+    )
+  }
+  {
+    name === "Drawer" && (
+      <div>
+        <button class="cf-button" type="button" data-variant="secondary" data-cf-dialog-trigger={id}>
+          Open filters
+        </button>
+        <dialog
+          class="cf-drawer"
+          id={id}
+          data-cf-drawer
+          data-side="right"
+          aria-labelledby={`${id}-title`}
+          aria-describedby={`${id}-description`}
+        >
+          <div class="cf-drawer__surface">
+            <header class="cf-drawer__header">
+              <div>
+                <h3 class="cf-drawer__title" id={`${id}-title`}>
+                  Filter components
+                </h3>
+                <p class="cf-drawer__description" id={`${id}-description`}>
+                  Narrow the component catalog.
+                </p>
+              </div>
+              <button class="cf-drawer__close" type="button" data-cf-dialog-close aria-label="Close drawer">
+                <span aria-hidden="true">×</span>
+              </button>
+            </header>
+            <div class="cf-drawer__body">
+              <div class="cf-stack" data-gap="md">
+                <label class="cf-checkbox">
+                  <>
+                    <input type="checkbox" />
+                    <span class="cf-checkbox__control" aria-hidden="true" />
+                    <span>Interactive only</span>
+                  </>
+                </label>
+                <label class="cf-checkbox">
+                  <>
+                    <input type="checkbox" />
+                    <span class="cf-checkbox__control" aria-hidden="true" />
+                    <span>Supports forms</span>
+                  </>
+                </label>
+              </div>
+            </div>
+            <footer class="cf-drawer__footer">
+              <button class="cf-button" type="button" data-cf-dialog-close>
+                Apply filters
+              </button>
+            </footer>
+          </div>
+        </dialog>
       </div>
     )
   }
@@ -1220,12 +1723,12 @@ const renderBashCode = (command: string) =>
             C
           </span>
           <div class="cf-chat__message">
-            <p class="cf-chat__author">
-              <>
-                <strong>cofob</strong>
-              </>
-            </p>
             <div class="cf-chat__bubble">
+              <p class="cf-chat__author">
+                <>
+                  <strong>cofob</strong>
+                </>
+              </p>
               Ship the semantic contract first.
               <time class="cf-chat__timestamp" datetime="19:19">
                 19:19
@@ -1252,12 +1755,12 @@ const renderBashCode = (command: string) =>
             R
           </span>
           <div class="cf-chat__message">
-            <p class="cf-chat__author">
-              <>
-                <strong>reader</strong>
-              </>
-            </p>
             <div class="cf-chat__bubble">
+              <p class="cf-chat__author">
+                <>
+                  <strong>reader</strong>
+                </>
+              </p>
               The consecutive messages read as one group.
               <time class="cf-chat__timestamp" datetime="19:21">
                 19:21

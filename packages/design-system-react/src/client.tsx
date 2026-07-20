@@ -17,13 +17,17 @@ import {
   useMemo,
   useRef,
   useState,
+  useSyncExternalStore,
 } from "react";
 import type {
   ButtonHTMLAttributes,
+  ChangeEventHandler,
+  CSSProperties,
   DialogHTMLAttributes,
   ForwardedRef,
   HTMLAttributes,
   InputHTMLAttributes,
+  AudioHTMLAttributes,
   KeyboardEvent as ReactKeyboardEvent,
   ReactElement,
   ReactNode,
@@ -52,7 +56,7 @@ import type {
   ToastRecord,
 } from "./types.js";
 import { useControllableState } from "./client-utils.js";
-import { cx } from "./utils.js";
+import { cx, slugId } from "./utils.js";
 
 function setForwardedRef<T>(ref: ForwardedRef<T>, value: T | null): void {
   if (typeof ref === "function") ref(value);
@@ -452,6 +456,216 @@ export const ThemeToggle = forwardRef<HTMLButtonElement, ThemeToggleProps>(funct
   );
 });
 
+export interface ComboboxOption {
+  value: string;
+  label: string;
+  description?: string;
+  disabled?: boolean;
+}
+
+export interface ComboboxProps extends Omit<HTMLAttributes<HTMLDivElement>, "onChange"> {
+  label: ReactNode;
+  options: readonly ComboboxOption[];
+  value?: string;
+  defaultValue?: string;
+  inputValue?: string;
+  defaultInputValue?: string;
+  name?: string;
+  placeholder?: string;
+  hint?: ReactNode;
+  disabled?: boolean;
+  required?: boolean;
+  noResultsLabel?: string;
+  inputProps?: Omit<InputHTMLAttributes<HTMLInputElement>, "value" | "defaultValue" | "name">;
+  onValueChange?: (value: string, option: ComboboxOption) => void;
+  onInputValueChange?: (value: string) => void;
+}
+
+export const Combobox = forwardRef<HTMLInputElement, ComboboxProps>(function Combobox(
+  {
+    label,
+    options,
+    value: controlledValue,
+    defaultValue = "",
+    inputValue: controlledInputValue,
+    defaultInputValue,
+    name,
+    placeholder,
+    hint,
+    disabled = false,
+    required = false,
+    noResultsLabel = "No results found",
+    inputProps,
+    onValueChange,
+    onInputValueChange,
+    className,
+    onBlur,
+    ...props
+  },
+  forwardedRef,
+) {
+  const [value, setValue] = useControllableState({
+    value: controlledValue,
+    defaultValue,
+  });
+  const selectedOption = options.find((option) => option.value === value);
+  const [query, setQuery] = useControllableState({
+    value: controlledInputValue,
+    defaultValue: defaultInputValue ?? selectedOption?.label ?? "",
+    onChange: onInputValueChange,
+  });
+  const [open, setOpen] = useState(false);
+  const [activeIndex, setActiveIndex] = useState(0);
+  const generatedId = useId().replaceAll(":", "");
+  const inputId = inputProps?.id ?? `cf-combobox-${generatedId}`;
+  const listboxId = `${inputId}-listbox`;
+  const hintId = hint ? `${inputId}-hint` : undefined;
+  const inputRef = useRef<HTMLInputElement | null>(null);
+  const filteredOptions = useMemo(() => {
+    const normalized = query.trim().toLocaleLowerCase();
+    if (!normalized || selectedOption?.label === query) return options;
+    return options.filter((option) =>
+      `${option.label} ${option.description ?? ""}`.toLocaleLowerCase().includes(normalized),
+    );
+  }, [options, query, selectedOption?.label]);
+  const enabledOptions = filteredOptions.filter((option) => !option.disabled);
+  const activeOption = enabledOptions[Math.min(activeIndex, Math.max(0, enabledOptions.length - 1))];
+
+  const choose = useCallback(
+    (option: ComboboxOption) => {
+      if (option.disabled) return;
+      setValue(option.value);
+      setQuery(option.label);
+      setOpen(false);
+      onValueChange?.(option.value, option);
+    },
+    [onValueChange, setQuery, setValue],
+  );
+  const move = (offset: number) => {
+    if (enabledOptions.length === 0) return;
+    setOpen(true);
+    setActiveIndex((current) => {
+      const next = current + offset;
+      return ((next % enabledOptions.length) + enabledOptions.length) % enabledOptions.length;
+    });
+  };
+
+  return (
+    <div
+      className={cx("cf-combobox", className)}
+      data-state={open ? "open" : "closed"}
+      data-value={value || undefined}
+      {...props}
+      onBlur={(event) => {
+        onBlur?.(event);
+        if (!event.defaultPrevented && !event.currentTarget.contains(event.relatedTarget)) setOpen(false);
+      }}
+    >
+      <label className="cf-combobox__label" htmlFor={inputId}>
+        {label}
+      </label>
+      <div className="cf-combobox__input-wrap">
+        <input
+          {...inputProps}
+          ref={(node) => {
+            inputRef.current = node;
+            setForwardedRef(forwardedRef, node);
+          }}
+          id={inputId}
+          className={cx("cf-input", "cf-combobox__input", inputProps?.className)}
+          role="combobox"
+          autoComplete="off"
+          aria-autocomplete="list"
+          aria-controls={listboxId}
+          aria-expanded={open}
+          aria-activedescendant={
+            open && activeOption ? `${listboxId}-${slugId(activeOption.value)}` : undefined
+          }
+          aria-describedby={[inputProps?.["aria-describedby"], hintId].filter(Boolean).join(" ") || undefined}
+          placeholder={placeholder}
+          value={query}
+          disabled={disabled}
+          required={required}
+          onFocus={(event) => {
+            inputProps?.onFocus?.(event);
+            if (!event.defaultPrevented && !disabled) {
+              setActiveIndex(0);
+              setOpen(true);
+            }
+          }}
+          onChange={(event) => {
+            inputProps?.onChange?.(event);
+            if (event.defaultPrevented) return;
+            setQuery(event.currentTarget.value);
+            setActiveIndex(0);
+            setOpen(true);
+          }}
+          onKeyDown={(event) => {
+            inputProps?.onKeyDown?.(event);
+            if (event.defaultPrevented) return;
+            if (event.key === "ArrowDown" || event.key === "ArrowUp") {
+              event.preventDefault();
+              move(event.key === "ArrowDown" ? 1 : -1);
+            } else if (event.key === "Home" && open) {
+              event.preventDefault();
+              setActiveIndex(0);
+            } else if (event.key === "End" && open) {
+              event.preventDefault();
+              setActiveIndex(Math.max(0, enabledOptions.length - 1));
+            } else if (event.key === "Enter" && open && activeOption) {
+              event.preventDefault();
+              choose(activeOption);
+            } else if (event.key === "Escape" && open) {
+              event.preventDefault();
+              setOpen(false);
+            }
+          }}
+        />
+      </div>
+      {name ? <input type="hidden" name={name} value={value} /> : null}
+      {hint ? (
+        <div className="cf-combobox__hint" id={hintId}>
+          {hint}
+        </div>
+      ) : null}
+      <div className="cf-combobox__listbox" id={listboxId} role="listbox" hidden={!open}>
+        {filteredOptions.length > 0 ? (
+          filteredOptions.map((option) => {
+            const enabledIndex = enabledOptions.indexOf(option);
+            const active = enabledIndex >= 0 && option === activeOption;
+            return (
+              <div
+                className="cf-combobox__option"
+                id={`${listboxId}-${slugId(option.value)}`}
+                role="option"
+                aria-selected={option.value === value}
+                aria-disabled={option.disabled || undefined}
+                data-active={active || undefined}
+                key={option.value}
+                onPointerDown={(event) => {
+                  event.preventDefault();
+                  choose(option);
+                  inputRef.current?.focus();
+                }}
+                onPointerMove={() => {
+                  if (enabledIndex >= 0) setActiveIndex(enabledIndex);
+                }}
+              >
+                <span>{option.label}</span>
+                {option.description ? (
+                  <span className="cf-combobox__option-description">{option.description}</span>
+                ) : null}
+              </div>
+            );
+          })
+        ) : (
+          <div className="cf-combobox__empty">{noResultsLabel}</div>
+        )}
+      </div>
+    </div>
+  );
+});
+
 export interface DialogProps extends Omit<DialogHTMLAttributes<HTMLDialogElement>, "open" | "title"> {
   open?: boolean;
   defaultOpen?: boolean;
@@ -573,6 +787,908 @@ export function Dialog({
         </div>
       </dialog>
     </>
+  );
+}
+
+export interface DrawerProps extends Omit<DialogHTMLAttributes<HTMLDialogElement>, "open" | "title"> {
+  open?: boolean;
+  defaultOpen?: boolean;
+  onOpenChange?: (open: boolean) => void;
+  trigger?: ReactNode;
+  triggerLabel?: string;
+  title: ReactNode;
+  description?: ReactNode;
+  footer?: ReactNode;
+  closeLabel?: string;
+  side?: "left" | "right" | "top" | "bottom";
+}
+
+export function Drawer({
+  open: controlledOpen,
+  defaultOpen = false,
+  onOpenChange,
+  trigger,
+  triggerLabel = "Open drawer",
+  title,
+  description,
+  footer,
+  closeLabel = "Close drawer",
+  side = "right",
+  id: providedId,
+  className,
+  children,
+  onCancel,
+  onClose,
+  onClick,
+  ...props
+}: DrawerProps) {
+  const [open, setOpen] = useControllableState({
+    value: controlledOpen,
+    defaultValue: defaultOpen,
+    onChange: onOpenChange,
+  });
+  const drawerRef = useRef<HTMLDialogElement>(null);
+  const [triggerElement, setTriggerElement] = useState<HTMLElement | null>(null);
+  const previousFocusRef = useRef<HTMLElement | null>(null);
+  const generatedId = useId();
+  const titleId = useId();
+  const descriptionId = useId();
+  const drawerId = providedId ?? generatedId;
+
+  useEffect(() => {
+    const drawer = drawerRef.current;
+    if (!drawer) return;
+    if (open && !drawer.open) {
+      previousFocusRef.current = document.activeElement as HTMLElement | null;
+      if (typeof drawer.showModal === "function") drawer.showModal();
+      else drawer.setAttribute("open", "");
+    }
+    if (!open && drawer.open) {
+      if (typeof drawer.close === "function") drawer.close();
+      else drawer.removeAttribute("open");
+    }
+  }, [open]);
+
+  return (
+    <>
+      {trigger ? (
+        <Trigger
+          trigger={trigger}
+          className="cf-drawer__trigger"
+          label={triggerLabel}
+          controls={drawerId}
+          expanded={open}
+          hasPopup="dialog"
+          setTriggerElement={setTriggerElement}
+          onPress={() => setOpen(true)}
+        />
+      ) : null}
+      <dialog
+        ref={drawerRef}
+        id={drawerId}
+        className={cx("cf-drawer", className)}
+        data-state={open ? "open" : "closed"}
+        data-side={side}
+        aria-labelledby={titleId}
+        aria-describedby={description ? descriptionId : undefined}
+        onCancel={(event) => {
+          onCancel?.(event);
+          if (event.defaultPrevented) return;
+          event.preventDefault();
+          setOpen(false);
+        }}
+        onClose={(event) => {
+          onClose?.(event);
+          setOpen(false);
+          (triggerElement ?? previousFocusRef.current)?.focus();
+        }}
+        onClick={(event) => {
+          onClick?.(event);
+          if (!event.defaultPrevented && event.target === event.currentTarget) setOpen(false);
+        }}
+        {...props}
+      >
+        <div className="cf-drawer__surface">
+          <header className="cf-drawer__header">
+            <div>
+              <h2 className="cf-drawer__title" id={titleId}>
+                {title}
+              </h2>
+              {description ? (
+                <p className="cf-drawer__description" id={descriptionId}>
+                  {description}
+                </p>
+              ) : null}
+            </div>
+            <button
+              type="button"
+              className="cf-drawer__close"
+              aria-label={closeLabel}
+              onClick={() => setOpen(false)}
+            >
+              <span aria-hidden="true">×</span>
+            </button>
+          </header>
+          <div className="cf-drawer__body">{children}</div>
+          {footer ? <footer className="cf-drawer__footer">{footer}</footer> : null}
+        </div>
+      </dialog>
+    </>
+  );
+}
+
+function formatFileSize(size: number): string {
+  if (size < 1024) return `${size} B`;
+  if (size < 1024 * 1024) return `${(size / 1024).toFixed(1)} KB`;
+  return `${(size / (1024 * 1024)).toFixed(1)} MB`;
+}
+
+function acceptsFile(file: File, accept: string | undefined): boolean {
+  if (!accept) return true;
+  return accept.split(",").some((entry) => {
+    const rule = entry.trim().toLocaleLowerCase();
+    if (!rule) return false;
+    if (rule.startsWith(".")) return file.name.toLocaleLowerCase().endsWith(rule);
+    if (rule.endsWith("/*")) return file.type.toLocaleLowerCase().startsWith(rule.slice(0, -1));
+    return file.type.toLocaleLowerCase() === rule;
+  });
+}
+
+export interface FileUploadProps extends Omit<HTMLAttributes<HTMLDivElement>, "onChange"> {
+  label: ReactNode;
+  files?: readonly File[];
+  defaultFiles?: readonly File[];
+  name?: string;
+  accept?: string;
+  multiple?: boolean;
+  disabled?: boolean;
+  required?: boolean;
+  maxFiles?: number;
+  maxSize?: number;
+  prompt?: ReactNode;
+  hint?: ReactNode;
+  removeLabel?: (file: File) => string;
+  onFilesChange?: (files: readonly File[]) => void;
+  inputProps?: Omit<InputHTMLAttributes<HTMLInputElement>, "type" | "name" | "accept" | "multiple">;
+}
+
+export function FileUpload({
+  label,
+  files: controlledFiles,
+  defaultFiles = [],
+  name,
+  accept,
+  multiple = false,
+  disabled = false,
+  required = false,
+  maxFiles = multiple ? Number.POSITIVE_INFINITY : 1,
+  maxSize,
+  prompt = "Choose files or drag them here",
+  hint,
+  removeLabel = (file) => `Remove ${file.name}`,
+  onFilesChange,
+  inputProps,
+  className,
+  onDragEnter,
+  onDragOver,
+  onDragLeave,
+  onDrop,
+  ...props
+}: FileUploadProps) {
+  const [files, setFiles] = useControllableState<readonly File[]>({
+    value: controlledFiles,
+    defaultValue: defaultFiles,
+    onChange: onFilesChange,
+  });
+  const [dragging, setDragging] = useState(false);
+  const [error, setError] = useState("");
+  const inputRef = useRef<HTMLInputElement>(null);
+  const generatedId = useId().replaceAll(":", "");
+  const inputId = inputProps?.id ?? `cf-file-upload-${generatedId}`;
+  const errorId = `${inputId}-error`;
+
+  const addFiles = (incoming: readonly File[]) => {
+    const accepted = incoming.filter(
+      (file) => acceptsFile(file, accept) && (!maxSize || file.size <= maxSize),
+    );
+    const rejectedCount = incoming.length - accepted.length;
+    const next = (multiple ? [...files, ...accepted] : accepted.slice(0, 1)).slice(0, maxFiles);
+    setFiles(next);
+    setError(
+      rejectedCount > 0
+        ? `${rejectedCount} ${rejectedCount === 1 ? "file was" : "files were"} not accepted.`
+        : incoming.length > accepted.length ||
+            next.length < (multiple ? files.length + accepted.length : accepted.length)
+          ? "Some files exceed the upload limit."
+          : "",
+    );
+  };
+
+  return (
+    <div
+      className={cx("cf-file-upload", className)}
+      data-disabled={disabled || undefined}
+      onDragEnter={(event) => {
+        onDragEnter?.(event);
+        if (event.defaultPrevented) return;
+        event.preventDefault();
+        if (!disabled) setDragging(true);
+      }}
+      onDragOver={(event) => {
+        onDragOver?.(event);
+        if (!event.defaultPrevented) event.preventDefault();
+      }}
+      onDragLeave={(event) => {
+        onDragLeave?.(event);
+        if (event.defaultPrevented) return;
+        if (!event.currentTarget.contains(event.relatedTarget as Node | null)) setDragging(false);
+      }}
+      onDrop={(event) => {
+        onDrop?.(event);
+        if (event.defaultPrevented) return;
+        event.preventDefault();
+        setDragging(false);
+        if (!disabled) addFiles(Array.from(event.dataTransfer.files));
+      }}
+      {...props}
+    >
+      <label className="cf-file-upload__label" htmlFor={inputId}>
+        {label}
+      </label>
+      <label className="cf-file-upload__dropzone" data-dragging={dragging || undefined} htmlFor={inputId}>
+        <input
+          {...inputProps}
+          ref={inputRef}
+          className={cx("cf-file-upload__input", inputProps?.className)}
+          id={inputId}
+          type="file"
+          name={name}
+          accept={accept}
+          multiple={multiple}
+          disabled={disabled}
+          required={required && files.length === 0}
+          aria-describedby={
+            [inputProps?.["aria-describedby"], error ? errorId : undefined].filter(Boolean).join(" ") ||
+            undefined
+          }
+          onChange={(event) => {
+            inputProps?.onChange?.(event);
+            if (!event.defaultPrevented) addFiles(Array.from(event.currentTarget.files ?? []));
+            event.currentTarget.value = "";
+          }}
+        />
+        <span className="cf-file-upload__prompt">{prompt}</span>
+        {hint ? <span className="cf-file-upload__hint">{hint}</span> : null}
+      </label>
+      {error ? (
+        <div className="cf-field__error" id={errorId} role="alert">
+          {error}
+        </div>
+      ) : null}
+      {files.length > 0 ? (
+        <ul className="cf-file-upload__files" aria-label="Selected files">
+          {files.map((file, index) => (
+            <li className="cf-file-upload__file" key={`${file.name}-${file.lastModified}-${index}`}>
+              <span>
+                <span>{file.name}</span>{" "}
+                <span className="cf-file-upload__file-meta">{formatFileSize(file.size)}</span>
+              </span>
+              <button
+                className="cf-file-upload__remove"
+                type="button"
+                aria-label={removeLabel(file)}
+                disabled={disabled}
+                onClick={() => setFiles(files.filter((_, fileIndex) => fileIndex !== index))}
+              >
+                Remove
+              </button>
+            </li>
+          ))}
+        </ul>
+      ) : null}
+    </div>
+  );
+}
+
+export interface SliderProps extends Omit<
+  InputHTMLAttributes<HTMLInputElement>,
+  "type" | "value" | "defaultValue" | "size" | "onChange"
+> {
+  label: ReactNode;
+  value?: number;
+  defaultValue?: number;
+  showValue?: boolean;
+  hint?: ReactNode;
+  formatValue?: (value: number) => ReactNode;
+  onValueChange?: (value: number) => void;
+  onChange?: ChangeEventHandler<HTMLInputElement>;
+  containerClassName?: string;
+}
+
+export const Slider = forwardRef<HTMLInputElement, SliderProps>(function Slider(
+  {
+    label,
+    value: controlledValue,
+    defaultValue = 0,
+    min = 0,
+    max = 100,
+    step = 1,
+    showValue = true,
+    hint,
+    formatValue = (current) => String(current),
+    onValueChange,
+    onChange,
+    containerClassName,
+    className,
+    id,
+    name,
+    ...props
+  },
+  ref,
+) {
+  const [value, setValue] = useControllableState({
+    value: controlledValue,
+    defaultValue,
+    onChange: onValueChange,
+  });
+  const generatedId = useId().replaceAll(":", "");
+  const inputId = id ?? `cf-slider-${generatedId}`;
+  const hintId = hint ? `${inputId}-hint` : undefined;
+  return (
+    <div className={cx("cf-slider", containerClassName)}>
+      <div className="cf-slider__header">
+        <label className="cf-slider__label" htmlFor={inputId}>
+          {label}
+        </label>
+        {showValue ? (
+          <output className="cf-slider__value" htmlFor={inputId}>
+            {formatValue(value)}
+          </output>
+        ) : null}
+      </div>
+      <input
+        {...props}
+        ref={ref}
+        className={cx("cf-slider__control", className)}
+        id={inputId}
+        name={name}
+        type="range"
+        min={min}
+        max={max}
+        step={step}
+        value={value}
+        aria-describedby={hintId}
+        onChange={(event) => {
+          onChange?.(event);
+          if (!event.defaultPrevented) setValue(event.currentTarget.valueAsNumber);
+        }}
+      />
+      {hint ? (
+        <div className="cf-slider__hint" id={hintId}>
+          {hint}
+        </div>
+      ) : null}
+    </div>
+  );
+});
+
+export interface AudioPlayerLabels {
+  play: string;
+  pause: string;
+  timeline: string;
+  mute: string;
+  unmute: string;
+  volume: string;
+}
+
+export interface AudioPlayerProps extends HTMLAttributes<HTMLDivElement> {
+  src: string;
+  durationHint?: number;
+  disabled?: boolean;
+  labels?: Partial<AudioPlayerLabels>;
+  audioProps?: Omit<AudioHTMLAttributes<HTMLAudioElement>, "src" | "controls">;
+}
+
+type AudioRangeStyle = CSSProperties & { "--cf-audio-progress": string };
+
+function finiteAudioDuration(value: number): number {
+  return Number.isFinite(value) && value > 0 ? value : 0;
+}
+
+function formatAudioTime(value: number): string {
+  const seconds = Math.max(0, Math.floor(Number.isFinite(value) ? value : 0));
+  const minutes = Math.floor(seconds / 60);
+  return `${minutes}:${String(seconds % 60).padStart(2, "0")}`;
+}
+
+export function AudioPlayer({
+  src,
+  durationHint = 0,
+  disabled = false,
+  labels,
+  audioProps,
+  className,
+  ...props
+}: AudioPlayerProps) {
+  const copy: AudioPlayerLabels = {
+    play: labels?.play ?? "Play audio",
+    pause: labels?.pause ?? "Pause audio",
+    timeline: labels?.timeline ?? "Playback position",
+    mute: labels?.mute ?? "Mute audio",
+    unmute: labels?.unmute ?? "Unmute audio",
+    volume: labels?.volume ?? "Volume",
+  };
+  const audioRef = useRef<HTMLAudioElement>(null);
+  const previousVolumeRef = useRef(1);
+  const [currentTime, setCurrentTime] = useState(0);
+  const [duration, setDuration] = useState(durationHint);
+  const [muted, setMuted] = useState(false);
+  const [playing, setPlaying] = useState(false);
+  const [volume, setVolume] = useState(1);
+  const resolvedDuration = finiteAudioDuration(duration) || finiteAudioDuration(durationHint);
+  const timelineMax = Math.max(resolvedDuration, 0.01);
+  const timelineValue = Math.min(currentTime, timelineMax);
+  const timelineProgress = resolvedDuration > 0 ? (timelineValue / resolvedDuration) * 100 : 0;
+  const volumeProgress = muted ? 0 : volume * 100;
+
+  const syncDuration = () => {
+    const audio = audioRef.current;
+    if (audio) setDuration(finiteAudioDuration(audio.duration) || finiteAudioDuration(durationHint));
+  };
+  const togglePlayback = async () => {
+    const audio = audioRef.current;
+    if (!audio || disabled) return;
+    if (!audio.paused) {
+      audio.pause();
+      return;
+    }
+    try {
+      await audio.play();
+    } catch {
+      setPlaying(false);
+    }
+  };
+  const seek = (nextTime: number) => {
+    const audio = audioRef.current;
+    if (!audio) return;
+    audio.currentTime = nextTime;
+    setCurrentTime(nextTime);
+  };
+  const changeVolume = (nextVolume: number) => {
+    const audio = audioRef.current;
+    if (!audio) return;
+    audio.volume = nextVolume;
+    audio.muted = nextVolume === 0;
+    if (nextVolume > 0) previousVolumeRef.current = nextVolume;
+    setVolume(nextVolume);
+    setMuted(nextVolume === 0);
+  };
+  const toggleMute = () => {
+    const audio = audioRef.current;
+    if (!audio || disabled) return;
+    if (audio.muted || volume === 0) {
+      const restored = previousVolumeRef.current || 1;
+      audio.muted = false;
+      audio.volume = restored;
+      setVolume(restored);
+      setMuted(false);
+    } else {
+      previousVolumeRef.current = volume;
+      audio.muted = true;
+      setMuted(true);
+    }
+  };
+
+  return (
+    <div
+      className={cx("cf-audio-player", className)}
+      data-state={playing ? "playing" : "paused"}
+      data-muted={muted || volume === 0}
+      data-cf-audio-player-managed="true"
+      {...props}
+    >
+      <audio
+        {...audioProps}
+        ref={audioRef}
+        src={src}
+        preload={audioProps?.preload ?? "metadata"}
+        onDurationChange={(event) => {
+          audioProps?.onDurationChange?.(event);
+          if (!event.defaultPrevented) syncDuration();
+        }}
+        onLoadedMetadata={(event) => {
+          audioProps?.onLoadedMetadata?.(event);
+          if (!event.defaultPrevented) syncDuration();
+        }}
+        onEnded={(event) => {
+          audioProps?.onEnded?.(event);
+          setPlaying(false);
+        }}
+        onPause={(event) => {
+          audioProps?.onPause?.(event);
+          setPlaying(false);
+        }}
+        onPlay={(event) => {
+          audioProps?.onPlay?.(event);
+          setPlaying(true);
+        }}
+        onTimeUpdate={(event) => {
+          audioProps?.onTimeUpdate?.(event);
+          setCurrentTime(event.currentTarget.currentTime);
+        }}
+      />
+      <button
+        className="cf-audio-player__button"
+        type="button"
+        aria-label={playing ? copy.pause : copy.play}
+        disabled={disabled}
+        onClick={() => void togglePlayback()}
+      >
+        <span className="cf-audio-player__icon cf-audio-player__play-icon" aria-hidden="true" />
+      </button>
+      <input
+        className="cf-audio-player__range cf-audio-player__timeline"
+        type="range"
+        min={0}
+        max={timelineMax}
+        step="0.01"
+        value={timelineValue}
+        aria-label={copy.timeline}
+        aria-valuetext={`${formatAudioTime(timelineValue)} of ${formatAudioTime(resolvedDuration)}`}
+        disabled={disabled}
+        style={{ "--cf-audio-progress": `${timelineProgress}%` } as AudioRangeStyle}
+        onChange={(event) => seek(event.currentTarget.valueAsNumber)}
+      />
+      <span className="cf-audio-player__time">
+        {formatAudioTime(timelineValue)} / {formatAudioTime(resolvedDuration)}
+      </span>
+      <div className="cf-audio-player__volume">
+        <button
+          className="cf-audio-player__button"
+          type="button"
+          aria-label={muted || volume === 0 ? copy.unmute : copy.mute}
+          disabled={disabled}
+          onClick={toggleMute}
+        >
+          <span className="cf-audio-player__icon cf-audio-player__volume-icon" aria-hidden="true" />
+        </button>
+        <input
+          className="cf-audio-player__range"
+          type="range"
+          min={0}
+          max={1}
+          step="0.01"
+          value={muted ? 0 : volume}
+          aria-label={copy.volume}
+          aria-valuetext={`${Math.round(volumeProgress)}%`}
+          disabled={disabled}
+          style={{ "--cf-audio-progress": `${volumeProgress}%` } as AudioRangeStyle}
+          onChange={(event) => changeVolume(event.currentTarget.valueAsNumber)}
+        />
+      </div>
+    </div>
+  );
+}
+
+export interface VideoPlayerLabels {
+  play: string;
+  pause: string;
+  timeline: string;
+  mute: string;
+  unmute: string;
+  volume: string;
+  fullscreen: string;
+  exitFullscreen: string;
+}
+
+export interface VideoPlayerProps extends HTMLAttributes<HTMLElement> {
+  src: string;
+  label: string;
+  caption?: ReactNode;
+  aspectRatio?: CSSProperties["aspectRatio"];
+  durationHint?: number;
+  disabled?: boolean;
+  labels?: Partial<VideoPlayerLabels>;
+  videoProps?: Omit<VideoHTMLAttributes<HTMLVideoElement>, "src" | "controls">;
+}
+
+type VideoRangeStyle = CSSProperties & { "--cf-video-progress": string };
+
+const subscribeToHydration = () => () => undefined;
+const getClientHydrationSnapshot = () => true;
+const getServerHydrationSnapshot = () => false;
+
+export function VideoPlayer({
+  src,
+  label,
+  caption,
+  aspectRatio = "16 / 9",
+  durationHint = 0,
+  disabled = false,
+  labels,
+  videoProps,
+  className,
+  style,
+  tabIndex = -1,
+  onKeyDown,
+  ...props
+}: VideoPlayerProps) {
+  const copy: VideoPlayerLabels = {
+    play: labels?.play ?? "Play video",
+    pause: labels?.pause ?? "Pause video",
+    timeline: labels?.timeline ?? "Playback position",
+    mute: labels?.mute ?? "Mute video",
+    unmute: labels?.unmute ?? "Unmute video",
+    volume: labels?.volume ?? "Volume",
+    fullscreen: labels?.fullscreen ?? "Enter fullscreen",
+    exitFullscreen: labels?.exitFullscreen ?? "Exit fullscreen",
+  };
+  const rootRef = useRef<HTMLElement>(null);
+  const videoRef = useRef<HTMLVideoElement>(null);
+  const startButtonRef = useRef<HTMLButtonElement>(null);
+  const playButtonRef = useRef<HTMLButtonElement>(null);
+  const fullscreenButtonRef = useRef<HTMLButtonElement>(null);
+  const previousVolumeRef = useRef(1);
+  const enhanced = useSyncExternalStore(
+    subscribeToHydration,
+    getClientHydrationSnapshot,
+    getServerHydrationSnapshot,
+  );
+  const [currentTime, setCurrentTime] = useState(0);
+  const [duration, setDuration] = useState(durationHint);
+  const [muted, setMuted] = useState(Boolean(videoProps?.muted));
+  const [playing, setPlaying] = useState(false);
+  const [started, setStarted] = useState(false);
+  const [volume, setVolume] = useState(1);
+  const [fullscreen, setFullscreen] = useState(false);
+  const resolvedDuration = finiteAudioDuration(duration) || finiteAudioDuration(durationHint);
+  const timelineMax = Math.max(resolvedDuration, 0.01);
+  const timelineValue = Math.min(currentTime, timelineMax);
+  const timelineProgress = resolvedDuration > 0 ? (timelineValue / resolvedDuration) * 100 : 0;
+  const volumeProgress = muted ? 0 : volume * 100;
+
+  useEffect(() => {
+    let wasFullscreen = document.fullscreenElement === rootRef.current;
+    const syncFullscreen = () => {
+      const isFullscreen = document.fullscreenElement === rootRef.current;
+      setFullscreen(isFullscreen);
+      if (isFullscreen) rootRef.current?.focus({ preventScroll: true });
+      else if (wasFullscreen) fullscreenButtonRef.current?.focus({ preventScroll: true });
+      wasFullscreen = isFullscreen;
+    };
+    document.addEventListener("fullscreenchange", syncFullscreen);
+    return () => document.removeEventListener("fullscreenchange", syncFullscreen);
+  }, []);
+
+  const syncDuration = () => {
+    const video = videoRef.current;
+    if (video) setDuration(finiteAudioDuration(video.duration) || finiteAudioDuration(durationHint));
+  };
+  const togglePlayback = async () => {
+    const video = videoRef.current;
+    if (!video || disabled) return;
+    if (!video.paused) {
+      video.pause();
+      return;
+    }
+    try {
+      await video.play();
+      setStarted(true);
+      if (document.activeElement === startButtonRef.current) {
+        playButtonRef.current?.focus({ preventScroll: true });
+      }
+    } catch {
+      setPlaying(false);
+    }
+  };
+  const seek = (nextTime: number) => {
+    const video = videoRef.current;
+    if (!video) return;
+    const normalized = Math.max(0, Math.min(nextTime, timelineMax));
+    video.currentTime = normalized;
+    setCurrentTime(normalized);
+  };
+  const changeVolume = (nextVolume: number) => {
+    const video = videoRef.current;
+    if (!video) return;
+    const normalized = Math.max(0, Math.min(nextVolume, 1));
+    video.volume = normalized;
+    video.muted = normalized === 0;
+    if (normalized > 0) previousVolumeRef.current = normalized;
+    setVolume(normalized);
+    setMuted(normalized === 0);
+  };
+  const toggleMute = () => {
+    const video = videoRef.current;
+    if (!video || disabled) return;
+    if (video.muted || volume === 0) {
+      const restored = previousVolumeRef.current || 1;
+      video.muted = false;
+      video.volume = restored;
+      setVolume(restored);
+      setMuted(false);
+    } else {
+      previousVolumeRef.current = volume;
+      video.muted = true;
+      setMuted(true);
+    }
+  };
+  const toggleFullscreen = async () => {
+    const root = rootRef.current;
+    if (!root || disabled) return;
+    try {
+      if (document.fullscreenElement === root) await document.exitFullscreen?.();
+      else await root.requestFullscreen?.();
+    } finally {
+      const isFullscreen = document.fullscreenElement === root;
+      setFullscreen(isFullscreen);
+      if (isFullscreen) root.focus({ preventScroll: true });
+    }
+  };
+  const handleKeyDown = (event: ReactKeyboardEvent<HTMLElement>) => {
+    onKeyDown?.(event);
+    if (event.defaultPrevented || event.altKey || event.ctrlKey || event.metaKey || disabled) return;
+    const target = event.target as Element;
+    if (target.closest("input, select, textarea, [contenteditable]:not([contenteditable='false'])")) return;
+    if (target.closest("button, a[href]") && (event.key === " " || event.key === "Enter")) return;
+
+    const key = event.key.toLowerCase();
+    const video = videoRef.current;
+    if (!video) return;
+    if (key === " " || key === "k") {
+      event.preventDefault();
+      void togglePlayback();
+    } else if (key === "arrowleft") {
+      event.preventDefault();
+      seek(video.currentTime - 5);
+    } else if (key === "arrowright") {
+      event.preventDefault();
+      seek(video.currentTime + 5);
+    } else if (key === "arrowup") {
+      event.preventDefault();
+      changeVolume((video.muted ? previousVolumeRef.current : video.volume) + 0.1);
+    } else if (key === "arrowdown") {
+      event.preventDefault();
+      changeVolume((video.muted ? previousVolumeRef.current : video.volume) - 0.1);
+    } else if (key === "m") {
+      event.preventDefault();
+      toggleMute();
+    } else if (key === "f") {
+      event.preventDefault();
+      void toggleFullscreen();
+    }
+  };
+
+  return (
+    <figure
+      ref={rootRef}
+      className={cx("cf-video-player", className)}
+      data-enhanced={enhanced}
+      data-state={playing ? "playing" : "paused"}
+      data-muted={muted || volume === 0}
+      data-fullscreen={fullscreen}
+      data-started={started}
+      data-cf-video-player-managed="true"
+      style={{ "--cf-video-aspect-ratio": aspectRatio, ...style } as CSSProperties}
+      {...props}
+      tabIndex={tabIndex}
+      onKeyDown={handleKeyDown}
+    >
+      <div className="cf-video-player__frame">
+        <video
+          {...videoProps}
+          ref={videoRef}
+          className={cx("cf-video-player__media", videoProps?.className)}
+          src={src}
+          controls={!enhanced}
+          playsInline={videoProps?.playsInline ?? true}
+          preload={videoProps?.preload ?? "metadata"}
+          aria-label={videoProps?.["aria-label"] ?? label}
+          onClick={(event) => {
+            videoProps?.onClick?.(event);
+            if (!event.defaultPrevented) void togglePlayback();
+          }}
+          onDurationChange={(event) => {
+            videoProps?.onDurationChange?.(event);
+            if (!event.defaultPrevented) syncDuration();
+          }}
+          onLoadedMetadata={(event) => {
+            videoProps?.onLoadedMetadata?.(event);
+            if (!event.defaultPrevented) syncDuration();
+          }}
+          onEnded={(event) => {
+            videoProps?.onEnded?.(event);
+            setPlaying(false);
+          }}
+          onPause={(event) => {
+            videoProps?.onPause?.(event);
+            setPlaying(false);
+          }}
+          onPlay={(event) => {
+            videoProps?.onPlay?.(event);
+            setPlaying(true);
+            setStarted(true);
+          }}
+          onTimeUpdate={(event) => {
+            videoProps?.onTimeUpdate?.(event);
+            setCurrentTime(event.currentTarget.currentTime);
+          }}
+        />
+        <button
+          ref={startButtonRef}
+          className="cf-video-player__start"
+          type="button"
+          aria-label={copy.play}
+          disabled={disabled}
+          onClick={() => void togglePlayback()}
+        >
+          <span className="cf-video-player__start-icon" aria-hidden="true" />
+        </button>
+        <div className="cf-video-player__controls">
+          <input
+            className="cf-video-player__range cf-video-player__timeline"
+            type="range"
+            min={0}
+            max={timelineMax}
+            step="0.01"
+            value={timelineValue}
+            aria-label={copy.timeline}
+            aria-valuetext={`${formatAudioTime(timelineValue)} of ${formatAudioTime(resolvedDuration)}`}
+            disabled={disabled}
+            style={{ "--cf-video-progress": `${timelineProgress}%` } as VideoRangeStyle}
+            onChange={(event) => seek(event.currentTarget.valueAsNumber)}
+          />
+          <button
+            ref={playButtonRef}
+            className="cf-video-player__button"
+            type="button"
+            aria-label={playing ? copy.pause : copy.play}
+            disabled={disabled}
+            onClick={() => void togglePlayback()}
+          >
+            <span className="cf-video-player__icon cf-video-player__play-icon" aria-hidden="true" />
+          </button>
+          <span className="cf-video-player__time">
+            {formatAudioTime(timelineValue)} / {formatAudioTime(resolvedDuration)}
+          </span>
+          <div className="cf-video-player__volume">
+            <button
+              className="cf-video-player__button"
+              type="button"
+              aria-label={muted || volume === 0 ? copy.unmute : copy.mute}
+              disabled={disabled}
+              onClick={toggleMute}
+            >
+              <span className="cf-video-player__icon cf-video-player__volume-icon" aria-hidden="true" />
+            </button>
+            <input
+              className="cf-video-player__range"
+              type="range"
+              min={0}
+              max={1}
+              step="0.01"
+              value={muted ? 0 : volume}
+              aria-label={copy.volume}
+              aria-valuetext={`${Math.round(volumeProgress)}%`}
+              disabled={disabled}
+              style={{ "--cf-video-progress": `${volumeProgress}%` } as VideoRangeStyle}
+              onChange={(event) => changeVolume(event.currentTarget.valueAsNumber)}
+            />
+          </div>
+          <button
+            ref={fullscreenButtonRef}
+            className="cf-video-player__button cf-video-player__fullscreen"
+            type="button"
+            aria-label={fullscreen ? copy.exitFullscreen : copy.fullscreen}
+            disabled={disabled}
+            onClick={() => void toggleFullscreen()}
+          >
+            <span className="cf-video-player__icon cf-video-player__fullscreen-icon" aria-hidden="true" />
+          </button>
+        </div>
+      </div>
+      {caption ? <figcaption className="cf-video-player__caption">{caption}</figcaption> : null}
+    </figure>
   );
 }
 

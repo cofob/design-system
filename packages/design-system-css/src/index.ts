@@ -13,4 +13,7 @@ export * from "./navbar.js";
 export * from "./syntax.js";
 export * from "./terminal.js";
 export * from "./animated-sticker.js";
+export * from "./combobox.js";
+export * from "./audio-player.js";
+export * from "./video-player.js";
 export * from "./init.js";
