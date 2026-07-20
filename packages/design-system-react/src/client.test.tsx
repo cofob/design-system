@@ -3,6 +3,7 @@ import { renderToString } from "react-dom/server";
 import { describe, expect, it, vi } from "vitest";
 import {
   Accordion,
+  AnimatedSticker,
   CodeBlock,
   Dialog,
   DropdownMenu,
@@ -19,6 +20,34 @@ import {
 } from "./client.js";
 
 describe("client components", () => {
+  it("server-renders an inline animated-sticker skeleton without a separate image request", () => {
+    const sticker = {
+      src: "/stickers/chris.123456789abc.webm",
+      skeletonSvg: '<svg viewBox="0 0 512 512"><path d="M0 0h10v10z"/></svg>',
+      width: 512,
+      height: 512,
+    };
+    const html = renderToString(<AnimatedSticker sticker={sticker} alt="Animated Chris" />);
+
+    expect(html).toContain('role="img"');
+    expect(html).toContain('aria-label="Animated Chris"');
+    expect(html).toContain('<span class="cf-animated-sticker__skeleton" aria-hidden="true"><svg');
+    expect(html).toContain("<video");
+    expect(html).toContain('data-cf-animated-sticker-src="/stickers/chris.123456789abc.webm"');
+    expect(html).not.toMatch(/<video[^>]*\ssrc=/u);
+    expect(html).not.toContain("<img");
+    expect(html).not.toContain("poster=");
+    expect(html).not.toContain("data:image");
+
+    const staticHtml = renderToString(
+      <AnimatedSticker sticker={sticker} alt="Static Chris" playback="static" />,
+    );
+    expect(staticHtml).toContain('data-playback="static"');
+    expect(staticHtml).toContain('data-state="static"');
+    expect(staticHtml).toContain("<svg");
+    expect(staticHtml).not.toContain("<video");
+  });
+
   it("shows the copy action by default and allows the toolbar to be disabled", () => {
     const { container, rerender } = render(<CodeBlock code="plain text" />);
     expect(screen.getByRole("button", { name: "Copy code" })).toBeInTheDocument();

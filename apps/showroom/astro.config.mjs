@@ -10,7 +10,12 @@ export default defineConfig({
   integrations: [react(), svelte(), socialImages()],
   vite: {
     ssr: {
-      noExternal: ["@cofob/design-system-css", "@cofob/design-system-react", "@cofob/design-system-svelte"],
+      noExternal: [
+        "@cofob/design-system-css",
+        "@cofob/design-system-react",
+        "@cofob/design-system-svelte",
+        "@cofob/design-system-stickers",
+      ],
     },
   },
 });

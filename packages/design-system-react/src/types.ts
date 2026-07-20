@@ -1,5 +1,6 @@
 import type { ComponentType, ReactNode, SVGProps } from "react";
 import type {
+  AnimatedStickerModel as CssAnimatedStickerModel,
   ChatMessageModel,
   ChatModel,
   CaptchaLabels as CssCaptchaLabels,
@@ -21,6 +22,7 @@ export type Size = CssSize;
 export type Tone = CssTone;
 export type CaptchaState = CssCaptchaState;
 export type CaptchaLabels = CssCaptchaLabels;
+export type AnimatedStickerModel = CssAnimatedStickerModel;
 export type { ChatMessageModel, ChatModel, LinkModel, PostModel, ResponsiveImageModel };
 export type TerminalCodeEntry = CssTerminalCodeEntry;
 

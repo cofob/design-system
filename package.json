@@ -9,6 +9,8 @@
     "node": ">=24.11.0"
   },
   "workspaces": [
+    "packages/design-system-assets",
+    "packages/design-system-stickers",
     "packages/design-system-css",
     "packages/design-system-react",
     "packages/design-system-svelte",
@@ -34,8 +36,8 @@
     "check:docs": "node scripts/check-component-docs.mjs",
     "check:public-api": "node scripts/check-public-api.mjs",
     "pack:check": "node scripts/check-packages.mjs",
-    "check:publint": "publint packages/design-system-css && publint packages/design-system-react && publint packages/design-system-svelte",
-    "check:exports": "attw --pack packages/design-system-css --profile esm-only --entrypoints . ./types && attw --pack packages/design-system-react --profile esm-only --entrypoints . ./static ./client ./types && attw --pack packages/design-system-svelte --profile esm-only --ignore-rules internal-resolution-error",
+    "check:publint": "publint packages/design-system-assets && publint packages/design-system-stickers && publint packages/design-system-css && publint packages/design-system-react && publint packages/design-system-svelte",
+    "check:exports": "attw --pack packages/design-system-assets --profile esm-only --entrypoints . && attw --pack packages/design-system-stickers --profile esm-only --entrypoints . ./react && attw --pack packages/design-system-css --profile esm-only --entrypoints . ./types && attw --pack packages/design-system-react --profile esm-only --entrypoints . ./static ./client ./types && attw --pack packages/design-system-svelte --profile esm-only --ignore-rules internal-resolution-error",
     "check:packages": "npm run pack:check && npm run check:publint && npm run check:exports",
     "check": "npm run check:styles && npm run check:manifest && npm run check:docs && npm run check:public-api && npm run build && npm run typecheck && npm run test:unit && npm run check:packages",
     "changeset": "changeset",

@@ -1,0 +1,162 @@
+---
+import CodeBlock from "../../components/CodeBlock.astro";
+import PageHeader from "../../components/PageHeader.astro";
+import StickerMedia from "../../components/StickerMedia.astro";
+import {
+  hydrateStickerPack,
+  loadStickerPackCatalogs,
+  stickerMediaUrl,
+  type StickerPackCatalog,
+} from "../../data/sticker-gallery";
+import Layout from "../../layouts/Layout.astro";
+
+export function getStaticPaths() {
+  return loadStickerPackCatalogs().map((catalog) => ({
+    params: { pack: catalog.pack.slug },
+    props: { catalog },
+  }));
+}
+
+interface Props {
+  catalog: StickerPackCatalog;
+}
+
+const { catalog } = Astro.props;
+const stickers = await hydrateStickerPack(catalog);
+const animatedCount = stickers.filter((sticker) => sticker.kind === "animated").length;
+const first = stickers[0];
+if (!first) throw new Error(`${catalog.pack.key} has no stickers.`);
+const componentImport = `import ${first.componentName} from "@cofob/design-system-stickers/react/${first.componentName}";
+
+<${first.componentName} alt="Describe this sticker in context" />`;
+---
+
+<Layout
+  title={catalog.pack.title}
+  description={`Browse all ${stickers.length} optimized stickers from ${catalog.pack.title}.`}
+>
+  <p><a class="cf-link" href="/stickers/">← All sticker packs</a></p>
+  <PageHeader
+    eyebrow="Sticker pack"
+    title={catalog.pack.title}
+    description={`${stickers.length} optimized assets: ${stickers.length - animatedCount} static WebP and ${animatedCount} animated VP9 WebM. Source attribution is preserved for every item.`}
+  />
+
+  <div class="astro-sticker-pack-toolbar">
+    <a class="cf-button" data-variant="secondary" href={catalog.pack.sourceUrl} rel="noreferrer">
+      Open original pack
+    </a>
+    <span class="cf-badge" data-tone="neutral">{catalog.pack.key}</span>
+  </div>
+
+  <section class="astro-section" aria-labelledby="pack-import-heading">
+    <div class="astro-section-header">
+      <h2 id="pack-import-heading">Import one sticker</h2>
+      <p>
+        Replace the component name with any label shown below. The equivalent Svelte path uses
+        <code>/svelte/</code> instead of <code>/react/</code>.
+      </p>
+    </div>
+    <CodeBlock code={componentImport} lang="tsx" label={`${catalog.pack.title} isolated import`} />
+  </section>
+
+  <section class="astro-section" aria-labelledby="pack-gallery-heading">
+    <div class="astro-section-header">
+      <h2 id="pack-gallery-heading">All stickers</h2>
+      <p>
+        Animated WebM is lazy: below-the-fold videos have no <code>src</code> until their card intersects the viewport.
+      </p>
+    </div>
+    <div class="astro-sticker-gallery" data-sticker-gallery>
+      {
+        stickers.map((sticker) => {
+          const reactSnippet = `import ${sticker.componentName} from "@cofob/design-system-stickers/react/${sticker.componentName}";\n\n<${sticker.componentName} alt="Describe this sticker in context" />`;
+          const svelteSnippet = `<script>\n  import ${sticker.componentName} from "@cofob/design-system-stickers/svelte/${sticker.componentName}";\n</script>\n\n<${sticker.componentName} alt="Describe this sticker in context" />`;
+          return (
+            <article class="astro-sticker-card" data-sticker-kind={sticker.kind}>
+              <div class="astro-sticker-card-media" data-cf-copy-scope>
+                <span hidden data-cf-copy-source>
+                  {sticker.componentName}
+                </span>
+                <button
+                  class="astro-sticker-copy-preview"
+                  type="button"
+                  data-cf-copy-button
+                  data-copy-label="Copy name"
+                  data-copied-label="Copied"
+                  data-copy-error-label="Try again"
+                  data-copy-aria-label={`Copy component name ${sticker.componentName}`}
+                  data-copied-aria-label={`${sticker.componentName} copied`}
+                  aria-label={`Copy component name ${sticker.componentName}`}
+                >
+                  <StickerMedia sticker={sticker} src={stickerMediaUrl(sticker)} alt="" decorative />
+                  <span class="astro-sticker-copy-label" data-cf-copy-label>
+                    Copy name
+                  </span>
+                </button>
+                <span class="cf-visually-hidden" aria-live="polite" data-cf-copy-status />
+              </div>
+              <div class="astro-sticker-card-meta">
+                <code>{sticker.componentName}</code>
+                <span class="cf-badge" data-tone="neutral" data-size="sm">
+                  {sticker.kind === "animated" ? sticker.sourceFormat : "webp"}
+                </span>
+              </div>
+              <div
+                class="astro-sticker-card-actions"
+                role="group"
+                aria-label={`Copy code for ${sticker.componentName}`}
+              >
+                <span data-cf-copy-scope>
+                  <span hidden data-cf-copy-source>
+                    {reactSnippet}
+                  </span>
+                  <button
+                    class="cf-button"
+                    data-variant="secondary"
+                    data-size="sm"
+                    type="button"
+                    data-cf-copy-button
+                    data-copy-label="React"
+                    data-copied-label="Copied"
+                    data-copy-aria-label={`Copy React snippet for ${sticker.componentName}`}
+                    data-copied-aria-label={`React snippet for ${sticker.componentName} copied`}
+                    aria-label={`Copy React snippet for ${sticker.componentName}`}
+                  >
+                    <span data-cf-copy-label>React</span>
+                  </button>
+                  <span class="cf-visually-hidden" aria-live="polite" data-cf-copy-status />
+                </span>
+                <span data-cf-copy-scope>
+                  <span hidden data-cf-copy-source>
+                    {svelteSnippet}
+                  </span>
+                  <button
+                    class="cf-button"
+                    data-variant="secondary"
+                    data-size="sm"
+                    type="button"
+                    data-cf-copy-button
+                    data-copy-label="Svelte"
+                    data-copied-label="Copied"
+                    data-copy-aria-label={`Copy Svelte snippet for ${sticker.componentName}`}
+                    data-copied-aria-label={`Svelte snippet for ${sticker.componentName} copied`}
+                    aria-label={`Copy Svelte snippet for ${sticker.componentName}`}
+                  >
+                    <span data-cf-copy-label>Svelte</span>
+                  </button>
+                  <span class="cf-visually-hidden" aria-live="polite" data-cf-copy-status />
+                </span>
+              </div>
+              {sticker.emoji && (
+                <span class="astro-sticker-emoji" aria-label="Telegram emoji">
+                  {sticker.emoji}
+                </span>
+              )}
+            </article>
+          );
+        })
+      }
+    </div>
+  </section>
+</Layout>

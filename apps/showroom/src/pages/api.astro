@@ -6,6 +6,15 @@ import publicApi from "../data/public-api.json";
 import Layout from "../layouts/Layout.astro";
 
 const examples: Record<string, string> = {
+  assets: `import { convertTgs } from "@cofob/design-system-assets";
+
+const manifest = await convertTgs({
+  input: "stickers/chris.tgs",
+  outputDir: "public/stickers/chris",
+  publicBase: "/stickers/chris",
+});
+
+// Render manifest.sticker.skeletonSvg inline; do not pass unchecked user SVG.`,
   css: `import "@cofob/design-system-css/index.css";
 import {
   getThemeScript,
@@ -33,6 +42,12 @@ import {
 
 // CSS stays an explicit application-level import.
 import "@cofob/design-system-css/index.css";`,
+  stickers: `import AnimatedChris001 from "@cofob/design-system-stickers/react/AnimatedChris001";
+import animatedChris from "@cofob/design-system-stickers/catalogs/animated-chris" with { type: "json" };
+
+// Copy published media to /stickers during the application build.
+// cf-stickers copy --out-dir public/stickers
+const firstSticker = animatedChris.stickers[0];`,
   svelte: `<script lang="ts">
   import "@cofob/design-system-css/index.css";
   import {

@@ -3,6 +3,7 @@ import { Plus } from "lucide-react";
 
 interface Props {
   name: string;
+  animatedSticker?: DS.AnimatedStickerModel;
 }
 
 const post: DS.PostSummary = {
@@ -95,7 +96,7 @@ function ThemeExample({ toggle = false }: { toggle?: boolean }) {
   );
 }
 
-export function ReactComponentPreview({ name }: Props) {
+export function ReactComponentPreview({ name, animatedSticker }: Props) {
   switch (name) {
     case "ThemeProvider":
       return <ThemeExample />;
@@ -662,6 +663,28 @@ export function ReactComponentPreview({ name }: Props) {
           </figure>
         </div>
       );
+    case "AnimatedSticker":
+      return animatedSticker ? (
+        <figure className="astro-sticker-figure">
+          <div className="astro-sticker-preview">
+            <DS.AnimatedSticker
+              sticker={animatedSticker}
+              alt="Animated cartoon rat Chris from the ‘Крис анимированный’ Telegram sticker pack."
+            />
+            <DS.AnimatedSticker
+              sticker={animatedSticker}
+              alt="Static first frame of animated cartoon rat Chris."
+              playback="static"
+            />
+          </div>
+          <figcaption>
+            Source:{" "}
+            <a href="https://t.me/addstickers/animated_chris" target="_blank" rel="noopener noreferrer">
+              Крис анимированный
+            </a>
+          </figcaption>
+        </figure>
+      ) : null;
     default:
       return <p>React preview unavailable.</p>;
   }

@@ -1,4 +1,6 @@
 ---
+import { readFile } from "node:fs/promises";
+import type { AnimatedStickerModel } from "@cofob/design-system-css";
 import NativePreview from "./NativePreview.astro";
 import { ReactComponentPreview } from "./ReactComponentPreview";
 import SvelteComponentPreview from "./SvelteComponentPreview.svelte";
@@ -13,6 +15,14 @@ interface Props {
 const { name, description, compact = false, linkHref } = Astro.props;
 const slug = name.replaceAll(/([a-z0-9])([A-Z])/g, "$1-$2").toLowerCase();
 const id = `framework-preview-${slug}`;
+const animatedSticker =
+  name === "AnimatedSticker"
+    ? (
+        JSON.parse(await readFile("public/stickers/animated-chris/animated-chris.manifest.json", "utf8")) as {
+          sticker: AnimatedStickerModel;
+        }
+      ).sticker
+    : undefined;
 ---
 
 <section
@@ -57,7 +67,7 @@ const id = `framework-preview-${slug}`;
     aria-labelledby={`${id}-tab-native`}
     data-framework-panel="native"
   >
-    <NativePreview {name} {compact} />
+    <NativePreview {name} {compact} {animatedSticker} />
   </div>
   <div
     class="astro-framework-panel"
@@ -68,7 +78,7 @@ const id = `framework-preview-${slug}`;
     hidden
   >
     <div class:list={["astro-demo", compact && "astro-demo-compact"]}>
-      <ReactComponentPreview {name} client:idle={{ timeout: 1500 }} />
+      <ReactComponentPreview {name} {animatedSticker} client:idle={{ timeout: 1500 }} />
     </div>
   </div>
   <div
@@ -80,7 +90,7 @@ const id = `framework-preview-${slug}`;
     hidden
   >
     <div class:list={["astro-demo", compact && "astro-demo-compact"]}>
-      <SvelteComponentPreview {name} client:idle={{ timeout: 1500 }} />
+      <SvelteComponentPreview {name} {animatedSticker} client:idle={{ timeout: 1500 }} />
     </div>
   </div>
   {

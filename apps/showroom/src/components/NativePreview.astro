@@ -1,13 +1,14 @@
 ---
-import { tokenizeBashCommand } from "@cofob/design-system-css";
+import { tokenizeBashCommand, type AnimatedStickerModel } from "@cofob/design-system-css";
 import NativeCaptcha from "./NativeCaptcha.astro";
 
 interface Props {
   name: string;
   compact?: boolean;
+  animatedSticker?: AnimatedStickerModel;
 }
 
-const { name, compact = false } = Astro.props;
+const { name, compact = false, animatedSticker } = Astro.props;
 const id = `demo-${name.toLowerCase().replaceAll(/[^a-z0-9]+/g, "-")}`;
 const lightImage =
   "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 640 360'%3E%3Crect width='640' height='360' fill='%230ea5e9'/%3E%3Ccircle cx='490' cy='90' r='150' fill='%237dd3fc'/%3E%3Cpath d='M0 300 220 110l170 150 90-85 160 145v40H0z' fill='%23e0f2fe'/%3E%3C/svg%3E";
@@ -1230,6 +1231,56 @@ const renderTerminalOutput = (output: string) => `<code>${escapeHtml(output)}</c
           </figcaption>
         </figure>
       </div>
+    )
+  }
+  {
+    name === "AnimatedSticker" && animatedSticker && (
+      <figure class="astro-sticker-figure">
+        <div class="astro-sticker-preview">
+          <span
+            class="cf-animated-sticker"
+            data-cf-animated-sticker
+            data-playback="auto"
+            data-state="loading"
+            role="img"
+            aria-label="Animated cartoon rat Chris from the ‘Крис анимированный’ Telegram sticker pack."
+          >
+            <span class="cf-animated-sticker__skeleton" aria-hidden="true">
+              <Fragment set:html={animatedSticker.skeletonSvg} />
+            </span>
+            <video
+              data-cf-animated-sticker-video
+              data-cf-animated-sticker-src={animatedSticker.src}
+              width={animatedSticker.width}
+              height={animatedSticker.height}
+              muted
+              loop
+              playsinline
+              preload="metadata"
+              aria-hidden="true"
+              tabindex="-1"
+            />
+          </span>
+          <span
+            class="cf-animated-sticker"
+            data-cf-animated-sticker
+            data-playback="static"
+            data-state="static"
+            role="img"
+            aria-label="Static first frame of animated cartoon rat Chris."
+          >
+            <span class="cf-animated-sticker__skeleton" aria-hidden="true">
+              <Fragment set:html={animatedSticker.skeletonSvg} />
+            </span>
+          </span>
+        </div>
+        <figcaption>
+          Source:{" "}
+          <a href="https://t.me/addstickers/animated_chris" target="_blank" rel="noopener noreferrer">
+            Крис анимированный
+          </a>
+        </figcaption>
+      </figure>
     )
   }
 </div>

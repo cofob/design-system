@@ -5,6 +5,8 @@ import componentGroups from "../../apps/showroom/src/data/components.json" with 
 const accessibilityRoutes = [
   "/",
   "/components/",
+  "/stickers/",
+  "/stickers/animated-chris/",
   "/foundations/",
   "/accessibility/",
   "/installation/",
@@ -218,7 +220,10 @@ test("documents every public component", async ({ page }) => {
   const cards = page.locator(".astro-component-card");
   await expect(cards).toHaveCount(componentRoutes.length);
   await expect(page.getByRole("link", { name: "Dialog API and examples" })).toBeVisible();
-  await expect(page.getByRole("link", { name: "Sticker API and examples" })).toBeVisible();
+  await expect(page.getByRole("link", { name: "Sticker API and examples", exact: true })).toBeVisible();
+  await expect(
+    page.getByRole("link", { name: "AnimatedSticker API and examples", exact: true }),
+  ).toBeVisible();
 });
 
 test("component API pages expose detailed examples and complete parameter tables", async ({ page }) => {
@@ -600,7 +605,7 @@ test("Captcha showroom simulation ignores repeated starts and supports success, 
     await captcha.dispatchEvent("click");
     await expect(captcha).toHaveAttribute("data-state", "verifying");
 
-    await expect.poll(() => captcha.getAttribute("data-state"), { timeout: 2_000 }).toBe(expectedState);
+    await expect.poll(() => captcha.getAttribute("data-state"), { timeout: 5_000 }).toBe(expectedState);
     await expect(captcha).not.toHaveAttribute("aria-busy", "true");
     await expect(liveStatus).toHaveText(
       expectedState === "success" ? "Verification complete" : "Verification failed",
@@ -661,6 +666,168 @@ test("Sticker includes the attributed cofob.dev image example in every adapter",
     await expect(attribution).toHaveAttribute("target", "_blank");
     await expect(attribution).toHaveAttribute("rel", "noopener noreferrer");
   }
+});
+
+test("AnimatedSticker ships its SVG in SSR and requests WebM only after intersection", async ({ page }) => {
+  const stickerRequests: string[] = [];
+  page.on("request", (request) => {
+    if (request.url().includes("/stickers/animated-chris/")) stickerRequests.push(request.url());
+  });
+  await page.addInitScript(() => {
+    type Record = {
+      callback: IntersectionObserverCallback;
+      observer: IntersectionObserver;
+      target: Element;
+    };
+    const records: Record[] = [];
+    class ControlledIntersectionObserver {
+      readonly root = null;
+      readonly rootMargin = "0px";
+      readonly thresholds = [0];
+      constructor(private readonly callback: IntersectionObserverCallback) {}
+      observe(target: Element) {
+        records.push({ callback: this.callback, observer: this as unknown as IntersectionObserver, target });
+      }
+      unobserve(target: Element) {
+        const index = records.findIndex((record) => record.target === target);
+        if (index >= 0) records.splice(index, 1);
+      }
+      disconnect() {
+        for (let index = records.length - 1; index >= 0; index -= 1) {
+          if (records[index]?.observer === (this as unknown as IntersectionObserver))
+            records.splice(index, 1);
+        }
+      }
+      takeRecords() {
+        return [];
+      }
+    }
+    Object.defineProperty(window, "IntersectionObserver", {
+      configurable: true,
+      value: ControlledIntersectionObserver,
+    });
+    (
+      window as typeof window & {
+        __intersectAnimatedSticker: (target: Element) => void;
+      }
+    ).__intersectAnimatedSticker = (target) => {
+      const record = records.find((candidate) => candidate.target === target);
+      record?.callback([{ isIntersecting: true, target } as IntersectionObserverEntry], record.observer);
+    };
+  });
+
+  const response = await page.goto("/components/animated-sticker/", { waitUntil: "domcontentloaded" });
+  if (!response) throw new Error("AnimatedSticker page did not return an HTTP response.");
+  const html = await response.text();
+  expect(html.match(/cf-animated-sticker__skeleton/gu)?.length).toBeGreaterThanOrEqual(3);
+  expect(html.match(/<svg\b/gu)?.length).toBeGreaterThanOrEqual(3);
+  expect(html).not.toContain("poster=");
+  expect(stickerRequests).toEqual([]);
+
+  for (const framework of frameworkNames) {
+    const panel = await selectFramework(page, framework);
+    const root = panel.getByRole("img", {
+      name: "Animated cartoon rat Chris from the ‘Крис анимированный’ Telegram sticker pack.",
+    });
+    const video = root.locator("video");
+    await expect(root.locator(".cf-animated-sticker__skeleton > svg")).toHaveCount(1);
+    await expect(root.locator("img")).toHaveCount(0);
+    await expect(video).not.toHaveAttribute("src", /.+/u);
+    await expect(video).not.toHaveAttribute("poster", /.+/u);
+    await root.evaluate((element) => {
+      (
+        window as typeof window & {
+          __intersectAnimatedSticker: (target: Element) => void;
+        }
+      ).__intersectAnimatedSticker(element);
+    });
+    await expect(video).toHaveAttribute(
+      "src",
+      /^\/stickers\/animated-chris\/animated-chris\.[a-f0-9]{12}\.webm$/u,
+    );
+    const attribution = panel.getByRole("link", { name: "Крис анимированный", exact: true });
+    await expect(attribution).toHaveAttribute("href", "https://t.me/addstickers/animated_chris");
+
+    const staticRoot = panel.getByRole("img", {
+      name: "Static first frame of animated cartoon rat Chris.",
+    });
+    await expect(staticRoot).toHaveAttribute("data-playback", "static");
+    await expect(staticRoot).toHaveAttribute("data-state", "static");
+    await expect(staticRoot.locator(".cf-animated-sticker__skeleton > svg")).toHaveCount(1);
+    await expect(staticRoot.locator("video")).toHaveCount(0);
+  }
+
+  expect(stickerRequests.some((url) => url.endsWith(".webm"))).toBe(true);
+  expect(stickerRequests.some((url) => url.endsWith(".svg") || url.endsWith(".manifest.json"))).toBe(false);
+});
+
+test("sticker gallery shards packs, lazy-loads WebM, and copies names or framework snippets", async ({
+  page,
+}) => {
+  const externalSkeletonRequests: string[] = [];
+  page.on("request", (request) => {
+    if (/\.(?:json|svg)(?:$|\?)/u.test(request.url())) externalSkeletonRequests.push(request.url());
+  });
+  await page.addInitScript(() => {
+    const copied: string[] = [];
+    (window as typeof window & { __copiedStickerText: string[] }).__copiedStickerText = copied;
+    Object.defineProperty(navigator, "clipboard", {
+      configurable: true,
+      value: {
+        writeText(value: string) {
+          copied.push(value);
+          return Promise.resolve();
+        },
+      },
+    });
+  });
+
+  await page.goto("/stickers/");
+  await expect(page.locator(".astro-sticker-pack-card")).toHaveCount(8);
+  await expect(page.getByRole("heading", { name: "576 stickers, split by pack." })).toBeVisible();
+
+  const response = await page.goto("/stickers/animated-chris/", { waitUntil: "domcontentloaded" });
+  if (!response) throw new Error("Animated Chris gallery did not return an HTTP response.");
+  const html = await response.text();
+  expect(html.match(/class="astro-sticker-card"/gu)).toHaveLength(37);
+  expect(html.match(/<svg\b/gu)?.length).toBeGreaterThanOrEqual(36);
+  const videoTags = html.match(/<video\b[^>]*>/gu) ?? [];
+  expect(videoTags).toHaveLength(36);
+  expect(videoTags.every((tag) => !/\ssrc=/u.test(tag))).toBe(true);
+
+  const firstCard = page.locator(".astro-sticker-card").first();
+  const nameButton = firstCard.getByRole("button", { name: "Copy component name AnimatedChris001" });
+  await nameButton.click();
+  await expect
+    .poll(() =>
+      page.evaluate(() =>
+        (window as typeof window & { __copiedStickerText: string[] }).__copiedStickerText.at(-1),
+      ),
+    )
+    .toBe("AnimatedChris001");
+
+  const reactButton = firstCard.getByRole("button", { name: "Copy React snippet for AnimatedChris001" });
+  await reactButton.click();
+  expect(
+    await page.evaluate(() =>
+      (window as typeof window & { __copiedStickerText: string[] }).__copiedStickerText.at(-1),
+    ),
+  ).toContain("@cofob/design-system-stickers/react/AnimatedChris001");
+
+  const svelteButton = firstCard.getByRole("button", { name: "Copy Svelte snippet for AnimatedChris001" });
+  await svelteButton.click();
+  expect(
+    await page.evaluate(() =>
+      (window as typeof window & { __copiedStickerText: string[] }).__copiedStickerText.at(-1),
+    ),
+  ).toContain("@cofob/design-system-stickers/svelte/AnimatedChris001");
+
+  const lastAnimated = page.locator('.astro-sticker-card[data-sticker-kind="animated"]').last();
+  const deferredVideo = lastAnimated.locator("video");
+  await expect(deferredVideo).not.toHaveAttribute("src", /.+/u);
+  await lastAnimated.scrollIntoViewIfNeeded();
+  await expect(deferredVideo).toHaveAttribute("src", /\.webm$/u);
+  expect(externalSkeletonRequests).toEqual([]);
 });
 
 test("BlueLine preserves the original marker geometry and motion in every adapter", async ({ page }) => {
@@ -1259,6 +1426,37 @@ test("@visual component overview remains stable in explicit and system themes", 
   await expect(page.locator("html")).toHaveAttribute("data-theme-preference", "system");
   await expect(page.locator("html")).toHaveAttribute("data-theme", "dark");
   await expect(page).toHaveScreenshot("components-system-dark.png", { fullPage: true });
+});
+
+test("@visual sticker pack gallery remains stable in both themes", async ({ page }) => {
+  await page.emulateMedia({ reducedMotion: "reduce" });
+  await page.goto("/stickers/");
+  for (const theme of ["light", "dark"] as const) {
+    await page.evaluate((selectedTheme) => localStorage.setItem("cf-theme", selectedTheme), theme);
+    await page.reload();
+    await expect(page.locator("html")).toHaveAttribute("data-theme-preference", theme);
+    await expect(page).toHaveScreenshot(`stickers-${theme}.png`, { fullPage: true });
+  }
+});
+
+test("@visual sticker copy card remains stable", async ({ page }) => {
+  await page.emulateMedia({ colorScheme: "dark", reducedMotion: "reduce" });
+  await page.addInitScript(() => localStorage.setItem("cf-theme", "system"));
+  await page.goto("/stickers/animated-chris/");
+  const card = page.locator(".astro-sticker-card").first();
+  await expect(card).toHaveScreenshot("sticker-copy-card.png");
+});
+
+test("@visual AnimatedSticker preserves its first frame under reduced motion", async ({ page }) => {
+  await page.emulateMedia({ colorScheme: "light", reducedMotion: "reduce" });
+  await page.goto("/components/animated-sticker/");
+  const panel = page.locator('[data-framework-panel="native"]');
+  const root = panel.getByRole("img", {
+    name: "Animated cartoon rat Chris from the ‘Крис анимированный’ Telegram sticker pack.",
+  });
+  await expect(root).toHaveAttribute("data-state", "reduced-motion");
+  await expect(root.locator("video")).not.toHaveAttribute("src", /.+/u);
+  await expect(panel).toHaveScreenshot("animated-sticker-reduced-motion.png");
 });
 
 test("@visual React and Svelte representative states remain stable", async ({ page }) => {

@@ -8,17 +8,20 @@ The system uses authored semantic CSS rather than utility generation or CSS-in-J
 
 | Package                         | Purpose                                                                                                  |
 | ------------------------------- | -------------------------------------------------------------------------------------------------------- |
+| `@cofob/design-system-assets`   | Node-only Telegram TGS conversion to transparent WebM and an inline SVG manifest                         |
+| `@cofob/design-system-stickers` | Optimized Telegram sticker assets with sharded catalogs and generated React/Svelte components            |
 | `@cofob/design-system-css`      | Semantic tokens, light/dark themes, Manrope, base/component CSS, PostCSS source, and vanilla controllers |
 | `@cofob/design-system-react`    | Typed React 18.3/19 components                                                                           |
 | `@cofob/design-system-svelte`   | Svelte 5 components compatible with SvelteKit 2                                                          |
 | `@cofob/design-system-showroom` | Private Astro application deployed to [design.cofob.dev](https://design.cofob.dev)                       |
 
-All public packages share a fixed Changesets version and are published to GitHub Packages.
+The three UI packages share a fixed Changesets version. The two asset packages are versioned independently. All public packages are published to GitHub Packages.
 
 ## Requirements
 
 - Node.js 24.11 or newer
 - npm 11
+- FFmpeg with `libvpx-vp9` when converting Telegram `.tgs` stickers
 - A classic GitHub token with `read:packages` for installing from GitHub Packages
 
 Configure the `@cofob` scope without committing a token:
@@ -46,6 +49,20 @@ Svelte or SvelteKit:
 
 ```sh
 npm install @cofob/design-system-css @cofob/design-system-svelte @lucide/svelte
+```
+
+Build-time TGS conversion:
+
+```sh
+npm install --save-dev @cofob/design-system-assets
+cf-tgs convert sticker.tgs --out-dir public/stickers/example --public-base /stickers/example
+```
+
+Reusable sticker packs and generated framework components:
+
+```sh
+npm install @cofob/design-system-stickers
+cf-stickers copy --out-dir public/stickers
 ```
 
 Import the complete stylesheet once at the application root:
@@ -81,6 +98,8 @@ npm run test:visual
 
 ```text
 packages/
+  design-system-assets/    build-time TGS conversion and manifest generation
+  design-system-stickers/  optimized packs, sharded catalogs, and generated adapters
   design-system-css/       tokens, CSS, public contracts, vanilla controllers
   design-system-react/     React adapter
   design-system-svelte/    Svelte 5 adapter

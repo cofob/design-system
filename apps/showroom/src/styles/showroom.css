@@ -740,6 +740,216 @@
   scroll-margin-top: 6rem;
 }
 
+.astro-sticker-instruction-grid,
+.astro-sticker-pack-grid,
+.astro-sticker-gallery {
+  display: grid;
+  gap: var(--cf-space-4);
+}
+
+.astro-sticker-instruction-grid {
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 28rem), 1fr));
+  margin-block-end: var(--cf-space-6);
+}
+
+.astro-sticker-instruction-grid > div {
+  min-inline-size: 0;
+}
+
+.astro-sticker-instruction-grid h3 {
+  margin-block-end: var(--cf-space-2);
+}
+
+.astro-sticker-pack-grid {
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 17rem), 1fr));
+}
+
+.astro-sticker-pack-card {
+  display: grid;
+  min-inline-size: 0;
+  grid-template-rows: auto auto 1fr;
+  gap: var(--cf-space-4);
+}
+
+.astro-sticker-pack-cover,
+.astro-sticker-card-media {
+  display: grid;
+  place-items: center;
+  overflow: hidden;
+  border-radius: var(--cf-radius-lg);
+  background-color: var(--cf-color-surface-muted);
+  background-image: radial-gradient(
+    color-mix(in srgb, var(--cf-color-border) 62%, transparent) 0.75px,
+    transparent 0.75px
+  );
+  background-size: 12px 12px;
+}
+
+.astro-sticker-pack-cover {
+  min-block-size: 13rem;
+}
+
+.astro-sticker-pack-cover .astro-sticker-gallery-media {
+  inline-size: 10rem;
+  block-size: 10rem;
+  object-fit: contain;
+}
+
+.astro-sticker-pack-kicker {
+  margin: 0;
+  color: var(--cf-color-accent);
+  font-size: var(--cf-font-size-xs);
+  font-weight: var(--cf-font-weight-bold);
+  letter-spacing: var(--cf-letter-spacing-wide);
+  text-transform: uppercase;
+}
+
+.astro-sticker-pack-card h3 {
+  margin-block: var(--cf-space-1) var(--cf-space-2);
+}
+
+.astro-sticker-pack-card p {
+  color: var(--cf-color-text-muted);
+}
+
+.astro-sticker-pack-actions,
+.astro-sticker-pack-toolbar {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: var(--cf-space-3);
+}
+
+.astro-sticker-pack-actions {
+  align-self: end;
+  justify-content: space-between;
+}
+
+.astro-sticker-pack-toolbar {
+  margin-block: calc(-1 * var(--cf-space-6)) var(--cf-space-8);
+}
+
+.astro-sticker-gallery {
+  grid-template-columns: repeat(auto-fill, minmax(min(100%, 10rem), 1fr));
+}
+
+.astro-sticker-card {
+  position: relative;
+  display: grid;
+  min-inline-size: 0;
+  grid-template-rows: auto auto auto;
+  gap: var(--cf-space-2);
+  padding: var(--cf-space-2);
+  border: 1px solid var(--cf-color-border);
+  border-radius: var(--cf-radius-lg);
+  background: var(--cf-color-surface);
+  box-shadow: var(--cf-shadow-xs);
+}
+
+.astro-sticker-card-media {
+  position: relative;
+  min-block-size: 9rem;
+  aspect-ratio: 1;
+}
+
+.astro-sticker-copy-preview {
+  display: grid;
+  inline-size: 100%;
+  block-size: 100%;
+  margin: 0;
+  padding: 0;
+  place-items: center;
+  overflow: hidden;
+  border: 0;
+  border-radius: inherit;
+  color: inherit;
+  background: transparent;
+  cursor: copy;
+}
+
+.astro-sticker-copy-preview:focus-visible {
+  outline: 3px solid var(--cf-color-focus);
+  outline-offset: -3px;
+}
+
+.astro-sticker-copy-preview .astro-sticker-gallery-media {
+  inline-size: 100%;
+  block-size: 100%;
+  object-fit: contain;
+}
+
+.astro-sticker-copy-label {
+  position: absolute;
+  inset-block-end: var(--cf-space-2);
+  inset-inline-start: 50%;
+  z-index: 2;
+  padding: var(--cf-space-1) var(--cf-space-2);
+  transform: translateX(-50%);
+  border: 1px solid var(--cf-color-border);
+  border-radius: var(--cf-radius-full);
+  color: var(--cf-color-text-strong);
+  background: color-mix(in srgb, var(--cf-color-surface) 92%, transparent);
+  box-shadow: var(--cf-shadow-xs);
+  font-size: var(--cf-font-size-xs);
+  font-weight: var(--cf-font-weight-semibold);
+  opacity: 0.82;
+  white-space: nowrap;
+  pointer-events: none;
+  transition: opacity var(--cf-duration-fast) var(--cf-ease-standard);
+  backdrop-filter: blur(8px);
+}
+
+.astro-sticker-copy-preview:is(:hover, :focus-visible) .astro-sticker-copy-label,
+.astro-sticker-copy-preview[data-copy-state="copied"] .astro-sticker-copy-label,
+.astro-sticker-copy-preview[data-copy-state="error"] .astro-sticker-copy-label {
+  opacity: 1;
+}
+
+.astro-sticker-card-meta {
+  display: flex;
+  min-inline-size: 0;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--cf-space-1);
+}
+
+.astro-sticker-card-meta code {
+  min-inline-size: 0;
+  overflow: hidden;
+  font-size: var(--cf-font-size-xs);
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.astro-sticker-card-actions {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: var(--cf-space-1);
+}
+
+.astro-sticker-card-actions > span,
+.astro-sticker-card-actions .cf-button {
+  min-inline-size: 0;
+  inline-size: 100%;
+}
+
+.astro-sticker-emoji {
+  position: absolute;
+  inset-block-start: var(--cf-space-2);
+  inset-inline-end: var(--cf-space-2);
+  display: grid;
+  min-inline-size: 1.75rem;
+  min-block-size: 1.75rem;
+  place-items: center;
+  border: 1px solid var(--cf-color-border);
+  border-radius: var(--cf-radius-full);
+  background: color-mix(in srgb, var(--cf-color-surface) 88%, transparent);
+  box-shadow: var(--cf-shadow-xs);
+  font-size: var(--cf-font-size-sm);
+  backdrop-filter: blur(8px);
+  pointer-events: none;
+}
+
 .astro-parameter-section {
   display: grid;
   gap: var(--cf-space-4);

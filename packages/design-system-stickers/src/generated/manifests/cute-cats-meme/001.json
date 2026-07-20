@@ -1,0 +1,15 @@
+{
+  "id": "cute-cats-meme/001",
+  "index": 1,
+  "componentName": "CuteCatsMeme001",
+  "emoji": "🙃",
+  "pack": "Cutecatsmeme",
+  "packTitle": "⚞ᴥ⚟  @noona_stickers",
+  "sourceUrl": "https://t.me/addstickers/Cutecatsmeme",
+  "width": 192,
+  "height": 192,
+  "kind": "static",
+  "mediaType": "image/webp",
+  "assetPath": "cute-cats-meme/001.268ea57492ce.webp",
+  "sha256": "268ea57492ce314004d77d1abe10eb88ee4061f1eda3b0a2d51e84ccd34ddb7c"
+}

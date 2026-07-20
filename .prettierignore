@@ -8,3 +8,10 @@ playwright-report
 test-results
 package-lock.json
 packages/design-system-css/src/fonts/*.woff2
+packages/design-system-stickers/assets
+packages/design-system-stickers/.cache
+packages/design-system-stickers/src/generated
+packages/design-system-stickers/src/react/generated
+packages/design-system-stickers/src/svelte/generated
+packages/design-system-stickers/src/index.ts
+packages/design-system-stickers/src/react/index.tsx

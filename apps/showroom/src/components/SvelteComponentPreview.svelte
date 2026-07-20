@@ -2,6 +2,7 @@
   import {
     Accordion,
     Alert,
+    AnimatedSticker,
     AppShell,
     Avatar,
     Badge,
@@ -53,14 +54,16 @@
     Tooltip,
     toast,
   } from "@cofob/design-system-svelte";
+  import type { AnimatedStickerModel } from "@cofob/design-system-svelte";
   import { Plus } from "@lucide/svelte";
 
   interface Props {
     name: string;
+    animatedSticker?: AnimatedStickerModel;
   }
 
   const generatedId = $props.id();
-  let { name }: Props = $props();
+  let { name, animatedSticker }: Props = $props();
 
   const fieldId = `svelte-field-${generatedId}`;
   const skipTargetId = `svelte-skip-target-${generatedId}`;
@@ -499,6 +502,25 @@ applyTheme(preference);`;
       </figcaption>
     </figure>
   </div>
+{:else if name === "AnimatedSticker" && animatedSticker}
+  <figure class="astro-sticker-figure">
+    <div class="astro-sticker-preview">
+      <AnimatedSticker
+        sticker={animatedSticker}
+        alt="Animated cartoon rat Chris from the ‘Крис анимированный’ Telegram sticker pack."
+      />
+      <AnimatedSticker
+        sticker={animatedSticker}
+        alt="Static first frame of animated cartoon rat Chris."
+        playback="static"
+      />
+    </div>
+    <figcaption>
+      Source: <a href="https://t.me/addstickers/animated_chris" target="_blank" rel="noopener noreferrer"
+        >Крис анимированный</a
+      >
+    </figcaption>
+  </figure>
 {:else}
   <Alert title="Unknown component" tone="warning">No Svelte preview is registered for {name}.</Alert>
 {/if}

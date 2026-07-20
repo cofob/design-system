@@ -15,6 +15,7 @@
     "@cofob/design-system-css": "0.1.1",
     "@cofob/design-system-react": "0.1.1",
     "@cofob/design-system-svelte": "0.1.1",
+    "@cofob/design-system-stickers": "0.1.0",
     "astro": "^7.1.1",
     "lucide": "^0.545.0",
     "lucide-react": "^0.545.0",

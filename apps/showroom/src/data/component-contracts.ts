@@ -227,6 +227,7 @@ const props: Record<string, readonly string[]> = {
   MediaGrid: ["as", "children", "container attributes"],
   ChatThread: ["messages", "label", "list attributes"],
   Sticker: ["tone", "rotation", "children", "data-image", "span attributes"],
+  AnimatedSticker: ["sticker", "alt", "playback", "preload", "span attributes"],
 };
 
 const allAdapters = ["React", "Svelte", "HTML"] as const;
@@ -362,6 +363,9 @@ const parameterTypes: Record<string, string> = {
   rotation: "-6 | -3 | 0 | 3 | 6",
   "data-image": '"true" when the sticker contains an image',
   children: "ReactNode | Svelte Snippet | child HTML",
+  sticker: "AnimatedStickerModel",
+  preload: '"none" | "metadata" | "auto" | ""',
+  playback: '"auto" | "static"',
 };
 
 const parameterDefaults: Record<string, string> = {
@@ -562,6 +566,11 @@ const parameterDescriptions: Record<string, string> = {
   rotation: "Small tokenized decorative rotation.",
   "data-image": "Removes label-like padding when Sticker wraps an attributed image.",
   children: "Idiomatic adapter composition content.",
+  sticker:
+    "Converted WebM URL, dimensions, and trusted sanitized inline SVG. Never pass unchecked user SVG as skeletonSvg.",
+  preload: "Native video preload hint; the inline SVG is present independently in SSR HTML.",
+  playback:
+    'Use "static" to render only the inline first-frame SVG and omit video entirely, guaranteeing no WebM request.',
 };
 
 const requiredParameters: Record<string, readonly string[]> = {
@@ -584,6 +593,7 @@ const requiredParameters: Record<string, readonly string[]> = {
   Avatar: ["name"],
   InlineEmoji: ["image"],
   ChatThread: ["messages"],
+  AnimatedSticker: ["sticker", "alt"],
 };
 
 const adapterOverrides: Record<string, readonly Adapter[]> = {
@@ -696,6 +706,7 @@ const componentParameterDefaults: Record<string, Record<string, string>> = {
   InlineEmoji: { "referrerPolicy/referrerpolicy": '"no-referrer"' },
   MediaGrid: { as: '"ul"' },
   ChatThread: { label: '"Conversation"' },
+  AnimatedSticker: { playback: '"auto"', preload: '"metadata"' },
 };
 
 const attributeParameter = (name: string) => name.endsWith(" attributes");
@@ -753,6 +764,7 @@ const parameterExamples: Record<string, string> = {
   alt: '"Ada Lovelace"',
   "referrerPolicy/referrerpolicy": '"no-referrer"',
   "data-image": 'data-image="true"',
+  playback: '"static"',
 };
 
 const componentParameterExamples: Record<string, Record<string, string>> = {
@@ -836,7 +848,7 @@ function parameterExample(component: string, name: string): string {
   if (name.includes("Label") || name === "label") return '"Accessible label"';
   if (["items", "items/tabs", "options/children", "entries", "links", "groups", "messages"].includes(name))
     return `{${name.split("/")[0]}}`;
-  if (["post", "result", "image", "darkImage"].includes(name)) return `{${name}}`;
+  if (["post", "result", "image", "darkImage", "sticker"].includes(name)) return `{${name}}`;
   return `{${name.replaceAll("/", "Or")}}`;
 }
 
@@ -889,6 +901,7 @@ const stateOverrides: Record<string, readonly string[]> = {
   InlineEmoji: ["named", "decorative", "inline alignment"],
   MediaGrid: ["one item", "two columns", "image/video/audio"],
   Sticker: ["label", "image", "attributed image"],
+  AnimatedSticker: ["loading", "playing", "static SVG only", "reduced motion", "load/play fallback"],
 };
 
 const reactUsage: Record<string, string> = {
@@ -931,6 +944,8 @@ const reactUsage: Record<string, string> = {
   ChatThread: "<ChatThread messages={messages} />",
   Sticker:
     '<figure><Sticker data-image="true"><img src="/sticker.webp" alt="A delighted fox" /></Sticker><figcaption>Source: …</figcaption></figure>',
+  AnimatedSticker:
+    '<><AnimatedSticker sticker={manifest.sticker} alt="Animated cartoon rat Chris" /><AnimatedSticker sticker={manifest.sticker} alt="Static first frame" playback="static" /></>',
 };
 
 const svelteUsage: Record<string, string> = {
@@ -949,6 +964,8 @@ const svelteUsage: Record<string, string> = {
   Table: '<Table label="Package comparison"><thead>…</thead><tbody>…</tbody></Table>',
   Sticker:
     '<figure><Sticker data-image="true"><img src="/sticker.webp" alt="A delighted fox" /></Sticker><figcaption>Source: …</figcaption></figure>',
+  AnimatedSticker:
+    '<AnimatedSticker sticker={manifest.sticker} alt="Animated cartoon rat Chris" />\n<AnimatedSticker sticker={manifest.sticker} alt="Static first frame" playback="static" />',
   Pagination: "<Pagination bind:page totalPages={12} />",
   Dialog:
     '<Dialog title="Confirm">{#snippet trigger({ open })}<Button onclick={open}>Open</Button>{/snippet}Content</Dialog>',
@@ -1011,6 +1028,8 @@ const nativeUsage: Record<string, string> = {
   ChatThread: '<ol class="cf-chat-thread">…</ol>',
   Sticker:
     '<figure><span class="cf-sticker" data-image="true"><img src="/sticker.webp" alt="A delighted fox" /></span><figcaption>Source: …</figcaption></figure>',
+  AnimatedSticker:
+    '<span class="cf-animated-sticker" data-cf-animated-sticker data-playback="auto" role="img" aria-label="Animated cartoon rat Chris"><span class="cf-animated-sticker__skeleton" aria-hidden="true"><svg viewBox="0 0 512 512">…</svg></span><video data-cf-animated-sticker-video data-cf-animated-sticker-src="/sticker.hash.webm" muted loop playsinline preload="metadata" aria-hidden="true"></video></span>\n<span class="cf-animated-sticker" data-playback="static" role="img" aria-label="Static first frame"><span class="cf-animated-sticker__skeleton" aria-hidden="true"><svg viewBox="0 0 512 512">…</svg></span></span>',
 };
 
 export function getComponentContract(name: string): ComponentContract {

@@ -19,6 +19,7 @@ import type {
 } from "../src/lib/index.js";
 import Accordion from "../src/lib/components/Accordion.svelte";
 import Alert from "../src/lib/components/Alert.svelte";
+import AnimatedSticker from "../src/lib/components/AnimatedSticker.svelte";
 import AppShell from "../src/lib/components/AppShell.svelte";
 import Avatar from "../src/lib/components/Avatar.svelte";
 import BlueLine from "../src/lib/components/BlueLine.svelte";
@@ -100,9 +101,43 @@ const componentNames = [
   "MediaGrid",
   "ChatThread",
   "Sticker",
+  "AnimatedSticker",
 ] as const;
 
 describe("Svelte adapter contract", () => {
+  it("server-renders the animated sticker SVG inline without img or poster", () => {
+    const sticker = {
+      src: "/stickers/chris.123456789abc.webm",
+      skeletonSvg: '<svg viewBox="0 0 512 512"><path d="M0 0h10v10z"/></svg>',
+      width: 512,
+      height: 512,
+    };
+    const output = render(AnimatedSticker, {
+      props: {
+        sticker,
+        alt: "Animated Chris",
+      },
+    });
+
+    expect(output.body).toContain('role="img"');
+    expect(output.body).toContain('aria-label="Animated Chris"');
+    expect(output.body).toMatch(/class="cf-animated-sticker__skeleton" aria-hidden="true">[\s\S]*?<svg/u);
+    expect(output.body).toContain("<video");
+    expect(output.body).toContain('data-cf-animated-sticker-src="/stickers/chris.123456789abc.webm"');
+    expect(output.body).not.toMatch(/<video[^>]*\ssrc=/u);
+    expect(output.body).not.toContain("<img");
+    expect(output.body).not.toContain("poster=");
+    expect(output.body).not.toContain("data:image");
+
+    const staticOutput = render(AnimatedSticker, {
+      props: { sticker, alt: "Static Chris", playback: "static" },
+    });
+    expect(staticOutput.body).toContain('data-playback="static"');
+    expect(staticOutput.body).toContain('data-state="static"');
+    expect(staticOutput.body).toContain("<svg");
+    expect(staticOutput.body).not.toContain("<video");
+  });
+
   it("exports every documented component", () => {
     for (const name of componentNames) expect(system[name]).toBeTypeOf("function");
   });

@@ -1,0 +1,46 @@
+---
+import type { GallerySticker } from "../data/sticker-gallery";
+
+interface Props {
+  sticker: GallerySticker;
+  src: string;
+  alt: string;
+  decorative?: boolean;
+}
+
+const { sticker, src, alt, decorative = false } = Astro.props;
+---
+
+{
+  sticker.kind === "animated" ? (
+    <span
+      class="cf-animated-sticker astro-sticker-gallery-media"
+      data-cf-animated-sticker
+      data-state="loading"
+      role={decorative ? undefined : "img"}
+      aria-label={decorative ? undefined : alt}
+      aria-hidden={decorative || undefined}
+    >
+      <span class="cf-animated-sticker__skeleton" aria-hidden="true" set:html={sticker.skeletonSvg} />
+      <video
+        data-cf-animated-sticker-video
+        data-cf-animated-sticker-src={src}
+        muted
+        loop
+        playsinline
+        preload="metadata"
+        aria-hidden="true"
+      />
+    </span>
+  ) : (
+    <img
+      class="astro-sticker-gallery-media"
+      src={src}
+      width={sticker.width}
+      height={sticker.height}
+      loading="lazy"
+      decoding="async"
+      alt={decorative ? "" : alt}
+    />
+  )
+}

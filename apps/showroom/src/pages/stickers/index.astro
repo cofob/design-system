@@ -1,0 +1,133 @@
+---
+import CodeBlock from "../../components/CodeBlock.astro";
+import PageHeader from "../../components/PageHeader.astro";
+import StickerMedia from "../../components/StickerMedia.astro";
+import { hydrateSticker, loadStickerPackCatalogs, stickerMediaUrl } from "../../data/sticker-gallery";
+import Layout from "../../layouts/Layout.astro";
+
+const catalogs = loadStickerPackCatalogs();
+const packs = await Promise.all(
+  catalogs.map(async (catalog) => {
+    const coverEntry = catalog.stickers[0];
+    if (!coverEntry) throw new Error(`${catalog.pack.key} has no stickers.`);
+    return { catalog, cover: await hydrateSticker(coverEntry) };
+  }),
+);
+const total = catalogs.reduce((sum, catalog) => sum + catalog.stickers.length, 0);
+const animated = catalogs
+  .flatMap((catalog) => catalog.stickers)
+  .filter((sticker) => sticker.kind === "animated").length;
+
+const installExample = `npm install @cofob/design-system-css @cofob/design-system-stickers
+cf-stickers copy --out-dir public/stickers`;
+const reactExample = `import "@cofob/design-system-css/index.css";
+import AnimatedChris001 from "@cofob/design-system-stickers/react/AnimatedChris001";
+
+<AnimatedChris001 alt="Chris reacting with surprise" />
+<AnimatedChris001 alt="Still first frame of Chris" playback="static" />`;
+const svelteExample = `<script lang="ts">
+  import "@cofob/design-system-css/index.css";
+  import AnimatedChris001 from "@cofob/design-system-stickers/svelte/AnimatedChris001";
+</script>
+
+<AnimatedChris001 alt="Chris reacting with surprise" />
+<AnimatedChris001 alt="Still first frame of Chris" playback="static" />`;
+const dataExample = `import { resolveStickerAsset } from "@cofob/design-system-stickers";
+import { animatedChris001Sticker } from "@cofob/design-system-stickers/stickers/animated-chris-001";
+import catalog from "@cofob/design-system-stickers/catalogs/animated-chris" with { type: "json" };
+
+const mediaUrl = resolveStickerAsset(animatedChris001Sticker);
+const firstCatalogEntry = catalog.stickers[0];`;
+---
+
+<Layout
+  title="Sticker gallery"
+  description={`Browse ${total} optimized Telegram stickers across eight attributed packs.`}
+>
+  <PageHeader
+    eyebrow="Sticker assets"
+    title={`${total} stickers, split by pack.`}
+    description={`${total - animated} static WebP stickers and ${animated} transparent VP9 animations. Animated cards render a colored inline SVG first frame during SSR and request WebM only when scrolled into view.`}
+  />
+
+  <section class="astro-section" aria-labelledby="sticker-usage-heading">
+    <div class="astro-section-header">
+      <h2 id="sticker-usage-heading">Use the package</h2>
+      <p>
+        Prefer isolated component imports. The root entrypoint contains only pack descriptors; catalogs and
+        full SVG manifests remain opt-in.
+      </p>
+    </div>
+    <div class="astro-sticker-instruction-grid">
+      <div>
+        <h3>Install and copy media</h3>
+        <CodeBlock code={installExample} lang="bash" label="Install the sticker asset package" />
+      </div>
+      <div>
+        <h3>React</h3>
+        <CodeBlock code={reactExample} lang="tsx" label="Use one generated React sticker" />
+      </div>
+      <div>
+        <h3>Svelte</h3>
+        <CodeBlock code={svelteExample} lang="svelte" label="Use one generated Svelte sticker" />
+      </div>
+      <div>
+        <h3>Metadata and raw assets</h3>
+        <CodeBlock code={dataExample} lang="typescript" label="Import a sharded sticker catalog" />
+      </div>
+    </div>
+    <div class="cf-alert" data-tone="info">
+      <div class="cf-alert__content">
+        <strong class="cf-alert__title">Animation is progressive</strong>
+        <p class="cf-alert__description">
+          The generated component starts with inline SVG. It assigns the video URL on viewport intersection,
+          and keeps the SVG on reduced motion, load failure, rejected playback, or <code
+            >playback="static"</code
+          >.
+        </p>
+      </div>
+    </div>
+  </section>
+
+  <section class="astro-section" aria-labelledby="sticker-packs-heading">
+    <div class="astro-section-header">
+      <h2 id="sticker-packs-heading">Sticker packs</h2>
+      <p>Each route loads one small catalog and only that pack's inline first-frame manifests.</p>
+    </div>
+    <div class="astro-sticker-pack-grid">
+      {
+        packs.map(({ catalog, cover }) => {
+          const animatedCount = catalog.stickers.filter((sticker) => sticker.kind === "animated").length;
+          return (
+            <article class="cf-card astro-sticker-pack-card" data-variant="outlined">
+              <div class="astro-sticker-pack-cover">
+                <StickerMedia
+                  sticker={cover}
+                  src={stickerMediaUrl(cover)}
+                  alt={`Preview of ${catalog.pack.title}`}
+                />
+              </div>
+              <div>
+                <p class="astro-sticker-pack-kicker">
+                  {catalog.pack.stickerCount} stickers · {animatedCount} animated
+                </p>
+                <h3>{catalog.pack.title}</h3>
+                <p>
+                  <code>{catalog.pack.componentPrefix}001</code>
+                </p>
+              </div>
+              <div class="astro-sticker-pack-actions">
+                <a class="cf-button" data-variant="primary" href={`/stickers/${catalog.pack.slug}/`}>
+                  Browse pack
+                </a>
+                <a class="cf-link" href={catalog.pack.sourceUrl} rel="noreferrer">
+                  Telegram source
+                </a>
+              </div>
+            </article>
+          );
+        })
+      }
+    </div>
+  </section>
+</Layout>

@@ -1,0 +1,62 @@
+{
+  "name": "@cofob/design-system-assets",
+  "version": "0.1.0",
+  "description": "Build-time asset converters for the cofob design system.",
+  "type": "module",
+  "sideEffects": false,
+  "license": "SEE LICENSE IN LICENSE",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/cofob/design-system.git",
+    "directory": "packages/design-system-assets"
+  },
+  "homepage": "https://github.com/cofob/design-system#readme",
+  "bugs": {
+    "url": "https://github.com/cofob/design-system/issues"
+  },
+  "publishConfig": {
+    "registry": "https://npm.pkg.github.com",
+    "access": "public"
+  },
+  "files": [
+    "dist",
+    "README.md",
+    "LICENSE"
+  ],
+  "main": "./dist/index.js",
+  "module": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "import": "./dist/index.js",
+      "default": "./dist/index.js"
+    },
+    "./package.json": "./package.json"
+  },
+  "bin": {
+    "cf-tgs": "./dist/cli.js"
+  },
+  "engines": {
+    "node": ">=24.11.0"
+  },
+  "scripts": {
+    "build": "npm run clean && tsc -p tsconfig.build.json && node ./scripts/mark-cli.mjs",
+    "clean": "node ./scripts/clean.mjs",
+    "typecheck": "tsc -p tsconfig.json --noEmit",
+    "test": "vitest run"
+  },
+  "dependencies": {
+    "@lottiefiles/dotlottie-web": "^0.78.0",
+    "@napi-rs/canvas": "^0.1.80",
+    "jsdom": "^27.4.0",
+    "lottie-web": "^5.13.0",
+    "svgo": "^4.0.0"
+  },
+  "devDependencies": {
+    "@types/jsdom": "^27.0.0",
+    "@types/node": "^24.0.0",
+    "typescript": "^5.9.2",
+    "vitest": "^3.2.4"
+  }
+}

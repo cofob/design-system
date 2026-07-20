@@ -480,6 +480,13 @@
               "entrypoints": [".", "./types"]
             },
             {
+              "name": "AnimatedStickerModel",
+              "kind": "interface",
+              "signature": "interface AnimatedStickerModel { src; skeletonSvg; width; height }",
+              "summary": "Converted animation URL, trusted sanitized inline SVG first frame, and intrinsic dimensions.",
+              "entrypoints": [".", "./types"]
+            },
+            {
               "name": "PostModel",
               "kind": "interface",
               "signature": "interface PostModel",
@@ -506,6 +513,27 @@
               "signature": "interface Controller { destroy(): void }",
               "summary": "Common cleanup contract for every vanilla controller.",
               "entrypoints": [".", "./types"]
+            },
+            {
+              "name": "AnimatedStickerState",
+              "kind": "type",
+              "signature": "type AnimatedStickerState = loading | playing | static | reduced-motion | fallback",
+              "summary": "Playback and inline-fallback states reflected on the animated sticker root.",
+              "entrypoints": ["."]
+            },
+            {
+              "name": "AnimatedStickerController",
+              "kind": "type",
+              "signature": "type AnimatedStickerController = Controller",
+              "summary": "Cleanup contract for animated sticker playback and motion-preference listeners.",
+              "entrypoints": ["."]
+            },
+            {
+              "name": "createAnimatedStickerController",
+              "kind": "function",
+              "signature": "createAnimatedStickerController(root: HTMLElement): AnimatedStickerController",
+              "summary": "Lazily assigns the WebM at viewport intersection, reveals it on playing, and preserves inline SVG on failure or reduced motion.",
+              "entrypoints": ["."]
             },
             {
               "name": "DesignSystemRoot",
@@ -680,6 +708,13 @@
               "kind": "interface",
               "signature": "interface ResponsiveImageModel",
               "summary": "Portable responsive image model.",
+              "entrypoints": [".", "./types"]
+            },
+            {
+              "name": "AnimatedStickerModel",
+              "kind": "type",
+              "signature": "type AnimatedStickerModel = CssAnimatedStickerModel",
+              "summary": "React-facing alias for a converted animated sticker and its trusted inline SVG skeleton.",
               "entrypoints": [".", "./types"]
             },
             {
@@ -1059,6 +1094,13 @@
           "description": "Interactive prop contracts are exported from the root and client entrypoints.",
           "items": [
             {
+              "name": "AnimatedStickerProps",
+              "kind": "interface",
+              "signature": "interface AnimatedStickerProps { sticker; alt; playback?; preload? }",
+              "summary": "Converted sticker model, accessible name, auto/static playback mode, video preload hint, and span attributes.",
+              "entrypoints": [".", "./client"]
+            },
+            {
               "name": "CodeBlockProps",
               "kind": "interface",
               "signature": "interface CodeBlockProps",
@@ -1302,6 +1344,13 @@
               "entrypoints": ["."]
             },
             {
+              "name": "AnimatedStickerModel",
+              "kind": "type",
+              "signature": "type AnimatedStickerModel = CssAnimatedStickerModel",
+              "summary": "Svelte-facing alias for a converted animated sticker and its trusted inline SVG skeleton.",
+              "entrypoints": ["."]
+            },
+            {
               "name": "ImageSource",
               "kind": "type",
               "signature": "type ImageSource = ResponsiveImageModel",
@@ -1404,6 +1453,169 @@
               "kind": "interface",
               "signature": "interface ToastRecord",
               "summary": "Normalized notification record stored in toasts.",
+              "entrypoints": ["."]
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "stickers",
+      "name": "@cofob/design-system-stickers",
+      "label": "Sticker assets",
+      "description": "Optimized Telegram sticker media, sharded metadata, and generated React and Svelte components.",
+      "entrypoints": [
+        {
+          "specifier": ".",
+          "kind": "JavaScript",
+          "summary": "Eight lightweight pack descriptors, URL helpers, and shared metadata types. Sticker catalogs and SVG manifests are opt-in subpaths."
+        },
+        {
+          "specifier": "./react",
+          "kind": "React",
+          "summary": "Named React components for all stickers; isolated per-sticker subpaths are also available."
+        },
+        {
+          "specifier": "./svelte",
+          "kind": "Svelte",
+          "summary": "Named Svelte components for all stickers; isolated per-sticker subpaths are also available."
+        }
+      ],
+      "groups": [
+        {
+          "title": "Catalog and resolution",
+          "description": "The root stays small; consumers explicitly import one pack catalog, one sticker manifest, or one generated component.",
+          "items": [
+            {
+              "name": "packs",
+              "kind": "constant",
+              "signature": "const packs: readonly StickerPack[]",
+              "summary": "Metadata for the eight attributed packs, including each opt-in catalog path.",
+              "entrypoints": ["."]
+            },
+            {
+              "name": "DEFAULT_STICKER_ASSET_BASE",
+              "kind": "constant",
+              "signature": "const DEFAULT_STICKER_ASSET_BASE = \"/stickers\"",
+              "summary": "Default public base used by generated sticker components.",
+              "entrypoints": ["."]
+            },
+            {
+              "name": "resolveStickerAsset",
+              "kind": "function",
+              "signature": "resolveStickerAsset(sticker, baseUrl?): string",
+              "summary": "Resolves a content-hashed asset path against a consumer's public base URL.",
+              "entrypoints": ["."]
+            },
+            {
+              "name": "resolveAnimatedSticker",
+              "kind": "function",
+              "signature": "resolveAnimatedSticker(sticker, baseUrl?): AnimatedStickerModel",
+              "summary": "Adapts a full animated manifest to the shared runtime component model.",
+              "entrypoints": ["."]
+            }
+          ]
+        },
+        {
+          "title": "Metadata types",
+          "description": "Serializable contracts shared by generated modules and pack catalogs.",
+          "items": [
+            {
+              "name": "StickerPack",
+              "kind": "interface",
+              "signature": "interface StickerPack",
+              "summary": "Attributed pack metadata and the path of its sharded catalog.",
+              "entrypoints": ["."]
+            },
+            {
+              "name": "StickerAssetKind",
+              "kind": "type",
+              "signature": "type StickerAssetKind = \"static\" | \"animated\"",
+              "summary": "Discriminator for static and animated sticker records.",
+              "entrypoints": ["."]
+            },
+            {
+              "name": "AnimatedStickerSourceFormat",
+              "kind": "type",
+              "signature": "type AnimatedStickerSourceFormat = \"tgs\" | \"video\"",
+              "summary": "Original Telegram format of an optimized animation.",
+              "entrypoints": ["."]
+            },
+            {
+              "name": "StaticStickerAsset",
+              "kind": "interface",
+              "signature": "interface StaticStickerAsset",
+              "summary": "Metadata for an optimized transparent WebP sticker.",
+              "entrypoints": ["."]
+            },
+            {
+              "name": "AnimatedStickerAsset",
+              "kind": "interface",
+              "signature": "interface AnimatedStickerAsset",
+              "summary": "Full animated metadata including trusted inline SVG and optimized WebM information.",
+              "entrypoints": ["."]
+            },
+            {
+              "name": "StickerAsset",
+              "kind": "type",
+              "signature": "type StickerAsset = StaticStickerAsset | AnimatedStickerAsset",
+              "summary": "Union of full static and animated sticker metadata.",
+              "entrypoints": ["."]
+            },
+            {
+              "name": "StickerAssetIndexEntry",
+              "kind": "type",
+              "signature": "type StickerAssetIndexEntry",
+              "summary": "Lightweight catalog record that points to a separate full manifest.",
+              "entrypoints": ["."]
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "assets",
+      "name": "@cofob/design-system-assets",
+      "label": "Build-time assets",
+      "description": "Node-only conversion of validated Telegram TGS animations into transparent WebM and trusted inline SVG manifests.",
+      "entrypoints": [
+        {
+          "specifier": ".",
+          "kind": "JavaScript",
+          "summary": "TGS conversion API and manifest types. The cf-tgs executable provides the matching CLI."
+        }
+      ],
+      "groups": [
+        {
+          "title": "TGS conversion",
+          "description": "Validate Telegram Lottie constraints, render frame zero, sanitize its SVG, and encode transparent VP9 WebM.",
+          "items": [
+            {
+              "name": "convertTgs",
+              "kind": "function",
+              "signature": "convertTgs(options: ConvertTgsOptions): Promise<TgsConversionManifest>",
+              "summary": "Writes a content-hashed WebM and stable JSON manifest with an inline SVG skeleton.",
+              "entrypoints": ["."]
+            },
+            {
+              "name": "ConvertTgsOptions",
+              "kind": "interface",
+              "signature": "interface ConvertTgsOptions",
+              "summary": "Input, output, public URL, FFmpeg, name, output size, compatibility, and VP9 CRF options.",
+              "entrypoints": ["."]
+            },
+            {
+              "name": "TgsConversionManifest",
+              "kind": "interface",
+              "signature": "interface TgsConversionManifest",
+              "summary": "Versioned sticker model, media metadata, and SHA-256 hashes for source, WebM, and SVG.",
+              "entrypoints": ["."]
+            },
+            {
+              "name": "AnimatedStickerModel",
+              "kind": "interface",
+              "signature": "interface AnimatedStickerModel { src; skeletonSvg; width; height }",
+              "summary": "Serializable runtime model embedded into SSR output by framework adapters.",
               "entrypoints": ["."]
             }
           ]

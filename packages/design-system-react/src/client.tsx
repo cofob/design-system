@@ -21,12 +21,15 @@ import {
 import type {
   ButtonHTMLAttributes,
   DialogHTMLAttributes,
+  ForwardedRef,
   HTMLAttributes,
   KeyboardEvent as ReactKeyboardEvent,
   ReactElement,
   ReactNode,
+  VideoHTMLAttributes,
 } from "react";
 import {
+  createAnimatedStickerController,
   createPopoverController,
   createThemeController,
   createTooltipController,
@@ -34,6 +37,7 @@ import {
 } from "@cofob/design-system-css";
 import type {
   AccordionItem,
+  AnimatedStickerModel,
   MenuItem,
   ResolvedTheme,
   Size,
@@ -44,6 +48,79 @@ import type {
 } from "./types.js";
 import { useControllableState } from "./client-utils.js";
 import { cx } from "./utils.js";
+
+function setForwardedRef<T>(ref: ForwardedRef<T>, value: T | null): void {
+  if (typeof ref === "function") ref(value);
+  else if (ref) ref.current = value;
+}
+
+export interface AnimatedStickerProps extends Omit<
+  HTMLAttributes<HTMLSpanElement>,
+  "children" | "dangerouslySetInnerHTML"
+> {
+  sticker: AnimatedStickerModel;
+  alt: string;
+  playback?: "auto" | "static";
+  preload?: VideoHTMLAttributes<HTMLVideoElement>["preload"];
+}
+
+/**
+ * Plays a converted Telegram sticker while keeping its trusted first-frame SVG
+ * in the server-rendered HTML. Never pass unsanitized user SVG as skeletonSvg.
+ */
+export const AnimatedSticker = forwardRef<HTMLSpanElement, AnimatedStickerProps>(function AnimatedSticker(
+  { sticker, alt, playback = "auto", preload = "metadata", className, ...props },
+  forwardedRef,
+) {
+  const rootRef = useRef<HTMLSpanElement | null>(null);
+  const setRoot = useCallback(
+    (node: HTMLSpanElement | null) => {
+      rootRef.current = node;
+      setForwardedRef(forwardedRef, node);
+    },
+    [forwardedRef],
+  );
+
+  useEffect(() => {
+    if (!rootRef.current) return;
+    const controller = createAnimatedStickerController(rootRef.current);
+    return () => controller.destroy();
+  }, [playback, sticker.src]);
+
+  return (
+    <span
+      {...props}
+      ref={setRoot}
+      className={cx("cf-animated-sticker", className)}
+      data-cf-animated-sticker
+      data-cf-animated-sticker-managed="true"
+      data-playback={playback}
+      data-state={playback === "static" ? "static" : "loading"}
+      role="img"
+      aria-label={alt}
+    >
+      <span
+        className="cf-animated-sticker__skeleton"
+        aria-hidden="true"
+        dangerouslySetInnerHTML={{ __html: sticker.skeletonSvg }}
+      />
+      {playback === "auto" ? (
+        <video
+          data-cf-animated-sticker-video
+          data-cf-animated-sticker-src={sticker.src}
+          width={sticker.width}
+          height={sticker.height}
+          muted
+          loop
+          playsInline
+          preload={preload}
+          aria-hidden="true"
+          tabIndex={-1}
+        />
+      ) : null}
+    </span>
+  );
+});
 
 interface TriggerElementProps extends HTMLAttributes<HTMLElement> {
   disabled?: boolean;
@@ -1002,7 +1079,7 @@ export interface ToastProviderProps {
 export function ToastProvider({ children, limit = 5, defaultDuration = 5000 }: ToastProviderProps) {
   const [toasts, setToasts] = useState<AnimatedToastRecord[]>([]);
   const toastsRef = useRef<AnimatedToastRecord[]>([]);
-  const timers = useRef(new Map<string, ReturnType<typeof setTimeout>>());
+  const timers = useRef(new Map<string, number>());
 
   const clearTimer = useCallback((id: string) => {
     const timer = timers.current.get(id);

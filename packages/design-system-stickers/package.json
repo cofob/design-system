@@ -1,0 +1,116 @@
+{
+  "name": "@cofob/design-system-stickers",
+  "version": "0.1.0",
+  "description": "Optimized, attributed Telegram sticker assets with generated React and Svelte components.",
+  "type": "module",
+  "sideEffects": false,
+  "license": "SEE LICENSE IN LICENSE",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/cofob/design-system.git",
+    "directory": "packages/design-system-stickers"
+  },
+  "homepage": "https://github.com/cofob/design-system#readme",
+  "bugs": {
+    "url": "https://github.com/cofob/design-system/issues"
+  },
+  "publishConfig": {
+    "registry": "https://npm.pkg.github.com",
+    "access": "public"
+  },
+  "files": [
+    "dist",
+    "README.md",
+    "LICENSE",
+    "THIRD_PARTY_NOTICES.md"
+  ],
+  "main": "./dist/index.js",
+  "module": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "import": "./dist/index.js",
+      "default": "./dist/index.js"
+    },
+    "./react": {
+      "types": "./dist/react/index.d.ts",
+      "import": "./dist/react/index.js",
+      "default": "./dist/react/index.js"
+    },
+    "./react/*": {
+      "types": "./dist/react/generated/*.d.ts",
+      "import": "./dist/react/generated/*.js",
+      "default": "./dist/react/generated/*.js"
+    },
+    "./svelte": {
+      "types": "./dist/svelte/index.d.ts",
+      "svelte": "./dist/svelte/index.js",
+      "default": "./dist/svelte/index.js"
+    },
+    "./svelte/*": {
+      "types": "./dist/svelte/generated/*.svelte.d.ts",
+      "svelte": "./dist/svelte/generated/*.svelte",
+      "default": "./dist/svelte/generated/*.svelte"
+    },
+    "./stickers/*": {
+      "types": "./dist/generated/stickers/*.d.ts",
+      "import": "./dist/generated/stickers/*.js",
+      "default": "./dist/generated/stickers/*.js"
+    },
+    "./manifests/*": "./dist/generated/manifests/*.json",
+    "./catalogs/*": "./dist/generated/catalogs/*.json",
+    "./assets/*": "./dist/assets/*",
+    "./package.json": "./package.json"
+  },
+  "bin": {
+    "cf-stickers": "./dist/cli.js"
+  },
+  "engines": {
+    "node": ">=24.11.0"
+  },
+  "scripts": {
+    "build": "npm run clean && tsc -p tsconfig.build.json && svelte-package -i src/svelte -o dist/svelte && node ./scripts/copy-assets.mjs && node ./scripts/mark-cli.mjs",
+    "clean": "node ./scripts/clean.mjs",
+    "generate": "npm run build --workspace @cofob/design-system-assets && node ./scripts/generate.mjs",
+    "typecheck": "tsc -p tsconfig.build.json --noEmit && svelte-check --tsconfig ./tsconfig.json",
+    "test": "vitest run"
+  },
+  "peerDependencies": {
+    "@cofob/design-system-react": ">=0.1.0 <1",
+    "@cofob/design-system-svelte": ">=0.1.0 <1",
+    "react": "^18.3.0 || ^19.0.0",
+    "svelte": "^5.0.0"
+  },
+  "peerDependenciesMeta": {
+    "@cofob/design-system-react": {
+      "optional": true
+    },
+    "@cofob/design-system-svelte": {
+      "optional": true
+    },
+    "react": {
+      "optional": true
+    },
+    "svelte": {
+      "optional": true
+    }
+  },
+  "devDependencies": {
+    "@cofob/design-system-assets": "0.1.0",
+    "@cofob/design-system-react": ">=0.1.1 <1",
+    "@cofob/design-system-svelte": ">=0.1.1 <1",
+    "@sveltejs/package": "^2.3.7",
+    "@sveltejs/vite-plugin-svelte": "^6.0.0",
+    "@types/node": "^24.0.0",
+    "@types/react": "^19.1.8",
+    "react": "^19.1.0",
+    "sharp": "^0.35.3",
+    "svelte": "^5.0.0",
+    "svelte-check": "^4.0.0",
+    "svgo": "^4.0.0",
+    "typescript": "^5.9.2",
+    "vite": "^7.0.0",
+    "vitest": "^3.2.4"
+  }
+}

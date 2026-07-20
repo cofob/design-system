@@ -12,6 +12,9 @@ const componentNames = new Set(
 );
 
 const packageSources = {
+  "@cofob/design-system-assets": {
+    ".": "packages/design-system-assets/src/index.ts",
+  },
   "@cofob/design-system-css": {
     ".": "packages/design-system-css/src/index.ts",
     "./types": "packages/design-system-css/src/types.ts",
@@ -25,6 +28,22 @@ const packageSources = {
   "@cofob/design-system-svelte": {
     ".": "packages/design-system-svelte/src/lib/index.ts",
   },
+  "@cofob/design-system-stickers": {
+    ".": "packages/design-system-stickers/src/index.ts",
+    "./react": "packages/design-system-stickers/src/react/index.tsx",
+    "./svelte": "packages/design-system-stickers/src/svelte/index.ts",
+  },
+};
+
+const dataEntrypoints = {
+  "@cofob/design-system-stickers": new Set([
+    "./react/*",
+    "./svelte/*",
+    "./stickers/*",
+    "./manifests/*",
+    "./catalogs/*",
+    "./assets/*",
+  ]),
 };
 
 function hasExportModifier(node) {
@@ -126,8 +145,11 @@ for (const [packageName, entrypointSources] of Object.entries(packageSources)) {
 
   const packageDirectory = entrypointSources["."].split("/src/")[0];
   const packageJson = JSON.parse(await readFile(`${packageDirectory}/package.json`, "utf8"));
+  const ignoredEntrypoints = dataEntrypoints[packageName] ?? new Set();
   const publishedEntrypoints = new Set(
-    Object.keys(packageJson.exports).filter((specifier) => specifier !== "./package.json"),
+    Object.keys(packageJson.exports).filter(
+      (specifier) => specifier !== "./package.json" && !ignoredEntrypoints.has(specifier),
+    ),
   );
   const documentedEntrypoints = new Set(packageEntry.entrypoints.map((entrypoint) => entrypoint.specifier));
   const missingEntrypoints = publishedEntrypoints.difference(documentedEntrypoints);

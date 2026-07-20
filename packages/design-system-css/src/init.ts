@@ -1,4 +1,5 @@
 import { createAccordionController } from "./accordion.js";
+import { createAnimatedStickerController } from "./animated-sticker.js";
 import { createCopyController } from "./copy.js";
 import { createDialogController } from "./dialog.js";
 import { addListener, createCleanup, defaultRoot, queryAll } from "./internal/dom.js";
@@ -33,6 +34,11 @@ export function initDesignSystem(root: DesignSystemRoot | null = defaultRoot()):
 
   const controllers: Controller[] = [];
   controllers.push(createCopyController(root));
+  for (const element of queryAll<HTMLElement>(root, "[data-cf-animated-sticker]")) {
+    if (!element.hasAttribute("data-cf-animated-sticker-managed")) {
+      controllers.push(createAnimatedStickerController(element));
+    }
+  }
   for (const element of queryAll<HTMLElement>(root, "[data-cf-navbar]")) {
     if (!element.hasAttribute("data-cf-navbar-managed")) controllers.push(createNavbarController(element));
   }

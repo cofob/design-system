@@ -241,6 +241,11 @@
         "name": "Sticker",
         "description": "Attributed sticker figure with required alternative text.",
         "interactive": true
+      },
+      {
+        "name": "AnimatedSticker",
+        "description": "Converted Telegram animation with an inline first-frame SVG fallback.",
+        "interactive": true
       }
     ]
   }

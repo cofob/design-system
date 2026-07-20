@@ -1,5 +1,6 @@
 import type { Snippet } from "svelte";
 import type {
+  AnimatedStickerModel as CssAnimatedStickerModel,
   ChatMessageModel,
   ChatModel,
   CaptchaLabels as CssCaptchaLabels,
@@ -18,6 +19,7 @@ export type Tone = CssTone;
 export type ThemePreference = CssThemePreference;
 export type CaptchaState = CssCaptchaState;
 export type CaptchaLabels = CssCaptchaLabels;
+export type AnimatedStickerModel = CssAnimatedStickerModel;
 export type { ChatMessageModel, ChatModel, LinkModel, PostModel, ResponsiveImageModel, TerminalCodeEntry };
 export type ButtonVariant = "primary" | "secondary" | "ghost" | "danger";
 

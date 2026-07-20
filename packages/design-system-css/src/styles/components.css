@@ -2972,6 +2972,59 @@
     object-fit: contain;
   }
 
+  .cf-animated-sticker {
+    position: relative;
+    display: inline-grid;
+    inline-size: clamp(8rem, 32vw, 10rem);
+    max-inline-size: 100%;
+    aspect-ratio: 1;
+    overflow: hidden;
+    vertical-align: middle;
+    isolation: isolate;
+  }
+
+  .cf-animated-sticker__skeleton,
+  .cf-animated-sticker video {
+    display: block;
+    inline-size: 100%;
+    block-size: 100%;
+    grid-area: 1 / 1;
+  }
+
+  .cf-animated-sticker__skeleton {
+    opacity: 1;
+    transition: opacity var(--cf-duration-normal) var(--cf-ease-standard);
+  }
+
+  .cf-animated-sticker__skeleton > svg {
+    display: block;
+    inline-size: 100%;
+    block-size: 100%;
+  }
+
+  .cf-animated-sticker video {
+    z-index: 1;
+    opacity: 0;
+    object-fit: contain;
+    pointer-events: none;
+    transition: opacity var(--cf-duration-normal) var(--cf-ease-standard);
+  }
+
+  .cf-animated-sticker[data-state="playing"] .cf-animated-sticker__skeleton {
+    opacity: 0;
+  }
+
+  .cf-animated-sticker[data-state="playing"] video {
+    opacity: 1;
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .cf-animated-sticker__skeleton,
+    .cf-animated-sticker video {
+      transition: none;
+    }
+  }
+
   /* Presentational CAPTCHA. State is controlled by the consumer; no verification logic lives here. */
   .cf-captcha {
     --cf-captcha-duration: calc(var(--cf-duration-slow) + var(--cf-duration-fast));

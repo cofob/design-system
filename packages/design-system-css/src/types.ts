@@ -40,6 +40,14 @@ export interface ResponsiveImageModel {
   height?: number;
 }
 
+/** Output of the trusted build-time TGS converter consumed by AnimatedSticker. */
+export interface AnimatedStickerModel {
+  src: string;
+  skeletonSvg: string;
+  width: number;
+  height: number;
+}
+
 export interface PostModel {
   slug?: string;
   href: string;

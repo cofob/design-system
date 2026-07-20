@@ -4,6 +4,57 @@ import { tmpdir } from "node:os";
 import path from "node:path";
 
 const packageRequirements = {
+  "@cofob/design-system-assets": {
+    files: [
+      "LICENSE",
+      "README.md",
+      "dist/index.js",
+      "dist/index.d.ts",
+      "dist/cli.js",
+      "dist/cli.d.ts",
+      "dist/types.js",
+      "dist/types.d.ts",
+    ],
+    patterns: [
+      { description: "compiled JavaScript", test: (file) => /^dist\/.+\.js$/.test(file) },
+      { description: "TypeScript declarations", test: (file) => /^dist\/.+\.d\.ts$/.test(file) },
+    ],
+  },
+  "@cofob/design-system-stickers": {
+    files: [
+      "LICENSE",
+      "README.md",
+      "THIRD_PARTY_NOTICES.md",
+      "dist/index.js",
+      "dist/index.d.ts",
+      "dist/react/index.js",
+      "dist/react/index.d.ts",
+      "dist/svelte/index.js",
+      "dist/svelte/index.d.ts",
+      "dist/cli.js",
+    ],
+    patterns: [
+      { description: "optimized WebP sticker assets", test: (file) => /^dist\/assets\/.+\.webp$/.test(file) },
+      { description: "optimized WebM sticker assets", test: (file) => /^dist\/assets\/.+\.webm$/.test(file) },
+      {
+        description: "per-pack sticker catalogs",
+        test: (file) => /^dist\/generated\/catalogs\/.+\.json$/.test(file),
+      },
+      {
+        description: "per-sticker manifests",
+        test: (file) => /^dist\/generated\/manifests\/.+\.json$/.test(file),
+      },
+      {
+        description: "per-sticker metadata exports",
+        test: (file) => /^dist\/generated\/stickers\/.+\.js$/.test(file),
+      },
+      { description: "generated React exports", test: (file) => file === "dist/react/index.js" },
+      {
+        description: "generated Svelte components",
+        test: (file) => /^dist\/svelte\/generated\/.+\.svelte$/.test(file),
+      },
+    ],
+  },
   "@cofob/design-system-css": {
     files: [
       "LICENSE",
@@ -53,7 +104,13 @@ const packageRequirements = {
   },
 };
 
-const packageDirectories = ["design-system-css", "design-system-react", "design-system-svelte"];
+const packageDirectories = [
+  "design-system-assets",
+  "design-system-stickers",
+  "design-system-css",
+  "design-system-react",
+  "design-system-svelte",
+];
 
 function parsePackResult(stdout, packageName) {
   const jsonStart = stdout.lastIndexOf("\n[");
@@ -71,7 +128,8 @@ function parsePackResult(stdout, packageName) {
 
 function collectExportTargets(value, targets = []) {
   if (typeof value === "string") {
-    if (value.startsWith("./") && value !== "./package.json") targets.push(value.slice(2));
+    if (value.startsWith("./") && value !== "./package.json" && !value.includes("*"))
+      targets.push(value.slice(2));
     return targets;
   }
   if (!value || typeof value !== "object") return targets;

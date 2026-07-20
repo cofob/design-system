@@ -57,6 +57,7 @@ const expected = [
   "MediaGrid",
   "ChatThread",
   "Sticker",
+  "AnimatedSticker",
 ];
 
 for (const name of expected) {

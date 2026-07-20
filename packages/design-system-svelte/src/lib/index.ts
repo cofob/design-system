@@ -53,11 +53,13 @@ export { default as InlineEmoji } from "./components/InlineEmoji.svelte";
 export { default as MediaGrid } from "./components/MediaGrid.svelte";
 export { default as ChatThread } from "./components/ChatThread.svelte";
 export { default as Sticker } from "./components/Sticker.svelte";
+export { default as AnimatedSticker } from "./components/AnimatedSticker.svelte";
 
 export { toast, dismissToast, clearToasts, toasts } from "./toast.js";
 export { applyTheme, resolvedTheme } from "./theme-context.js";
 export type {
   AccordionItem,
+  AnimatedStickerModel,
   ButtonVariant,
   CaptchaLabels,
   CaptchaState,
