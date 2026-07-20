@@ -1,0 +1,296 @@
+@import url("asciinema-player/dist/bundle/asciinema-player.css");
+
+.cf-asciinema-player {
+  container-type: inline-size;
+  inline-size: 100%;
+  min-inline-size: 0;
+  margin: 0;
+}
+
+.cf-asciinema-player__stage {
+  inline-size: 100%;
+  min-inline-size: 0;
+  overflow: hidden;
+  border-color: var(--cf-color-border);
+  border-radius: var(--cf-radius-lg);
+  background: var(--cf-color-canvas);
+}
+
+/* stylelint-disable selector-class-pattern -- These selectors are part of asciinema-player's public CSS contract. */
+/* stylelint-disable custom-property-pattern -- These custom properties are part of asciinema-player's theme contract. */
+
+.cf-asciinema-player [data-cf-asciinema-player-mount],
+.cf-asciinema-player div.ap-wrapper {
+  inline-size: 100%;
+  min-inline-size: 0;
+}
+
+.cf-asciinema-player div.ap-wrapper {
+  block-size: auto;
+}
+
+.cf-asciinema-player div.ap-player {
+  border-radius: var(--cf-radius-lg);
+  font-family: var(--cf-font-mono);
+}
+
+.cf-asciinema-player .ap-default-term-ff {
+  --term-font-family: var(--cf-font-mono);
+}
+
+.cf-asciinema-player .asciinema-player-theme-cofob {
+  --term-color-foreground: var(--cf-color-text);
+  --term-color-background: var(--cf-color-canvas);
+  --term-color-0: var(--cf-terminal-foreground-0);
+  --term-color-1: var(--cf-terminal-foreground-1);
+  --term-color-2: var(--cf-terminal-foreground-2);
+  --term-color-3: var(--cf-terminal-foreground-3);
+  --term-color-4: var(--cf-terminal-foreground-4);
+  --term-color-5: var(--cf-terminal-foreground-5);
+  --term-color-6: var(--cf-terminal-foreground-6);
+  --term-color-7: var(--cf-terminal-foreground-7);
+  --term-color-8: var(--cf-terminal-foreground-8);
+  --term-color-9: var(--cf-terminal-foreground-9);
+  --term-color-10: var(--cf-terminal-foreground-10);
+  --term-color-11: var(--cf-terminal-foreground-11);
+  --term-color-12: var(--cf-terminal-foreground-12);
+  --term-color-13: var(--cf-terminal-foreground-13);
+  --term-color-14: var(--cf-terminal-foreground-14);
+  --term-color-15: var(--cf-terminal-foreground-15);
+}
+
+.cf-asciinema-player div.ap-player div.ap-control-bar {
+  inset-inline: var(--cf-space-2);
+  bottom: var(--cf-space-2);
+  inline-size: auto;
+  min-block-size: var(--cf-control-height-md);
+  box-sizing: border-box;
+  align-items: center;
+  border: 1px solid color-mix(in srgb, var(--cf-color-text-inverse) 18%, transparent);
+  border-radius: var(--cf-radius-lg);
+  background: color-mix(in srgb, var(--cf-color-surface-inverse) 88%, transparent);
+  color: var(--cf-color-text-inverse);
+  padding: var(--cf-space-2);
+  pointer-events: none;
+  transform: translateY(var(--cf-space-1));
+  transition:
+    opacity var(--cf-duration-fast) var(--cf-ease-standard),
+    transform var(--cf-duration-fast) var(--cf-ease-standard);
+  backdrop-filter: blur(var(--cf-space-2));
+}
+
+.cf-asciinema-player div.ap-wrapper.ap-hud .ap-control-bar {
+  opacity: 1;
+  pointer-events: auto;
+  transform: translateY(0);
+}
+
+.cf-asciinema-player div.ap-control-bar button.ap-button {
+  display: inline-grid;
+  flex: 0 0 var(--cf-control-height-sm);
+  inline-size: var(--cf-control-height-sm);
+  block-size: var(--cf-control-height-sm);
+  place-items: center;
+  margin: 0;
+  border-radius: var(--cf-radius-md);
+  padding: var(--cf-space-2);
+  transition:
+    background-color var(--cf-duration-fast) var(--cf-ease-standard),
+    color var(--cf-duration-fast) var(--cf-ease-standard),
+    transform var(--cf-duration-fast) var(--cf-ease-standard);
+}
+
+.cf-asciinema-player div.ap-control-bar button.ap-button:hover {
+  background: color-mix(in srgb, var(--cf-color-text-inverse) 12%, transparent);
+  color: var(--cf-color-accent);
+}
+
+.cf-asciinema-player div.ap-control-bar button.ap-button:active {
+  background: color-mix(in srgb, var(--cf-color-text-inverse) 18%, transparent);
+  color: var(--cf-color-accent);
+  transform: scale(0.94);
+}
+
+.cf-asciinema-player div.ap-control-bar button.ap-button svg {
+  inline-size: 1rem;
+  block-size: 1rem;
+}
+
+.cf-asciinema-player div.ap-control-bar button.ap-kbd-button svg {
+  inline-size: 1.125rem;
+}
+
+.cf-asciinema-player div.ap-control-bar svg.ap-icon path {
+  fill: currentcolor;
+}
+
+.cf-asciinema-player div.ap-control-bar span.ap-timer {
+  min-inline-size: 3.25rem;
+  block-size: var(--cf-control-height-sm);
+  margin-inline: var(--cf-space-1);
+  color: currentcolor;
+  font-size: var(--cf-font-size-xs);
+}
+
+.cf-asciinema-player div.ap-control-bar span.ap-timer span {
+  font-family: var(--cf-font-mono);
+  font-weight: var(--cf-font-weight-semibold);
+}
+
+.cf-asciinema-player div.ap-control-bar .ap-progressbar {
+  block-size: var(--cf-control-height-sm);
+  padding-inline: var(--cf-space-2);
+}
+
+.cf-asciinema-player div.ap-control-bar .ap-progressbar .ap-bar .ap-gutter {
+  inset-block-start: calc(50% - 0.1875rem);
+  block-size: 0.375rem;
+  border-radius: var(--cf-radius-full);
+}
+
+.cf-asciinema-player div.ap-control-bar .ap-progressbar .ap-bar .ap-gutter-empty {
+  background: color-mix(in srgb, var(--cf-color-text-inverse) 38%, transparent);
+}
+
+.cf-asciinema-player div.ap-control-bar .ap-progressbar .ap-bar .ap-gutter-full {
+  background: var(--cf-color-accent);
+}
+
+:root[data-theme="dark"] .cf-asciinema-player div.ap-player div.ap-control-bar {
+  border-color: var(--cf-color-border);
+  background: color-mix(in srgb, var(--cf-color-surface-raised) 92%, transparent);
+  box-shadow: var(--cf-shadow-md);
+  color: var(--cf-color-text);
+}
+
+:root[data-theme="dark"] .cf-asciinema-player div.ap-control-bar button.ap-button:hover {
+  background: var(--cf-color-accent-soft);
+  color: var(--cf-color-accent);
+}
+
+:root[data-theme="dark"] .cf-asciinema-player div.ap-control-bar button.ap-button:active {
+  background: var(--cf-color-accent-soft-hover);
+  color: var(--cf-color-accent-active);
+}
+
+:root[data-theme="dark"] .cf-asciinema-player div.ap-control-bar .ap-progressbar .ap-bar .ap-gutter-empty {
+  background: var(--cf-color-border-strong);
+}
+
+.cf-asciinema-player span.ap-marker-container span.ap-marker,
+.cf-asciinema-player span.ap-marker-container span.ap-marker.ap-marker-past {
+  background: var(--cf-color-accent);
+}
+
+.cf-asciinema-player .ap-tooltip-container span.ap-tooltip {
+  bottom: calc(100% + var(--cf-space-2));
+  border: 1px solid var(--cf-color-border);
+  border-radius: var(--cf-radius-md);
+  background: var(--cf-color-surface-raised);
+  box-shadow: var(--cf-shadow-md);
+  color: var(--cf-color-text);
+  font-family: var(--cf-font-sans);
+  font-size: var(--cf-font-size-xs);
+  font-weight: var(--cf-font-weight-semibold);
+  line-height: 1.4;
+  padding: var(--cf-space-1) var(--cf-space-2);
+}
+
+.cf-asciinema-player .ap-wrapper:focus-visible {
+  outline: 3px solid var(--cf-color-focus);
+  outline-offset: -3px;
+}
+
+.cf-asciinema-player .ap-button:focus-visible {
+  position: relative;
+  z-index: 1;
+  outline: 2px solid var(--cf-color-focus);
+  outline-offset: 1px;
+}
+
+.cf-asciinema-player .ap-player .ap-overlay-start .ap-play-button div span svg {
+  display: none;
+}
+
+.cf-asciinema-player .ap-overlay-start .ap-play-button span::before {
+  display: inline-block;
+  inline-size: 3.25rem;
+  block-size: 3.75rem;
+  background: var(--term-color-foreground);
+  clip-path: polygon(8% 0, 100% 50%, 8% 100%);
+  content: "";
+  filter: drop-shadow(
+    0 0 var(--cf-space-1) color-mix(in srgb, var(--term-color-background) 45%, transparent)
+  );
+}
+
+.cf-asciinema-player__fallback[hidden],
+.cf-asciinema-player__stage[hidden] {
+  display: none;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .cf-asciinema-player *,
+  .cf-asciinema-player *::before,
+  .cf-asciinema-player *::after {
+    scroll-behavior: auto !important;
+    transition-duration: 0.01ms !important;
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+  }
+}
+
+@container (inline-size < 26rem) {
+  .cf-asciinema-player div.ap-player div.ap-control-bar {
+    inset-inline: var(--cf-space-1);
+    bottom: var(--cf-space-1);
+  }
+
+  .cf-asciinema-player div.ap-control-bar span.ap-timer {
+    min-inline-size: 2.75rem;
+    margin-inline: 0;
+  }
+
+  .cf-asciinema-player div.ap-control-bar .ap-progressbar {
+    padding-inline: var(--cf-space-1);
+  }
+}
+
+@media (forced-colors: active) {
+  .cf-asciinema-player__stage,
+  .cf-asciinema-player .ap-control-bar {
+    border-color: CanvasText;
+  }
+
+  .cf-asciinema-player .ap-overlay-start .ap-play-button span::before {
+    background: ButtonText;
+    forced-color-adjust: none;
+  }
+
+  .cf-asciinema-player div.ap-player div.ap-control-bar {
+    border-color: CanvasText;
+    background: Canvas;
+    box-shadow: none;
+    color: CanvasText;
+  }
+
+  .cf-asciinema-player div.ap-control-bar button.ap-button:hover,
+  .cf-asciinema-player div.ap-control-bar button.ap-button:active {
+    background: Highlight;
+    color: HighlightText;
+  }
+
+  .cf-asciinema-player div.ap-control-bar .ap-progressbar .ap-bar .ap-gutter-full,
+  .cf-asciinema-player span.ap-marker-container span.ap-marker,
+  .cf-asciinema-player span.ap-marker-container span.ap-marker.ap-marker-past {
+    background: Highlight;
+  }
+
+  .cf-asciinema-player .ap-button:focus-visible,
+  .cf-asciinema-player .ap-wrapper:focus-visible {
+    outline-color: Highlight;
+  }
+}
+
+/* stylelint-enable custom-property-pattern */
+/* stylelint-enable selector-class-pattern */

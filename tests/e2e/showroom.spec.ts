@@ -675,6 +675,60 @@ test("CodeBlock and TerminalCodeBlock copy only their explicit sources", async (
   }
 });
 
+test("AsciinemaPlayer mounts and supports keyboard playback in every adapter", async ({ page, request }) => {
+  const recording = await request.get("/asciinema/design-system-demo.cast");
+  expect(recording.ok()).toBe(true);
+  expect(await recording.text()).toContain('"version":2');
+
+  await page.addInitScript(() => localStorage.setItem("cf-theme", "light"));
+  await page.goto("/components/asciinema-player/");
+
+  for (const framework of frameworkNames) {
+    const panel = await selectFramework(page, framework);
+    const root = panel.getByRole("figure", {
+      name: "cofob design system terminal demonstration",
+    });
+    await expect(root).toHaveAttribute("data-state", "ready");
+    await expect(root.locator(".asciinema-player-theme-cofob")).toHaveCount(1);
+    await expect(root.locator(".ap-term-text")).toContainText("cofob design system");
+    await expect(root.locator(".ap-overlay-start .ap-play-button svg")).toHaveCSS("display", "none");
+
+    const controls = root.locator(".ap-control-bar");
+    await root.locator(".ap-player").hover();
+    await expect(controls).toHaveCSS("opacity", "1");
+    await expect(controls).toHaveCSS("padding", "8px");
+    await expect(controls).toHaveCSS("border-radius", "12px");
+
+    const playback = root.getByRole("button", { name: "Play", exact: true });
+    await playback.focus();
+    await expect(playback).toBeFocused();
+    await page.keyboard.press("Enter");
+    await expect(root.getByRole("button", { name: "Pause", exact: true })).toBeVisible();
+    await page.keyboard.press("Enter");
+    await expect(root.getByRole("button", { name: "Play", exact: true })).toBeVisible();
+
+    const shortcuts = root.getByRole("button", { name: "Show keyboard shortcuts", exact: true });
+    await shortcuts.focus();
+    await page.keyboard.press("Enter");
+    await expect(root.getByText("Keyboard shortcuts", { exact: true })).toBeVisible();
+    await page.keyboard.press("Escape");
+    await expect(root.getByText("Keyboard shortcuts", { exact: true })).toBeHidden();
+  }
+
+  const nativePanel = await selectFramework(page, "Native");
+  const player = nativePanel.locator(".asciinema-player-theme-cofob");
+  const lightBackground = await player.evaluate((element) =>
+    getComputedStyle(element).getPropertyValue("--term-color-background").trim(),
+  );
+  await page.evaluate(() => {
+    document.documentElement.dataset.theme = "dark";
+  });
+  const darkBackground = await player.evaluate((element) =>
+    getComputedStyle(element).getPropertyValue("--term-color-background").trim(),
+  );
+  expect(darkBackground).not.toBe(lightBackground);
+});
+
 test("Native, React, and Svelte parity fixtures present the same content", async ({ page }) => {
   test.setTimeout(120_000);
 
@@ -1758,6 +1812,45 @@ test("@visual AnimatedSticker preserves its first frame under reduced motion", a
   await expect(root).toHaveAttribute("data-state", "reduced-motion");
   await expect(root.locator("video")).not.toHaveAttribute("src", /.+/u);
   await expect(panel).toHaveScreenshot("animated-sticker-reduced-motion.png");
+});
+
+test("@visual AsciinemaPlayer remains stable across themes and media preferences", async ({ page }) => {
+  await page.addInitScript(() => {
+    if (localStorage.getItem("cf-theme") === null) localStorage.setItem("cf-theme", "light");
+  });
+  await page.goto("/components/asciinema-player/");
+
+  const preview = page.locator("[data-framework-preview]");
+  const player = preview.locator('[data-framework-panel="native"] [data-cf-asciinema-player]');
+  await expect(player).toHaveAttribute("data-state", "ready");
+  await expect(player.locator(".ap-term-text")).toContainText("cofob design system");
+  await page.getByRole("tab", { name: "Native", exact: true }).hover();
+  await expect(preview).toHaveScreenshot("asciinema-player-light.png");
+  await player.locator(".ap-player").hover();
+  await expect(player.locator(".ap-control-bar")).toHaveCSS("opacity", "1");
+  await expect(preview).toHaveScreenshot("asciinema-player-controls-light.png");
+
+  await page.evaluate(() => localStorage.setItem("cf-theme", "dark"));
+  await page.reload();
+  await expect(page.locator("html")).toHaveAttribute("data-theme", "dark");
+  await expect(player).toHaveAttribute("data-state", "ready");
+  await expect(player.locator(".ap-term-text")).toContainText("cofob design system");
+  await page.getByRole("tab", { name: "Native", exact: true }).hover();
+  await expect(preview).toHaveScreenshot("asciinema-player-dark.png");
+  await player.locator(".ap-player").hover();
+  await expect(player.locator(".ap-control-bar")).toHaveCSS("opacity", "1");
+  await expect(preview).toHaveScreenshot("asciinema-player-controls-dark.png");
+
+  await page.getByRole("tab", { name: "Native", exact: true }).hover();
+  await page.emulateMedia({ reducedMotion: "reduce" });
+  await expect(preview).toHaveScreenshot("asciinema-player-reduced-motion.png");
+
+  await page.emulateMedia({ forcedColors: "active", reducedMotion: "no-preference" });
+  await player.locator(".ap-player").hover();
+  await expect(player.locator(".ap-control-bar")).toHaveCSS("opacity", "1");
+  await expect(preview).toHaveScreenshot("asciinema-player-forced-colors.png", {
+    maxDiffPixelRatio: 0,
+  });
 });
 
 test("@visual React and Svelte representative states remain stable", async ({ page }) => {

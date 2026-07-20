@@ -1572,6 +1572,209 @@
       ]
     },
     {
+      "id": "asciinema-player",
+      "name": "@cofob/design-system-asciinema-player",
+      "label": "Asciinema player",
+      "description": "SSR-safe Native, React, and Svelte terminal-recording player adapters with design-system presentation.",
+      "entrypoints": [
+        {
+          "specifier": ".",
+          "kind": "JavaScript",
+          "summary": "Framework-neutral controller, lifecycle contracts, labels, and upstream player types."
+        },
+        {
+          "specifier": "./react",
+          "kind": "React",
+          "summary": "Client-lifecycle React component with an SSR-rendered design-system fallback."
+        },
+        {
+          "specifier": "./svelte",
+          "kind": "Svelte",
+          "summary": "Svelte 5 component with bindable player state and SSR-rendered fallback."
+        },
+        {
+          "specifier": "./styles.css",
+          "kind": "CSS",
+          "summary": "Upstream player CSS plus token-driven cofob theme and accessibility overrides."
+        }
+      ],
+      "groups": [
+        {
+          "title": "Controller and shell",
+          "description": "Mount the browser-only upstream player into a portable, server-rendered data-attribute shell.",
+          "items": [
+            {
+              "name": "createAsciinemaPlayerController",
+              "kind": "function",
+              "signature": "createAsciinemaPlayerController(root, config): AsciinemaPlayerController",
+              "summary": "Dynamically imports and mounts the player, updates fallback state, and returns deterministic cleanup.",
+              "entrypoints": ["."]
+            },
+            {
+              "name": "AsciinemaPlayerController",
+              "kind": "interface",
+              "signature": "interface AsciinemaPlayerController { ready; player; destroy() }",
+              "summary": "Current upstream handle, mount promise, and idempotent disposal contract.",
+              "entrypoints": ["."]
+            },
+            {
+              "name": "AsciinemaPlayerConfig",
+              "kind": "interface",
+              "signature": "interface AsciinemaPlayerConfig",
+              "summary": "Source, upstream options, fallback, labels, and lifecycle callbacks used by the controller.",
+              "entrypoints": ["."]
+            },
+            {
+              "name": "AsciinemaPlayerLabels",
+              "kind": "interface",
+              "signature": "interface AsciinemaPlayerLabels",
+              "summary": "Portable loading, error, and fallback-link copy shared by every adapter.",
+              "entrypoints": ["."]
+            },
+            {
+              "name": "DEFAULT_ASCIINEMA_PLAYER_LABELS",
+              "kind": "constant",
+              "signature": "const DEFAULT_ASCIINEMA_PLAYER_LABELS: Readonly<AsciinemaPlayerLabels>",
+              "summary": "English default copy for the player fallback shell.",
+              "entrypoints": ["."]
+            },
+            {
+              "name": "resolveAsciinemaPlayerLabels",
+              "kind": "function",
+              "signature": "resolveAsciinemaPlayerLabels(labels?): AsciinemaPlayerLabels",
+              "summary": "Merges partial consumer copy with the immutable English defaults.",
+              "entrypoints": ["."]
+            }
+          ]
+        },
+        {
+          "title": "Upstream player contracts",
+          "description": "The supported asciinema-player 3.17.0 source, option, control, parser, and event types.",
+          "items": [
+            {
+              "name": "Source",
+              "kind": "type",
+              "signature": "type Source = string | UrlSource | DataSource",
+              "summary": "Recording URL, URL configuration, or in-memory recording source.",
+              "entrypoints": ["."]
+            },
+            {
+              "name": "UrlSource",
+              "kind": "interface",
+              "signature": "interface UrlSource",
+              "summary": "URL-backed source with fetch, parser, encoding, and timing controls.",
+              "entrypoints": ["."]
+            },
+            {
+              "name": "DataSource",
+              "kind": "interface",
+              "signature": "interface DataSource",
+              "summary": "Immediate or lazily produced recording data with parser controls.",
+              "entrypoints": ["."]
+            },
+            {
+              "name": "Options",
+              "kind": "interface",
+              "signature": "interface Options",
+              "summary": "Complete upstream playback, sizing, controls, terminal, theme, audio, and logging options.",
+              "entrypoints": ["."]
+            },
+            {
+              "name": "Player",
+              "kind": "interface",
+              "signature": "interface Player",
+              "summary": "Imperative playback, seeking, timing, event, element, and disposal handle.",
+              "entrypoints": ["."]
+            },
+            {
+              "name": "SeekLocation",
+              "kind": "type",
+              "signature": "type SeekLocation = number | percentage | marker location",
+              "summary": "Absolute, percentage, or marker-relative destination accepted by Player.seek.",
+              "entrypoints": ["."]
+            },
+            {
+              "name": "Marker",
+              "kind": "type",
+              "signature": "type Marker = number | [time, label]",
+              "summary": "Unlabelled or labelled timeline marker supplied through options.",
+              "entrypoints": ["."]
+            },
+            {
+              "name": "InputEvent",
+              "kind": "interface",
+              "signature": "interface InputEvent { data: string }",
+              "summary": "Recorded terminal input payload emitted by the player.",
+              "entrypoints": ["."]
+            },
+            {
+              "name": "MarkerEvent",
+              "kind": "interface",
+              "signature": "interface MarkerEvent { index; time; label }",
+              "summary": "Marker index, timestamp, and label emitted during playback.",
+              "entrypoints": ["."]
+            },
+            {
+              "name": "Logger",
+              "kind": "interface",
+              "signature": "interface Logger",
+              "summary": "Console-compatible logging sink accepted by upstream options.",
+              "entrypoints": ["."]
+            },
+            {
+              "name": "BuiltInParser",
+              "kind": "type",
+              "signature": "type BuiltInParser = asciicast | typescript | ttyrec",
+              "summary": "Names of the recording parsers included by asciinema-player.",
+              "entrypoints": ["."]
+            },
+            {
+              "name": "Parser",
+              "kind": "type",
+              "signature": "type Parser = (data, options) => Recording | Promise<Recording>",
+              "summary": "Custom recording parser callback contract.",
+              "entrypoints": ["."]
+            },
+            {
+              "name": "ParserOptions",
+              "kind": "interface",
+              "signature": "interface ParserOptions { encoding: string }",
+              "summary": "Encoding context supplied to a custom parser.",
+              "entrypoints": ["."]
+            },
+            {
+              "name": "Recording",
+              "kind": "interface",
+              "signature": "interface Recording",
+              "summary": "Normalized terminal dimensions, events, theme, and idle limit returned by parsers.",
+              "entrypoints": ["."]
+            },
+            {
+              "name": "RecordingData",
+              "kind": "type",
+              "signature": "type RecordingData",
+              "summary": "Text, buffer, response, array, or object input accepted by recording parsers.",
+              "entrypoints": ["."]
+            },
+            {
+              "name": "RecordingEvent",
+              "kind": "type",
+              "signature": "type RecordingEvent = [time, code, data]",
+              "summary": "Normalized timestamped event consumed by the terminal driver.",
+              "entrypoints": ["."]
+            },
+            {
+              "name": "RecordingEventCode",
+              "kind": "type",
+              "signature": "type RecordingEventCode = o | i | r | m",
+              "summary": "Output, input, resize, and marker recording-event discriminator.",
+              "entrypoints": ["."]
+            }
+          ]
+        }
+      ]
+    },
+    {
       "id": "stickers",
       "name": "@cofob/design-system-stickers",
       "label": "Sticker assets",

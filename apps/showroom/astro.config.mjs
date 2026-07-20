@@ -11,6 +11,7 @@ export default defineConfig({
   vite: {
     ssr: {
       noExternal: [
+        "@cofob/design-system-asciinema-player",
         "@cofob/design-system-css",
         "@cofob/design-system-react",
         "@cofob/design-system-svelte",

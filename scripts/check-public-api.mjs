@@ -15,6 +15,11 @@ const packageSources = {
   "@cofob/design-system-assets": {
     ".": "packages/design-system-assets/src/index.ts",
   },
+  "@cofob/design-system-asciinema-player": {
+    ".": "packages/design-system-asciinema-player/src/index.ts",
+    "./react": "packages/design-system-asciinema-player/src/react/index.tsx",
+    "./svelte": "packages/design-system-asciinema-player/src/svelte/index.ts",
+  },
   "@cofob/design-system-css": {
     ".": "packages/design-system-css/src/index.ts",
     "./types": "packages/design-system-css/src/types.ts",

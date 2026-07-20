@@ -10,6 +10,7 @@
   },
   "workspaces": [
     "packages/design-system-css",
+    "packages/design-system-asciinema-player",
     "packages/design-system-react",
     "packages/design-system-svelte",
     "packages/design-system-assets",
@@ -23,7 +24,7 @@
     "dev": "npm run dev --workspace @cofob/design-system-showroom",
     "build": "npm run build --workspaces --if-present",
     "typecheck": "npm run typecheck --workspaces --if-present",
-    "lint": "eslint . && stylelint \"packages/design-system-css/src/**/*.css\" \"apps/showroom/src/**/*.css\"",
+    "lint": "eslint . && stylelint \"packages/design-system-css/src/**/*.css\" \"packages/design-system-asciinema-player/src/**/*.css\" \"apps/showroom/src/**/*.css\"",
     "format": "prettier --write .",
     "format:check": "prettier --check .",
     "test": "npm run test:unit && npm run test:e2e",
@@ -36,14 +37,14 @@
     "check:docs": "node scripts/check-component-docs.mjs",
     "check:public-api": "node scripts/check-public-api.mjs",
     "pack:check": "node scripts/check-packages.mjs",
-    "check:publint": "publint packages/design-system-assets && publint packages/design-system-stickers && publint packages/design-system-css && publint packages/design-system-react && publint packages/design-system-svelte",
-    "check:exports": "attw --pack packages/design-system-assets --profile esm-only --entrypoints . && attw --pack packages/design-system-stickers --profile esm-only --entrypoints . ./react && attw --pack packages/design-system-css --profile esm-only --entrypoints . ./types && attw --pack packages/design-system-react --profile esm-only --entrypoints . ./static ./client ./types && attw --pack packages/design-system-svelte --profile esm-only --ignore-rules internal-resolution-error",
+    "check:publint": "publint packages/design-system-assets && publint packages/design-system-stickers && publint packages/design-system-css && publint packages/design-system-asciinema-player && publint packages/design-system-react && publint packages/design-system-svelte",
+    "check:exports": "attw --pack packages/design-system-assets --profile esm-only --entrypoints . && attw --pack packages/design-system-stickers --profile esm-only --entrypoints . ./react && attw --pack packages/design-system-css --profile esm-only --entrypoints . ./types && attw --pack packages/design-system-asciinema-player --profile esm-only --entrypoints . ./react && attw --pack packages/design-system-react --profile esm-only --entrypoints . ./static ./client ./types && attw --pack packages/design-system-svelte --profile esm-only --ignore-rules internal-resolution-error",
     "check:packages": "npm run pack:check && npm run check:publint && npm run check:exports",
     "check": "npm run check:styles && npm run check:manifest && npm run check:docs && npm run check:public-api && npm run build && npm run typecheck && npm run test:unit && npm run check:packages",
     "changeset": "changeset",
     "version-packages": "changeset version",
     "release": "npm run build && changeset publish",
-    "deploy:showroom": "npm run build --workspace @cofob/design-system-css && npm run build --workspace @cofob/design-system-react && npm run build --workspace @cofob/design-system-svelte && npm run build --workspace @cofob/design-system-assets && npm run build --workspace @cofob/design-system-stickers && npm run build --workspace @cofob/design-system-showroom && wrangler pages deploy apps/showroom/dist --project-name cofob-design-system --branch main"
+    "deploy:showroom": "npm run build --workspace @cofob/design-system-css && npm run build --workspace @cofob/design-system-react && npm run build --workspace @cofob/design-system-svelte && npm run build --workspace @cofob/design-system-asciinema-player && npm run build --workspace @cofob/design-system-assets && npm run build --workspace @cofob/design-system-stickers && npm run build --workspace @cofob/design-system-showroom && wrangler pages deploy apps/showroom/dist --project-name cofob-design-system --branch main"
   },
   "devDependencies": {
     "@arethetypeswrong/cli": "^0.18.2",

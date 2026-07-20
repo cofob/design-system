@@ -59,6 +59,7 @@ const expected = [
   "Sticker",
   "AnimatedSticker",
   "AnimatedStickerToggle",
+  "AsciinemaPlayer",
 ];
 
 for (const name of expected) {
@@ -80,6 +81,8 @@ for (const { sourcePath, source } of documentationSources) {
   }
 }
 
+const coreAdapterComponents = expected.filter((name) => name !== "AsciinemaPlayer");
+
 for (const sourcePaths of [
   [
     "packages/design-system-react/src/index.ts",
@@ -91,9 +94,19 @@ for (const sourcePaths of [
   const source = (await Promise.all(sourcePaths.map((sourcePath) => readFile(sourcePath, "utf8")))).join(
     "\n",
   );
-  for (const name of expected) {
+  for (const name of coreAdapterComponents) {
     if (!source.includes(name)) throw new Error(`${name} is not exported by ${sourcePaths[0]}`);
   }
 }
 
-console.log(`${names.length} public components are documented and exported by both adapters.`);
+for (const sourcePath of [
+  "packages/design-system-asciinema-player/src/react/index.tsx",
+  "packages/design-system-asciinema-player/src/svelte/index.ts",
+]) {
+  const source = await readFile(sourcePath, "utf8");
+  if (!source.includes("AsciinemaPlayer")) {
+    throw new Error(`AsciinemaPlayer is not exported by ${sourcePath}`);
+  }
+}
+
+console.log(`${names.length} public components are documented and exported by their adapters.`);

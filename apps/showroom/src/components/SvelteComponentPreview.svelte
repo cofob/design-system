@@ -56,6 +56,7 @@
     toast,
   } from "@cofob/design-system-svelte";
   import type { AnimatedStickerModel } from "@cofob/design-system-svelte";
+  import { AsciinemaPlayer } from "@cofob/design-system-asciinema-player/svelte";
   import { Plus } from "@lucide/svelte";
 
   interface Props {
@@ -201,6 +202,18 @@ applyTheme(preference);`;
   <CodeBlock code={codeBlockExample} language="typescript" copyable />
 {:else if name === "TerminalCodeBlock"}
   <TerminalCodeBlock entries={terminalEntries} />
+{:else if name === "AsciinemaPlayer"}
+  <AsciinemaPlayer
+    source="/asciinema/design-system-demo.cast"
+    options={{ cols: 72, rows: 9, poster: "npt:0.1", preload: true }}
+    label="cofob design system terminal demonstration"
+    fallbackHref="/asciinema/design-system-demo.cast"
+    labels={{
+      loadingTitle: "Terminal demonstration",
+      errorTitle: "Terminal player unavailable",
+      fallbackLink: "Open recording",
+    }}
+  />
 {:else if name === "Table"}
   <Table label="Package comparison" density="compact" striped minWidth="28rem">
     <thead>
