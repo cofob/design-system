@@ -1,5 +1,14 @@
 # @cofob/design-system-showroom
 
+## 0.1.5
+
+### Patch Changes
+
+- Updated dependencies [75df12b]
+  - @cofob/design-system-css@0.4.1
+  - @cofob/design-system-react@0.4.1
+  - @cofob/design-system-svelte@0.4.1
+
 ## 0.1.4
 
 ### Patch Changes

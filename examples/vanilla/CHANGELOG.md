@@ -1,5 +1,12 @@
 # @cofob/example-vanilla
 
+## 0.0.5
+
+### Patch Changes
+
+- Updated dependencies [75df12b]
+  - @cofob/design-system-css@0.4.1
+
 ## 0.0.4
 
 ### Patch Changes

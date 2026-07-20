@@ -1,5 +1,13 @@
 # @cofob/example-react
 
+## 0.0.5
+
+### Patch Changes
+
+- Updated dependencies [75df12b]
+  - @cofob/design-system-css@0.4.1
+  - @cofob/design-system-react@0.4.1
+
 ## 0.0.4
 
 ### Patch Changes

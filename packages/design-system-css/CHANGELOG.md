@@ -1,5 +1,11 @@
 # @cofob/design-system-css
 
+## 0.4.1
+
+### Patch Changes
+
+- 75df12b: Reduce vertical padding across all alert tones while preserving their horizontal inset.
+
 ## 0.4.0
 
 ### Minor Changes
