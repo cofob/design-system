@@ -66,4 +66,14 @@ describe("application and publishing CSS contracts", () => {
   it("keeps footer content inset from narrow viewport edges", () => {
     expect(componentStyles).toMatch(/\.cf-footer\s*\{[^}]*padding-inline:\s*var\(--cf-space-4\)/s);
   });
+
+  it("supports narrow, default, and full prose measures", () => {
+    expect(componentStyles).toMatch(
+      /\.cf-prose\s*\{[^}]*inline-size:\s*100%[^}]*max-inline-size:\s*var\(--cf-content-narrow\)/s,
+    );
+    expect(componentStyles).toMatch(
+      /\.cf-prose\[data-size="default"\]\s*\{[^}]*max-inline-size:\s*var\(--cf-content-default\)/s,
+    );
+    expect(componentStyles).toMatch(/\.cf-prose\[data-size="full"\]\s*\{[^}]*max-inline-size:\s*none/s);
+  });
 });

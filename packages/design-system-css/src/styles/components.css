@@ -311,10 +311,19 @@
   }
 
   .cf-prose {
+    inline-size: 100%;
     max-inline-size: var(--cf-content-narrow);
     color: var(--cf-color-text);
     font-size: var(--cf-font-size-md);
     line-height: 1.75;
+  }
+
+  .cf-prose[data-size="default"] {
+    max-inline-size: var(--cf-content-default);
+  }
+
+  .cf-prose[data-size="full"] {
+    max-inline-size: none;
   }
 
   .cf-prose :where(h1, h2, h3, h4) {

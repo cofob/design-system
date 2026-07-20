@@ -160,7 +160,7 @@ export function ReactComponentPreview({ name, animatedSticker }: Props) {
       return <DS.Link href="#installation">Read the installation guide</DS.Link>;
     case "Prose":
       return (
-        <DS.Prose className="astro-preview-copy">
+        <DS.Prose size="default">
           <h3>Long-form rhythm</h3>
           <p>
             Headings, paragraphs, links, and inline <code>code</code> share a comfortable reading measure.

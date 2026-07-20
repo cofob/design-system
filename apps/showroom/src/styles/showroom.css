@@ -245,7 +245,7 @@
   background-size: 12px 12px;
 }
 
-.astro-demo > * {
+.astro-demo > :not(.cf-prose) {
   min-inline-size: 0;
   max-width: 100%;
 }

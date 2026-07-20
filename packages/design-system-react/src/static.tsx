@@ -118,8 +118,12 @@ export const Link = forwardRef<HTMLAnchorElement, LinkProps>(function Link(
   );
 });
 
-export function Prose({ className, ...props }: HTMLAttributes<HTMLElement>) {
-  return <article className={cx("cf-prose", className)} {...props} />;
+export interface ProseProps extends HTMLAttributes<HTMLElement> {
+  size?: "narrow" | "default" | "full";
+}
+
+export function Prose({ size = "narrow", className, ...props }: ProseProps) {
+  return <article className={cx("cf-prose", className)} data-size={size} {...props} />;
 }
 
 export interface TableProps extends TableHTMLAttributes<HTMLTableElement> {

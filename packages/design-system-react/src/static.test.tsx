@@ -19,6 +19,7 @@ import {
   MediaGrid,
   Pagination,
   PostCard,
+  Prose,
   SearchResultCard,
   Select,
   Table,
@@ -26,6 +27,14 @@ import {
 } from "./static.js";
 
 describe("static components", () => {
+  it("exposes explicit prose width choices", () => {
+    const { container, rerender } = render(<Prose size="default">Article body</Prose>);
+    expect(container.querySelector(".cf-prose")).toHaveAttribute("data-size", "default");
+
+    rerender(<Prose size="full">Article body</Prose>);
+    expect(container.querySelector(".cf-prose")).toHaveAttribute("data-size", "full");
+  });
+
   it("renders without a browser and exposes semantic state", () => {
     const html = renderToString(<Button loading>Save</Button>);
     expect(html).toContain("cf-button");

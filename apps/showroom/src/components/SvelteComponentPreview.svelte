@@ -185,7 +185,7 @@ applyTheme(preference);`;
 {:else if name === "Link"}
   <Link href="#installation">Read the installation guide</Link>
 {:else if name === "Prose"}
-  <Prose class="astro-preview-copy">
+  <Prose size="default">
     <h3>Long-form rhythm</h3>
     <p>Headings, paragraphs, links, and inline <code>code</code> share a comfortable reading measure.</p>
   </Prose>

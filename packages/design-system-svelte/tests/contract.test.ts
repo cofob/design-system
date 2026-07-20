@@ -38,6 +38,7 @@ import Navbar from "../src/lib/components/Navbar.svelte";
 import LatestPostCard from "../src/lib/components/LatestPostCard.svelte";
 import PostCard from "../src/lib/components/PostCard.svelte";
 import Popover from "../src/lib/components/Popover.svelte";
+import Prose from "../src/lib/components/Prose.svelte";
 import ResponsiveImage from "../src/lib/components/ResponsiveImage.svelte";
 import Select from "../src/lib/components/Select.svelte";
 import Switch from "../src/lib/components/Switch.svelte";
@@ -106,6 +107,11 @@ const componentNames = [
 ] as const;
 
 describe("Svelte adapter contract", () => {
+  it("server-renders explicit prose width choices", () => {
+    const output = render(Prose, { props: { size: "default" } });
+    expect(output.body).toContain('class="cf-prose" data-size="default"');
+  });
+
   it("server-renders the animated sticker SVG inline without img or poster", () => {
     const sticker = {
       src: "/stickers/chris.123456789abc.webm",

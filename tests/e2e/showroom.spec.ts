@@ -539,6 +539,17 @@ test("Footer keeps horizontal padding on narrow viewports", async ({ page }) => 
   }
 });
 
+test("Prose exposes a wider default content measure", async ({ page }) => {
+  await page.goto("/components/prose/");
+
+  for (const framework of frameworkNames) {
+    const panel = await selectFramework(page, framework);
+    const prose = panel.locator(".cf-prose");
+    await expect(prose).toHaveAttribute("data-size", "default");
+    await expect(prose).toHaveCSS("max-inline-size", "1024px");
+  }
+});
+
 test("CodeBlock and TerminalCodeBlock copy only their explicit sources", async ({ page }) => {
   await page.addInitScript(() => {
     Object.defineProperty(navigator, "clipboard", {
