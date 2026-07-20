@@ -1,5 +1,18 @@
 # @cofob/design-system-svelte
 
+## 0.5.0
+
+### Minor Changes
+
+- 9de57cd: Render ANSI colors, text styles, and safe OSC 8 hyperlinks in terminal output across native, React, and Svelte presentations.
+- 3da25bd: Add radio groups, breadcrumbs, configurable linear and circular progress indicators, spinners, pulsing skeletons, separators, comboboxes, drawers, file uploads, sliders, steppers, and themed audio and video players across the CSS, React, and Svelte packages.
+
+### Patch Changes
+
+- Updated dependencies [9de57cd]
+- Updated dependencies [3da25bd]
+  - @cofob/design-system-css@0.5.0
+
 ## 0.4.1
 
 ### Patch Changes

@@ -1,5 +1,17 @@
 # @cofob/design-system-showroom
 
+## 0.1.6
+
+### Patch Changes
+
+- Updated dependencies [9a7141e]
+- Updated dependencies [9de57cd]
+- Updated dependencies [3da25bd]
+  - @cofob/design-system-asciinema-player@0.5.0
+  - @cofob/design-system-css@0.5.0
+  - @cofob/design-system-react@0.5.0
+  - @cofob/design-system-svelte@0.5.0
+
 ## 0.1.5
 
 ### Patch Changes
