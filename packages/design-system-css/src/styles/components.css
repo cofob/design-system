@@ -3433,6 +3433,10 @@
   }
 
   @media (width < 64.0625rem) {
+    .cf-section[data-spacing="lg"] {
+      margin-block: var(--cf-space-10);
+    }
+
     .cf-navbar[data-collapse-at="tablet"] {
       --cf-navbar-mobile-display: block;
       --cf-navbar-navigation-display: none;

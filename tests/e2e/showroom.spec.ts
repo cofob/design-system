@@ -550,6 +550,25 @@ test("Prose exposes a wider default content measure", async ({ page }) => {
   }
 });
 
+test("large Section spacing contracts at the tablet navbar breakpoint", async ({ page }) => {
+  await page.setViewportSize({ width: 900, height: 800 });
+  await page.goto("/components/section/");
+
+  for (const framework of frameworkNames) {
+    const panel = await selectFramework(page, framework);
+    const section = panel.locator(".cf-section");
+    await section.evaluate((element) => element.setAttribute("data-spacing", "lg"));
+    await expect(section).toHaveCSS("margin-top", "40px");
+    await expect(section).toHaveCSS("margin-bottom", "40px");
+  }
+
+  await page.setViewportSize({ width: 1100, height: 800 });
+  for (const framework of frameworkNames) {
+    const panel = await selectFramework(page, framework);
+    await expect(panel.locator('.cf-section[data-spacing="lg"]')).toHaveCSS("margin-top", "64px");
+  }
+});
+
 test("CodeBlock and TerminalCodeBlock copy only their explicit sources", async ({ page }) => {
   await page.addInitScript(() => {
     Object.defineProperty(navigator, "clipboard", {

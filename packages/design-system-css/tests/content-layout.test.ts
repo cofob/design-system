@@ -76,4 +76,10 @@ describe("application and publishing CSS contracts", () => {
     );
     expect(componentStyles).toMatch(/\.cf-prose\[data-size="full"\]\s*\{[^}]*max-inline-size:\s*none/s);
   });
+
+  it("reduces large section rhythm alongside the tablet navbar", () => {
+    expect(componentStyles).toMatch(
+      /@media \(width < 64\.0625rem\)\s*\{[\s\S]*?\.cf-section\[data-spacing="lg"\]\s*\{[^}]*margin-block:\s*var\(--cf-space-10\)/,
+    );
+  });
 });
