@@ -697,6 +697,13 @@ export function ReactComponentPreview({ name, animatedSticker }: Props) {
           </figcaption>
         </figure>
       ) : null;
+    case "AnimatedStickerToggle":
+      return (
+        <DS.AnimatedStickerToggle
+          label="Animated stickers"
+          description="Turn off WebM playback, persist the choice, and keep SVG/WebP first frames."
+        />
+      );
     default:
       return <p>React preview unavailable.</p>;
   }

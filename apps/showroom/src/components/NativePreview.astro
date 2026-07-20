@@ -1314,4 +1314,32 @@ const renderTerminalOutput = (output: string) => `<code>${escapeHtml(output)}</c
       </figure>
     )
   }
+  {
+    name === "AnimatedStickerToggle" && (
+      <label
+        class="cf-switch cf-animated-sticker-toggle"
+        data-cf-animated-sticker-toggle-root
+        data-size="md"
+        data-state="checked"
+      >
+        <input
+          class="cf-switch__control"
+          type="checkbox"
+          role="switch"
+          checked
+          aria-checked="true"
+          data-cf-animated-sticker-toggle
+        />
+        <span class="cf-switch__track" aria-hidden="true">
+          <span class="cf-switch__thumb" />
+        </span>
+        <span class="cf-switch__content">
+          <span class="cf-switch__label">Animated stickers</span>
+          <span class="cf-switch__description">
+            Turn off WebM playback, persist the choice, and keep SVG/WebP first frames.
+          </span>
+        </span>
+      </label>
+    )
+  }
 </div>

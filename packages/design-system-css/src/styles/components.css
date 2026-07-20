@@ -3013,10 +3013,15 @@
     transition: opacity var(--cf-duration-normal) var(--cf-ease-standard);
   }
 
-  .cf-animated-sticker__skeleton > svg {
+  .cf-animated-sticker__skeleton > svg,
+  .cf-animated-sticker__skeleton > img {
     display: block;
     inline-size: 100%;
     block-size: 100%;
+  }
+
+  .cf-animated-sticker__skeleton > img {
+    object-fit: contain;
   }
 
   .cf-animated-sticker video {
@@ -3027,12 +3032,22 @@
     transition: opacity var(--cf-duration-normal) var(--cf-ease-standard);
   }
 
-  .cf-animated-sticker[data-state="playing"] .cf-animated-sticker__skeleton {
+  .cf-animated-sticker[data-state="playing"] .cf-animated-sticker__skeleton,
+  .cf-animated-sticker[data-state="paused"] .cf-animated-sticker__skeleton {
     opacity: 0;
   }
 
-  .cf-animated-sticker[data-state="playing"] video {
+  .cf-animated-sticker[data-state="playing"] video,
+  .cf-animated-sticker[data-state="paused"] video {
     opacity: 1;
+  }
+
+  :root[data-cf-animated-stickers="disabled"] .cf-animated-sticker__skeleton {
+    opacity: 1;
+  }
+
+  :root[data-cf-animated-stickers="disabled"] .cf-animated-sticker video {
+    display: none;
   }
 
   @media (prefers-reduced-motion: reduce) {

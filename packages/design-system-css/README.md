@@ -96,6 +96,14 @@ Every controller exposes `destroy()`. Stateful controllers additionally expose
 imperative state methods; their public TypeScript declarations are included in
 the package.
 
+## Animated sticker preference
+
+`setAnimatedStickersEnabled(false)` unloads animated WebM stickers and preserves the choice in
+`localStorage` under `cf-animated-stickers`. Controllers restore it on the next page load before
+assigning any video `src`. Use `AnimatedStickerToggle` in React/Svelte or
+`createAnimatedStickerToggleController()` for native HTML. Vector animations retain their trusted
+inline SVG first frame; video-based animations use an optimized WebP first frame.
+
 ## Captcha presentation
 
 The `.cf-captcha` class contract exposes `idle`, `verifying`, `success`, and

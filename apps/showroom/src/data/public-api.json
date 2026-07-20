@@ -482,8 +482,8 @@
             {
               "name": "AnimatedStickerModel",
               "kind": "interface",
-              "signature": "interface AnimatedStickerModel { src; skeletonSvg; width; height }",
-              "summary": "Converted animation URL, trusted sanitized inline SVG first frame, and intrinsic dimensions.",
+              "signature": "type AnimatedStickerModel = { src; width; height } & ({ skeletonSvg } | { firstFrameSrc })",
+              "summary": "Converted animation URL, intrinsic dimensions, and an inline SVG or WebP first frame.",
               "entrypoints": [".", "./types"]
             },
             {
@@ -517,7 +517,7 @@
             {
               "name": "AnimatedStickerState",
               "kind": "type",
-              "signature": "type AnimatedStickerState = loading | playing | static | reduced-motion | fallback",
+              "signature": "type AnimatedStickerState = loading | playing | paused | static | disabled | reduced-motion | fallback",
               "summary": "Playback and inline-fallback states reflected on the animated sticker root.",
               "entrypoints": ["."]
             },
@@ -529,10 +529,66 @@
               "entrypoints": ["."]
             },
             {
+              "name": "AnimatedStickerToggleController",
+              "kind": "type",
+              "signature": "type AnimatedStickerToggleController = Controller",
+              "summary": "Cleanup contract for a native switch bound to the global animated sticker flag.",
+              "entrypoints": ["."]
+            },
+            {
+              "name": "AnimatedStickersEnabledListener",
+              "kind": "type",
+              "signature": "type AnimatedStickersEnabledListener = (enabled: boolean) => void",
+              "summary": "Subscriber notified whenever the global animated sticker flag changes.",
+              "entrypoints": ["."]
+            },
+            {
+              "name": "ANIMATED_STICKERS_ATTRIBUTE",
+              "kind": "constant",
+              "signature": "const ANIMATED_STICKERS_ATTRIBUTE = data-cf-animated-stickers",
+              "summary": "HTML attribute used as the document-wide animation opt-out flag.",
+              "entrypoints": ["."]
+            },
+            {
+              "name": "ANIMATED_STICKERS_STORAGE_KEY",
+              "kind": "constant",
+              "signature": "const ANIMATED_STICKERS_STORAGE_KEY = cf-animated-stickers",
+              "summary": "localStorage key used to preserve the global animated sticker preference across reloads.",
+              "entrypoints": ["."]
+            },
+            {
               "name": "createAnimatedStickerController",
               "kind": "function",
               "signature": "createAnimatedStickerController(root: HTMLElement): AnimatedStickerController",
-              "summary": "Lazily assigns the WebM at viewport intersection, reveals it on playing, and preserves inline SVG on failure or reduced motion.",
+              "summary": "Lazily assigns WebM in the viewport, pauses it outside, removes SVG after playing, and restores SVG for global or motion fallbacks.",
+              "entrypoints": ["."]
+            },
+            {
+              "name": "createAnimatedStickerToggleController",
+              "kind": "function",
+              "signature": "createAnimatedStickerToggleController(toggle: HTMLInputElement): AnimatedStickerToggleController",
+              "summary": "Connects a native checkbox switch to the document-wide animated sticker flag.",
+              "entrypoints": ["."]
+            },
+            {
+              "name": "getAnimatedStickersEnabled",
+              "kind": "function",
+              "signature": "getAnimatedStickersEnabled(root?: HTMLElement | null): boolean",
+              "summary": "Restores and reads whether animated WebM stickers are globally enabled; missing storage and markup default to true.",
+              "entrypoints": ["."]
+            },
+            {
+              "name": "setAnimatedStickersEnabled",
+              "kind": "function",
+              "signature": "setAnimatedStickersEnabled(enabled: boolean, root?: HTMLElement | null): void",
+              "summary": "Persists the preference and updates the global HTML flag, mounted stickers, and controls.",
+              "entrypoints": ["."]
+            },
+            {
+              "name": "subscribeAnimatedStickersEnabled",
+              "kind": "function",
+              "signature": "subscribeAnimatedStickersEnabled(listener, root?): () => void",
+              "summary": "Observes API updates and direct mutations of the global HTML flag.",
               "entrypoints": ["."]
             },
             {
@@ -714,7 +770,7 @@
               "name": "AnimatedStickerModel",
               "kind": "type",
               "signature": "type AnimatedStickerModel = CssAnimatedStickerModel",
-              "summary": "React-facing alias for a converted animated sticker and its trusted inline SVG skeleton.",
+              "summary": "React-facing alias for a converted animated sticker with an inline SVG or WebP first frame.",
               "entrypoints": [".", "./types"]
             },
             {
@@ -1108,6 +1164,13 @@
               "entrypoints": [".", "./client"]
             },
             {
+              "name": "AnimatedStickerToggleProps",
+              "kind": "interface",
+              "signature": "interface AnimatedStickerToggleProps { enabled?; defaultEnabled?; label?; description?; onEnabledChange? }",
+              "summary": "Controlled or default global animation state, visible copy, callback, and native input attributes.",
+              "entrypoints": [".", "./client"]
+            },
+            {
               "name": "CodeBlockProps",
               "kind": "interface",
               "signature": "interface CodeBlockProps",
@@ -1354,7 +1417,7 @@
               "name": "AnimatedStickerModel",
               "kind": "type",
               "signature": "type AnimatedStickerModel = CssAnimatedStickerModel",
-              "summary": "Svelte-facing alias for a converted animated sticker and its trusted inline SVG skeleton.",
+              "summary": "Svelte-facing alias for a converted animated sticker with an inline SVG or WebP first frame.",
               "entrypoints": ["."]
             },
             {
@@ -1557,9 +1620,23 @@
             },
             {
               "name": "AnimatedStickerAsset",
+              "kind": "type",
+              "signature": "type AnimatedStickerAsset = VectorAnimatedStickerAsset | VideoAnimatedStickerAsset",
+              "summary": "Full animated metadata with optimized WebM and an inline SVG or WebP first frame.",
+              "entrypoints": ["."]
+            },
+            {
+              "name": "VectorAnimatedStickerAsset",
               "kind": "interface",
-              "signature": "interface AnimatedStickerAsset",
-              "summary": "Full animated metadata including trusted inline SVG and optimized WebM information.",
+              "signature": "interface VectorAnimatedStickerAsset { sourceFormat: \"tgs\"; skeletonSvg; ... }",
+              "summary": "TGS-derived WebM metadata with a trusted inline SVG first frame.",
+              "entrypoints": ["."]
+            },
+            {
+              "name": "VideoAnimatedStickerAsset",
+              "kind": "interface",
+              "signature": "interface VideoAnimatedStickerAsset { sourceFormat: \"video\"; firstFrameAssetPath; firstFrameSrc; ... }",
+              "summary": "Video-derived WebM metadata with an optimized content-hashed WebP first frame.",
               "entrypoints": ["."]
             },
             {

@@ -54,6 +54,7 @@ export { default as MediaGrid } from "./components/MediaGrid.svelte";
 export { default as ChatThread } from "./components/ChatThread.svelte";
 export { default as Sticker } from "./components/Sticker.svelte";
 export { default as AnimatedSticker } from "./components/AnimatedSticker.svelte";
+export { default as AnimatedStickerToggle } from "./components/AnimatedStickerToggle.svelte";
 
 export { toast, dismissToast, clearToasts, toasts } from "./toast.js";
 export { applyTheme, resolvedTheme } from "./theme-context.js";

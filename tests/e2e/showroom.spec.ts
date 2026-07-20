@@ -795,7 +795,9 @@ test("Sticker includes the attributed cofob.dev image example in every adapter",
   }
 });
 
-test("AnimatedSticker ships its SVG in SSR and requests WebM only after intersection", async ({ page }) => {
+test("AnimatedSticker lazy-loads WebM, removes its SVG, and pauses outside the viewport", async ({
+  page,
+}) => {
   const stickerRequests: string[] = [];
   page.on("request", (request) => {
     if (request.url().includes("/stickers/animated-chris/")) stickerRequests.push(request.url());
@@ -833,13 +835,29 @@ test("AnimatedSticker ships its SVG in SSR and requests WebM only after intersec
       configurable: true,
       value: ControlledIntersectionObserver,
     });
+    Object.defineProperties(HTMLMediaElement.prototype, {
+      play: {
+        configurable: true,
+        value(this: HTMLMediaElement) {
+          this.dataset.playCalls = String(Number(this.dataset.playCalls ?? "0") + 1);
+          this.dispatchEvent(new Event("playing"));
+          return Promise.resolve();
+        },
+      },
+      pause: {
+        configurable: true,
+        value(this: HTMLMediaElement) {
+          this.dataset.pauseCalls = String(Number(this.dataset.pauseCalls ?? "0") + 1);
+        },
+      },
+    });
     (
       window as typeof window & {
-        __intersectAnimatedSticker: (target: Element) => void;
+        __intersectAnimatedSticker: (target: Element, isIntersecting?: boolean) => void;
       }
-    ).__intersectAnimatedSticker = (target) => {
+    ).__intersectAnimatedSticker = (target, isIntersecting = true) => {
       const record = records.find((candidate) => candidate.target === target);
-      record?.callback([{ isIntersecting: true, target } as IntersectionObserverEntry], record.observer);
+      record?.callback([{ isIntersecting, target } as IntersectionObserverEntry], record.observer);
     };
   });
 
@@ -864,7 +882,7 @@ test("AnimatedSticker ships its SVG in SSR and requests WebM only after intersec
     await root.evaluate((element) => {
       (
         window as typeof window & {
-          __intersectAnimatedSticker: (target: Element) => void;
+          __intersectAnimatedSticker: (target: Element, isIntersecting?: boolean) => void;
         }
       ).__intersectAnimatedSticker(element);
     });
@@ -872,6 +890,29 @@ test("AnimatedSticker ships its SVG in SSR and requests WebM only after intersec
       "src",
       /^\/stickers\/animated-chris\/animated-chris\.[a-f0-9]{12}\.webm$/u,
     );
+    await expect(video).toHaveAttribute("data-play-calls", "1");
+    await expect(root).toHaveAttribute("data-state", "playing");
+    await expect(root.locator(".cf-animated-sticker__skeleton")).toHaveCount(0);
+    await root.evaluate((element) => {
+      (
+        window as typeof window & {
+          __intersectAnimatedSticker: (target: Element, isIntersecting?: boolean) => void;
+        }
+      ).__intersectAnimatedSticker(element, false);
+    });
+    await expect(root).toHaveAttribute("data-state", "paused");
+    await expect(video).toHaveAttribute("data-pause-calls", "1");
+    await expect(root.locator(".cf-animated-sticker__skeleton")).toHaveCount(0);
+    await root.evaluate((element) => {
+      (
+        window as typeof window & {
+          __intersectAnimatedSticker: (target: Element, isIntersecting?: boolean) => void;
+        }
+      ).__intersectAnimatedSticker(element);
+    });
+    await expect(video).toHaveAttribute("data-play-calls", "2");
+    await expect(root).toHaveAttribute("data-state", "playing");
+    await expect(root.locator(".cf-animated-sticker__skeleton")).toHaveCount(0);
     const attribution = panel.getByRole("link", { name: "Крис анимированный", exact: true });
     await expect(attribution).toHaveAttribute("href", "https://t.me/addstickers/animated_chris");
 
@@ -884,8 +925,54 @@ test("AnimatedSticker ships its SVG in SSR and requests WebM only after intersec
     await expect(staticRoot.locator("video")).toHaveCount(0);
   }
 
+  await page.evaluate(() => {
+    document.documentElement.dataset.cfAnimatedStickers = "disabled";
+  });
+  for (const framework of frameworkNames) {
+    const panel = await selectFramework(page, framework);
+    const root = panel.getByRole("img", {
+      name: "Animated cartoon rat Chris from the ‘Крис анимированный’ Telegram sticker pack.",
+    });
+    await expect(root).toHaveAttribute("data-state", "disabled");
+    await expect(root.locator("video")).not.toHaveAttribute("src", /.+/u);
+    await expect(root.locator(".cf-animated-sticker__skeleton > svg")).toHaveCount(1);
+    await expect(
+      panel.getByRole("img", { name: "Static first frame of animated cartoon rat Chris." }).locator("svg"),
+    ).toHaveCount(1);
+  }
+
   expect(stickerRequests.some((url) => url.endsWith(".webm"))).toBe(true);
   expect(stickerRequests.some((url) => url.endsWith(".svg") || url.endsWith(".manifest.json"))).toBe(false);
+});
+
+test("AnimatedStickerToggle synchronizes the global flag across adapters", async ({ page }) => {
+  await page.goto("/components/animated-sticker-toggle/");
+
+  const nativePanel = await selectFramework(page, "Native");
+  const nativeToggle = nativePanel.getByRole("switch", { name: "Animated stickers" });
+  await expect(nativeToggle).toBeChecked();
+  await nativeToggle.click();
+  await expect(page.locator("html")).toHaveAttribute("data-cf-animated-stickers", "disabled");
+
+  const reactPanel = await selectFramework(page, "React");
+  const reactToggle = reactPanel.getByRole("switch", { name: "Animated stickers" });
+  await expect(reactToggle).not.toBeChecked();
+  await reactToggle.click();
+  await expect(page.locator("html")).toHaveAttribute("data-cf-animated-stickers", "enabled");
+
+  const sveltePanel = await selectFramework(page, "Svelte");
+  const svelteToggle = sveltePanel.getByRole("switch", { name: "Animated stickers" });
+  await expect(svelteToggle).toBeChecked();
+  await svelteToggle.click();
+  await expect(page.locator("html")).toHaveAttribute("data-cf-animated-stickers", "disabled");
+
+  await selectFramework(page, "Native");
+  await expect(nativeToggle).not.toBeChecked();
+
+  await page.reload();
+  await expect(page.locator("html")).toHaveAttribute("data-cf-animated-stickers", "disabled");
+  const reloadedNativePanel = await selectFramework(page, "Native");
+  await expect(reloadedNativePanel.getByRole("switch", { name: "Animated stickers" })).not.toBeChecked();
 });
 
 test("sticker gallery shards packs, lazy-loads WebM, and copies names or framework snippets", async ({
@@ -917,7 +1004,8 @@ test("sticker gallery shards packs, lazy-loads WebM, and copies names or framewo
   if (!response) throw new Error("Animated Chris gallery did not return an HTTP response.");
   const html = await response.text();
   expect(html.match(/class="astro-sticker-card"/gu)).toHaveLength(37);
-  expect(html.match(/<svg\b/gu)?.length).toBeGreaterThanOrEqual(36);
+  expect(html.match(/class="cf-animated-sticker__skeleton"[^>]*>[\s\S]*?<svg\b/gu)).toHaveLength(35);
+  expect(html.match(/first-frame\.[a-f0-9]{12}\.webp/gu)).toHaveLength(1);
   const videoTags = html.match(/<video\b[^>]*>/gu) ?? [];
   expect(videoTags).toHaveLength(36);
   expect(videoTags.every((tag) => !/\ssrc=/u.test(tag))).toBe(true);
@@ -955,6 +1043,17 @@ test("sticker gallery shards packs, lazy-loads WebM, and copies names or framewo
   await lastAnimated.scrollIntoViewIfNeeded();
   await expect(deferredVideo).toHaveAttribute("src", /\.webm$/u);
   expect(externalSkeletonRequests).toEqual([]);
+
+  const videoResponse = await page.goto("/stickers/vibe-flag/", { waitUntil: "domcontentloaded" });
+  if (!videoResponse) throw new Error("Vibe Flag gallery did not return an HTTP response.");
+  const videoHtml = await videoResponse.text();
+  expect(videoHtml.match(/first-frame\.[a-f0-9]{12}\.webp/gu)).toHaveLength(48);
+  expect(videoHtml.match(/class="cf-animated-sticker__skeleton"[^>]*>[\s\S]*?<img\b/gu)).toHaveLength(48);
+  const firstVideoCard = page.locator('.astro-sticker-card[data-sticker-kind="animated"]').first();
+  await expect(firstVideoCard.locator(".cf-animated-sticker__skeleton > img")).toHaveAttribute(
+    "src",
+    /first-frame\.[a-f0-9]{12}\.webp$/u,
+  );
 });
 
 test("BlueLine preserves the original marker geometry and motion in every adapter", async ({ page }) => {
