@@ -1,5 +1,16 @@
 # @cofob/design-system-svelte
 
+## 0.3.0
+
+### Minor Changes
+
+- 9440e47: Pause animated sticker video playback while the sticker is outside the viewport and resume it when the sticker becomes visible again. Remove the inline first-frame skeleton from the DOM after playback starts, restoring it for fallback states and controller cleanup. Add a global `data-cf-animated-stickers` flag, imperative helpers, and Native/React/Svelte `AnimatedStickerToggle` components that unload every WebM while leaving static SVG/WebP stickers available.
+
+### Patch Changes
+
+- Updated dependencies [9440e47]
+  - @cofob/design-system-css@0.3.0
+
 ## 0.2.0
 
 ### Minor Changes
