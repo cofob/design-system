@@ -1,5 +1,12 @@
 # @cofob/design-system-svelte
 
+## 0.4.1
+
+### Patch Changes
+
+- Updated dependencies [75df12b]
+  - @cofob/design-system-css@0.4.1
+
 ## 0.4.0
 
 ### Minor Changes
