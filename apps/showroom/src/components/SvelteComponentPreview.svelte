@@ -3,6 +3,7 @@
     Accordion,
     Alert,
     AnimatedSticker,
+    AnimatedStickerToggle,
     AppShell,
     Avatar,
     Badge,
@@ -521,6 +522,11 @@ applyTheme(preference);`;
       >
     </figcaption>
   </figure>
+{:else if name === "AnimatedStickerToggle"}
+  <AnimatedStickerToggle
+    label="Animated stickers"
+    description="Turn off WebM playback and keep static SVG/WebP stickers."
+  />
 {:else}
   <Alert title="Unknown component" tone="warning">No Svelte preview is registered for {name}.</Alert>
 {/if}

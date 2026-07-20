@@ -47,6 +47,23 @@ const componentImport = `import ${first.componentName} from "@cofob/design-syste
       Open original pack
     </a>
     <span class="cf-badge" data-tone="neutral">{catalog.pack.key}</span>
+    <label
+      class="cf-switch cf-animated-sticker-toggle"
+      data-cf-animated-sticker-toggle-root
+      data-size="sm"
+      data-state="checked"
+    >
+      <input
+        class="cf-switch__control"
+        type="checkbox"
+        role="switch"
+        checked
+        aria-checked="true"
+        data-cf-animated-sticker-toggle
+      />
+      <span class="cf-switch__track" aria-hidden="true"><span class="cf-switch__thumb"></span></span>
+      <span class="cf-switch__content"><span class="cf-switch__label">Animated stickers</span></span>
+    </label>
   </div>
 
   <section class="astro-section" aria-labelledby="pack-import-heading">
@@ -64,7 +81,9 @@ const componentImport = `import ${first.componentName} from "@cofob/design-syste
     <div class="astro-section-header">
       <h2 id="pack-gallery-heading">All stickers</h2>
       <p>
-        Animated WebM is lazy: below-the-fold videos have no <code>src</code> until their card intersects the viewport.
+        Animated WebM is lazy: below-the-fold videos have no <code>src</code> until their card intersects the viewport,
+        and playback pauses whenever a card leaves it. The global switch unloads animated WebM while keeping ordinary
+        WebP stickers and inline SVG first frames visible.
       </p>
     </div>
     <div class="astro-sticker-gallery" data-sticker-gallery>

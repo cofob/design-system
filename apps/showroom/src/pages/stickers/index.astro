@@ -21,15 +21,19 @@ const animated = catalogs
 const installExample = `npm install @cofob/design-system-css @cofob/design-system-stickers
 cf-stickers copy --out-dir public/stickers`;
 const reactExample = `import "@cofob/design-system-css/index.css";
+import { AnimatedStickerToggle } from "@cofob/design-system-react";
 import AnimatedChris001 from "@cofob/design-system-stickers/react/AnimatedChris001";
 
+<AnimatedStickerToggle label="Animated stickers" />
 <AnimatedChris001 alt="Chris reacting with surprise" />
 <AnimatedChris001 alt="Still first frame of Chris" playback="static" />`;
 const svelteExample = `<script lang="ts">
   import "@cofob/design-system-css/index.css";
+  import { AnimatedStickerToggle } from "@cofob/design-system-svelte";
   import AnimatedChris001 from "@cofob/design-system-stickers/svelte/AnimatedChris001";
 </script>
 
+<AnimatedStickerToggle label="Animated stickers" />
 <AnimatedChris001 alt="Chris reacting with surprise" />
 <AnimatedChris001 alt="Still first frame of Chris" playback="static" />`;
 const dataExample = `import { resolveStickerAsset } from "@cofob/design-system-stickers";
@@ -81,9 +85,11 @@ const firstCatalogEntry = catalog.stickers[0];`;
         <strong class="cf-alert__title">Animation is progressive</strong>
         <p class="cf-alert__description">
           The generated component starts with inline SVG. It assigns the video URL on viewport intersection,
-          and keeps the SVG on reduced motion, load failure, rejected playback, or <code
+          removes the SVG after playback starts, pauses on the current video frame outside the viewport, and
+          keeps or restores the SVG on reduced motion, load failure, rejected playback, or <code
             >playback="static"</code
-          >.
+          >. Set <code>data-cf-animated-stickers="disabled"</code> on <code>&lt;html&gt;</code> or use
+          <code>AnimatedStickerToggle</code> to unload every WebM globally; static SVG/WebP stickers remain available.
         </p>
       </div>
     </div>

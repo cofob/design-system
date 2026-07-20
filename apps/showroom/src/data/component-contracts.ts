@@ -228,6 +228,14 @@ const props: Record<string, readonly string[]> = {
   ChatThread: ["messages", "label", "list attributes"],
   Sticker: ["tone", "rotation", "children", "data-image", "span attributes"],
   AnimatedSticker: ["sticker", "alt", "playback", "preload", "span attributes"],
+  AnimatedStickerToggle: [
+    "enabled/defaultEnabled",
+    "label",
+    "description",
+    "size",
+    "onEnabledChange",
+    "input attributes",
+  ],
 };
 
 const allAdapters = ["React", "Svelte", "HTML"] as const;
@@ -366,6 +374,8 @@ const parameterTypes: Record<string, string> = {
   sticker: "AnimatedStickerModel",
   preload: '"none" | "metadata" | "auto" | ""',
   playback: '"auto" | "static"',
+  "enabled/defaultEnabled": "boolean; controlled or initial global state",
+  onEnabledChange: "(enabled: boolean) => void",
 };
 
 const parameterDefaults: Record<string, string> = {
@@ -432,6 +442,7 @@ const parameterDefaults: Record<string, string> = {
   fit: '"cover"',
   priority: "false",
   rotation: "-3",
+  "enabled/defaultEnabled": "true",
 };
 
 const parameterDescriptions: Record<string, string> = {
@@ -568,9 +579,13 @@ const parameterDescriptions: Record<string, string> = {
   children: "Idiomatic adapter composition content.",
   sticker:
     "Converted WebM URL, dimensions, and trusted sanitized inline SVG. Never pass unchecked user SVG as skeletonSvg.",
-  preload: "Native video preload hint; the inline SVG is present independently in SSR HTML.",
+  preload:
+    "Native video preload hint; the inline SVG is present independently in SSR HTML and is removed from the DOM after playback starts. Auto playback pauses outside the viewport and resumes when visible again.",
   playback:
     'Use "static" to render only the inline first-frame SVG and omit video entirely, guaranteeing no WebM request.',
+  "enabled/defaultEnabled":
+    "Controls the document-wide data-cf-animated-stickers flag. Disabled mode unloads WebM and restores each trusted inline SVG; ordinary SVG/WebP stickers are unchanged.",
+  onEnabledChange: "Runs after the global animated sticker preference changes through this control.",
 };
 
 const requiredParameters: Record<string, readonly string[]> = {
@@ -707,6 +722,7 @@ const componentParameterDefaults: Record<string, Record<string, string>> = {
   MediaGrid: { as: '"ul"' },
   ChatThread: { label: '"Conversation"' },
   AnimatedSticker: { playback: '"auto"', preload: '"metadata"' },
+  AnimatedStickerToggle: { label: '"Animated stickers"', size: '"md"' },
 };
 
 const attributeParameter = (name: string) => name.endsWith(" attributes");
@@ -901,7 +917,16 @@ const stateOverrides: Record<string, readonly string[]> = {
   InlineEmoji: ["named", "decorative", "inline alignment"],
   MediaGrid: ["one item", "two columns", "image/video/audio"],
   Sticker: ["label", "image", "attributed image"],
-  AnimatedSticker: ["loading", "playing", "static SVG only", "reduced motion", "load/play fallback"],
+  AnimatedSticker: [
+    "loading",
+    "playing",
+    "offscreen paused",
+    "static SVG only",
+    "globally disabled",
+    "reduced motion",
+    "load/play fallback",
+  ],
+  AnimatedStickerToggle: ["enabled", "disabled", "focus-visible", "form disabled"],
 };
 
 const reactUsage: Record<string, string> = {
@@ -946,6 +971,8 @@ const reactUsage: Record<string, string> = {
     '<figure><Sticker data-image="true"><img src="/sticker.webp" alt="A delighted fox" /></Sticker><figcaption>Source: …</figcaption></figure>',
   AnimatedSticker:
     '<><AnimatedSticker sticker={manifest.sticker} alt="Animated cartoon rat Chris" /><AnimatedSticker sticker={manifest.sticker} alt="Static first frame" playback="static" /></>',
+  AnimatedStickerToggle:
+    '<AnimatedStickerToggle defaultEnabled label="Animated stickers" onEnabledChange={setEnabled} />',
 };
 
 const svelteUsage: Record<string, string> = {
@@ -966,6 +993,8 @@ const svelteUsage: Record<string, string> = {
     '<figure><Sticker data-image="true"><img src="/sticker.webp" alt="A delighted fox" /></Sticker><figcaption>Source: …</figcaption></figure>',
   AnimatedSticker:
     '<AnimatedSticker sticker={manifest.sticker} alt="Animated cartoon rat Chris" />\n<AnimatedSticker sticker={manifest.sticker} alt="Static first frame" playback="static" />',
+  AnimatedStickerToggle:
+    '<AnimatedStickerToggle bind:enabled label="Animated stickers" onEnabledChange={setEnabled} />',
   Pagination: "<Pagination bind:page totalPages={12} />",
   Dialog:
     '<Dialog title="Confirm">{#snippet trigger({ open })}<Button onclick={open}>Open</Button>{/snippet}Content</Dialog>',
@@ -1030,6 +1059,8 @@ const nativeUsage: Record<string, string> = {
     '<figure><span class="cf-sticker" data-image="true"><img src="/sticker.webp" alt="A delighted fox" /></span><figcaption>Source: …</figcaption></figure>',
   AnimatedSticker:
     '<span class="cf-animated-sticker" data-cf-animated-sticker data-playback="auto" role="img" aria-label="Animated cartoon rat Chris"><span class="cf-animated-sticker__skeleton" aria-hidden="true"><svg viewBox="0 0 512 512">…</svg></span><video data-cf-animated-sticker-video data-cf-animated-sticker-src="/sticker.hash.webm" muted loop playsinline preload="metadata" aria-hidden="true"></video></span>\n<span class="cf-animated-sticker" data-playback="static" role="img" aria-label="Static first frame"><span class="cf-animated-sticker__skeleton" aria-hidden="true"><svg viewBox="0 0 512 512">…</svg></span></span>',
+  AnimatedStickerToggle:
+    '<label class="cf-switch cf-animated-sticker-toggle" data-cf-animated-sticker-toggle-root><input class="cf-switch__control" type="checkbox" role="switch" data-cf-animated-sticker-toggle checked><span class="cf-switch__track" aria-hidden="true"><span class="cf-switch__thumb"></span></span><span class="cf-switch__content"><span class="cf-switch__label">Animated stickers</span></span></label>',
 };
 
 export function getComponentContract(name: string): ComponentContract {

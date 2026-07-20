@@ -1,8 +1,14 @@
 import { afterEach, describe, expect, it, vi } from "vitest";
-import { createAnimatedStickerController, initDesignSystem } from "../src/index.js";
+import {
+  createAnimatedStickerController,
+  getAnimatedStickersEnabled,
+  initDesignSystem,
+  setAnimatedStickersEnabled,
+} from "../src/index.js";
 
 afterEach(() => {
   document.body.innerHTML = "";
+  document.documentElement.removeAttribute("data-cf-animated-stickers");
   vi.restoreAllMocks();
   vi.unstubAllGlobals();
 });
@@ -62,6 +68,12 @@ function mockIntersection() {
     enter(target: Element) {
       callback?.([{ isIntersecting: true, target } as IntersectionObserverEntry], {} as IntersectionObserver);
     },
+    leave(target: Element) {
+      callback?.(
+        [{ isIntersecting: false, target } as IntersectionObserverEntry],
+        {} as IntersectionObserver,
+      );
+    },
     disconnect,
   };
 }
@@ -101,20 +113,38 @@ describe("animated sticker controller", () => {
 
     video.dispatchEvent(new Event("playing"));
     expect(root.dataset.state).toBe("playing");
+    expect(root.querySelector(".cf-animated-sticker__skeleton")).toBeNull();
+
+    intersection.leave(root);
+    expect(pause).toHaveBeenCalledOnce();
+    expect(root.dataset.state).toBe("paused");
+    expect(root.querySelector(".cf-animated-sticker__skeleton")).toBeNull();
+    video.dispatchEvent(new Event("playing"));
+    expect(root.dataset.state).toBe("paused");
+
+    intersection.enter(root);
+    expect(play).toHaveBeenCalledTimes(2);
+    video.dispatchEvent(new Event("playing"));
+    expect(root.dataset.state).toBe("playing");
 
     motion.setMatches(true);
-    expect(pause).toHaveBeenCalledOnce();
+    expect(pause).toHaveBeenCalledTimes(2);
     expect(root.dataset.state).toBe("reduced-motion");
+    expect(root.querySelector(".cf-animated-sticker__skeleton > svg")).not.toBeNull();
 
     motion.setMatches(false);
-    expect(play).toHaveBeenCalledTimes(2);
+    expect(play).toHaveBeenCalledTimes(3);
     expect(root.dataset.state).toBe("loading");
+    video.dispatchEvent(new Event("playing"));
+    expect(root.dataset.state).toBe("playing");
+    expect(root.querySelector(".cf-animated-sticker__skeleton")).toBeNull();
 
     controller.destroy();
-    expect(pause).toHaveBeenCalledTimes(2);
+    expect(pause).toHaveBeenCalledTimes(3);
     expect(video.hasAttribute("src")).toBe(false);
     expect(intersection.disconnect).toHaveBeenCalled();
     expect(root.dataset.state).toBe("loading");
+    expect(root.querySelector(".cf-animated-sticker__skeleton > svg")).not.toBeNull();
     video.dispatchEvent(new Event("playing"));
     expect(root.dataset.state).toBe("loading");
   });
@@ -151,6 +181,62 @@ describe("animated sticker controller", () => {
     expect(root.dataset.state).toBe("static");
     expect(video.hasAttribute("src")).toBe(false);
     expect(play).not.toHaveBeenCalled();
+    controller.destroy();
+  });
+
+  it("unloads WebM globally, restores the SVG, and observes direct flag changes", async () => {
+    mockMotion();
+    const intersection = mockIntersection();
+    const { root, video } = renderSticker();
+    const play = vi.fn(() => Promise.resolve());
+    const pause = vi.fn();
+    const load = vi.fn();
+    Object.defineProperties(video, {
+      play: { configurable: true, value: play },
+      pause: { configurable: true, value: pause },
+      load: { configurable: true, value: load },
+    });
+    setAnimatedStickersEnabled(false);
+
+    const controller = createAnimatedStickerController(root);
+    intersection.enter(root);
+    expect(root.dataset.state).toBe("disabled");
+    expect(video.hasAttribute("src")).toBe(false);
+    expect(play).not.toHaveBeenCalled();
+
+    setAnimatedStickersEnabled(true);
+    expect(root.dataset.state).toBe("loading");
+    expect(video.getAttribute("src")).toBe("/chris.webm");
+    expect(play).toHaveBeenCalledOnce();
+    video.dispatchEvent(new Event("playing"));
+    expect(root.querySelector(".cf-animated-sticker__skeleton")).toBeNull();
+
+    document.documentElement.setAttribute("data-cf-animated-stickers", "disabled");
+    await new Promise<void>((resolve) => queueMicrotask(resolve));
+    expect(getAnimatedStickersEnabled()).toBe(false);
+    expect(root.dataset.state).toBe("disabled");
+    expect(video.hasAttribute("src")).toBe(false);
+    expect(load).toHaveBeenCalledOnce();
+    expect(root.querySelector(".cf-animated-sticker__skeleton > svg")).not.toBeNull();
+    controller.destroy();
+  });
+
+  it("connects a native switch to the global flag without affecting static images", () => {
+    mockMotion(true);
+    document.body.innerHTML = `
+      <label data-cf-animated-sticker-toggle-root data-state="checked">
+        <input type="checkbox" role="switch" data-cf-animated-sticker-toggle checked>
+      </label>
+      <img src="/static-sticker.webp" alt="Static sticker">
+    `;
+    const controller = initDesignSystem(document);
+    const toggle = document.querySelector<HTMLInputElement>("[data-cf-animated-sticker-toggle]")!;
+    toggle.checked = false;
+    toggle.dispatchEvent(new Event("change", { bubbles: true }));
+
+    expect(document.documentElement.dataset.cfAnimatedStickers).toBe("disabled");
+    expect(toggle.getAttribute("aria-checked")).toBe("false");
+    expect(document.querySelector("img")?.getAttribute("src")).toBe("/static-sticker.webp");
     controller.destroy();
   });
 

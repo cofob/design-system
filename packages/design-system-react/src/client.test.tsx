@@ -4,6 +4,7 @@ import { describe, expect, it, vi } from "vitest";
 import {
   Accordion,
   AnimatedSticker,
+  AnimatedStickerToggle,
   CodeBlock,
   Dialog,
   DropdownMenu,
@@ -46,6 +47,27 @@ describe("client components", () => {
     expect(staticHtml).toContain('data-state="static"');
     expect(staticHtml).toContain("<svg");
     expect(staticHtml).not.toContain("<video");
+  });
+
+  it("controls the global animated sticker flag", async () => {
+    const onEnabledChange = vi.fn();
+    render(
+      <AnimatedStickerToggle
+        defaultEnabled={false}
+        label="Animated stickers"
+        onEnabledChange={onEnabledChange}
+      />,
+    );
+    const toggle = screen.getByRole("switch", { name: "Animated stickers" });
+    await waitFor(() => expect(document.documentElement.dataset.cfAnimatedStickers).toBe("disabled"));
+    expect(toggle).not.toBeChecked();
+
+    fireEvent.click(toggle);
+    expect(document.documentElement.dataset.cfAnimatedStickers).toBe("enabled");
+    expect(toggle).toBeChecked();
+    expect(onEnabledChange).toHaveBeenCalledWith(true);
+    expect(onEnabledChange).toHaveBeenCalledTimes(1);
+    document.documentElement.removeAttribute("data-cf-animated-stickers");
   });
 
   it("shows the copy action by default and allows the toolbar to be disabled", () => {

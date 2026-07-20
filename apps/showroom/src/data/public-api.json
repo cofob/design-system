@@ -517,7 +517,7 @@
             {
               "name": "AnimatedStickerState",
               "kind": "type",
-              "signature": "type AnimatedStickerState = loading | playing | static | reduced-motion | fallback",
+              "signature": "type AnimatedStickerState = loading | playing | paused | static | disabled | reduced-motion | fallback",
               "summary": "Playback and inline-fallback states reflected on the animated sticker root.",
               "entrypoints": ["."]
             },
@@ -529,10 +529,59 @@
               "entrypoints": ["."]
             },
             {
+              "name": "AnimatedStickerToggleController",
+              "kind": "type",
+              "signature": "type AnimatedStickerToggleController = Controller",
+              "summary": "Cleanup contract for a native switch bound to the global animated sticker flag.",
+              "entrypoints": ["."]
+            },
+            {
+              "name": "AnimatedStickersEnabledListener",
+              "kind": "type",
+              "signature": "type AnimatedStickersEnabledListener = (enabled: boolean) => void",
+              "summary": "Subscriber notified whenever the global animated sticker flag changes.",
+              "entrypoints": ["."]
+            },
+            {
+              "name": "ANIMATED_STICKERS_ATTRIBUTE",
+              "kind": "constant",
+              "signature": "const ANIMATED_STICKERS_ATTRIBUTE = data-cf-animated-stickers",
+              "summary": "HTML attribute used as the document-wide animation opt-out flag.",
+              "entrypoints": ["."]
+            },
+            {
               "name": "createAnimatedStickerController",
               "kind": "function",
               "signature": "createAnimatedStickerController(root: HTMLElement): AnimatedStickerController",
-              "summary": "Lazily assigns the WebM at viewport intersection, reveals it on playing, and preserves inline SVG on failure or reduced motion.",
+              "summary": "Lazily assigns WebM in the viewport, pauses it outside, removes SVG after playing, and restores SVG for global or motion fallbacks.",
+              "entrypoints": ["."]
+            },
+            {
+              "name": "createAnimatedStickerToggleController",
+              "kind": "function",
+              "signature": "createAnimatedStickerToggleController(toggle: HTMLInputElement): AnimatedStickerToggleController",
+              "summary": "Connects a native checkbox switch to the document-wide animated sticker flag.",
+              "entrypoints": ["."]
+            },
+            {
+              "name": "getAnimatedStickersEnabled",
+              "kind": "function",
+              "signature": "getAnimatedStickersEnabled(root?: HTMLElement | null): boolean",
+              "summary": "Reads whether animated WebM stickers are globally enabled; missing markup defaults to true.",
+              "entrypoints": ["."]
+            },
+            {
+              "name": "setAnimatedStickersEnabled",
+              "kind": "function",
+              "signature": "setAnimatedStickersEnabled(enabled: boolean, root?: HTMLElement | null): void",
+              "summary": "Updates the global HTML flag and all mounted animated stickers and controls.",
+              "entrypoints": ["."]
+            },
+            {
+              "name": "subscribeAnimatedStickersEnabled",
+              "kind": "function",
+              "signature": "subscribeAnimatedStickersEnabled(listener, root?): () => void",
+              "summary": "Observes API updates and direct mutations of the global HTML flag.",
               "entrypoints": ["."]
             },
             {
@@ -1098,6 +1147,13 @@
               "kind": "interface",
               "signature": "interface AnimatedStickerProps { sticker; alt; playback?; preload? }",
               "summary": "Converted sticker model, accessible name, auto/static playback mode, video preload hint, and span attributes.",
+              "entrypoints": [".", "./client"]
+            },
+            {
+              "name": "AnimatedStickerToggleProps",
+              "kind": "interface",
+              "signature": "interface AnimatedStickerToggleProps { enabled?; defaultEnabled?; label?; description?; onEnabledChange? }",
+              "summary": "Controlled or default global animation state, visible copy, callback, and native input attributes.",
               "entrypoints": [".", "./client"]
             },
             {

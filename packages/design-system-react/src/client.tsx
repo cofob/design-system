@@ -23,16 +23,20 @@ import type {
   DialogHTMLAttributes,
   ForwardedRef,
   HTMLAttributes,
+  InputHTMLAttributes,
   KeyboardEvent as ReactKeyboardEvent,
   ReactElement,
   ReactNode,
   VideoHTMLAttributes,
 } from "react";
 import {
+  ANIMATED_STICKERS_ATTRIBUTE,
   createAnimatedStickerController,
   createPopoverController,
   createThemeController,
   createTooltipController,
+  setAnimatedStickersEnabled,
+  subscribeAnimatedStickersEnabled,
   THEME_STORAGE_KEY,
 } from "@cofob/design-system-css";
 import type {
@@ -121,6 +125,96 @@ export const AnimatedSticker = forwardRef<HTMLSpanElement, AnimatedStickerProps>
     </span>
   );
 });
+
+export interface AnimatedStickerToggleProps extends Omit<
+  InputHTMLAttributes<HTMLInputElement>,
+  "checked" | "defaultChecked" | "children" | "size" | "type"
+> {
+  enabled?: boolean;
+  defaultEnabled?: boolean;
+  label?: ReactNode;
+  description?: ReactNode;
+  size?: Size;
+  onEnabledChange?: (enabled: boolean) => void;
+}
+
+/** Controls the document-wide animated sticker flag. Static SVG/WebP stickers are unaffected. */
+export const AnimatedStickerToggle = forwardRef<HTMLInputElement, AnimatedStickerToggleProps>(
+  function AnimatedStickerToggle(
+    {
+      enabled,
+      defaultEnabled = true,
+      label = "Animated stickers",
+      description,
+      size = "md",
+      className,
+      disabled,
+      onChange,
+      onEnabledChange,
+      ...props
+    },
+    ref,
+  ) {
+    const [uncontrolledEnabled, setUncontrolledEnabled] = useState(defaultEnabled);
+    const controlled = enabled !== undefined;
+    const currentEnabled = enabled ?? uncontrolledEnabled;
+    const initialEnabled = useRef(currentEnabled);
+
+    useEffect(() => {
+      const preferenceRoot = document.documentElement;
+      if (controlled || !preferenceRoot.hasAttribute(ANIMATED_STICKERS_ATTRIBUTE)) {
+        setAnimatedStickersEnabled(initialEnabled.current, preferenceRoot);
+      }
+      return subscribeAnimatedStickersEnabled((nextEnabled) => {
+        if (!controlled) setUncontrolledEnabled(nextEnabled);
+      }, preferenceRoot);
+      // The initial global contract is established once; controlled updates are synchronized below.
+      // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, []);
+
+    useEffect(() => {
+      if (controlled) setAnimatedStickersEnabled(currentEnabled);
+    }, [controlled, currentEnabled]);
+
+    return (
+      <label
+        className={cx("cf-switch", "cf-animated-sticker-toggle", className)}
+        data-cf-animated-sticker-toggle-root
+        data-size={size}
+        data-state={currentEnabled ? "checked" : "unchecked"}
+        data-disabled={disabled || undefined}
+      >
+        <input
+          {...props}
+          ref={ref}
+          className="cf-switch__control"
+          type="checkbox"
+          role="switch"
+          checked={currentEnabled}
+          disabled={disabled}
+          aria-checked={currentEnabled}
+          data-cf-animated-sticker-toggle
+          data-cf-animated-sticker-toggle-managed="true"
+          onChange={(event) => {
+            onChange?.(event);
+            if (event.defaultPrevented) return;
+            const nextEnabled = event.currentTarget.checked;
+            if (!controlled) setUncontrolledEnabled(nextEnabled);
+            if (nextEnabled !== currentEnabled) onEnabledChange?.(nextEnabled);
+            setAnimatedStickersEnabled(nextEnabled);
+          }}
+        />
+        <span className="cf-switch__track" aria-hidden="true">
+          <span className="cf-switch__thumb" />
+        </span>
+        <span className="cf-switch__content">
+          <span className="cf-switch__label">{label}</span>
+          {description ? <span className="cf-switch__description">{description}</span> : null}
+        </span>
+      </label>
+    );
+  },
+);
 
 interface TriggerElementProps extends HTMLAttributes<HTMLElement> {
   disabled?: boolean;
