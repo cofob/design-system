@@ -19,6 +19,7 @@ import {
   MediaGrid,
   Pagination,
   PostCard,
+  Prose,
   SearchResultCard,
   Select,
   Table,
@@ -26,6 +27,14 @@ import {
 } from "./static.js";
 
 describe("static components", () => {
+  it("exposes explicit prose width choices", () => {
+    const { container, rerender } = render(<Prose size="default">Article body</Prose>);
+    expect(container.querySelector(".cf-prose")).toHaveAttribute("data-size", "default");
+
+    rerender(<Prose size="full">Article body</Prose>);
+    expect(container.querySelector(".cf-prose")).toHaveAttribute("data-size", "full");
+  });
+
   it("renders without a browser and exposes semantic state", () => {
     const html = renderToString(<Button loading>Save</Button>);
     expect(html).toContain("cf-button");
@@ -178,8 +187,21 @@ describe("static components", () => {
   });
 
   it("renders content models", () => {
-    render(<PostCard post={{ href: "/hello", title: "Hello", tags: ["design"] }} />);
-    expect(screen.getByRole("link", { name: "Hello" })).toHaveAttribute("href", "/hello");
+    const { container } = render(
+      <>
+        <PostCard post={{ href: "/hello", title: "Hello", tags: ["design"] }} target="_blank" />
+        <SearchResultCard result={{ href: "/search", title: "Search result" }} query="result" />
+      </>,
+    );
+    const postCard = container.querySelector("a.cf-post-card");
+    expect(postCard).toHaveAttribute("href", "/hello");
+    expect(postCard).toHaveAttribute("aria-label", "Hello");
+    expect(postCard).toHaveAttribute("target", "_blank");
+    expect(postCard?.querySelectorAll("a")).toHaveLength(0);
+    const searchResultCard = container.querySelector("a.cf-search-result-card");
+    expect(searchResultCard).toHaveAttribute("href", "/search");
+    expect(searchResultCard).toHaveAttribute("aria-label", "Search result");
+    expect(searchResultCard?.querySelectorAll("a")).toHaveLength(0);
   });
 
   it("renders application and portable media foundations", () => {
@@ -232,7 +254,7 @@ describe("static components", () => {
     const { container } = render(
       <>
         <PostCard post={post} />
-        <LatestPostCard post={post} />
+        <LatestPostCard post={post} target="_blank" />
         <SearchResultCard result={post} query="design" />
       </>,
     );
@@ -241,10 +263,23 @@ describe("static components", () => {
       "srcset",
       "/cover.webp 1x",
     );
+    const postCard = container.querySelector("a.cf-post-card");
+    expect(postCard).toHaveAttribute("href", "/canonical");
+    expect(postCard).toHaveAttribute("aria-label", "Canonical design");
+    expect(postCard?.querySelectorAll("a")).toHaveLength(0);
     expect(container.querySelector(".cf-latest-post-card__title")).toHaveTextContent("Canonical design");
     expect(container.querySelector(".cf-latest-post-card__description")).toHaveTextContent(
       "Shared package model",
     );
+    const latestPostCard = container.querySelector("a.cf-latest-post-card");
+    expect(latestPostCard).toHaveAttribute("href", "/canonical");
+    expect(latestPostCard).toHaveAttribute("aria-label", "Canonical design");
+    expect(latestPostCard).toHaveAttribute("target", "_blank");
+    expect(latestPostCard?.querySelectorAll("a")).toHaveLength(0);
+    const searchResultCard = container.querySelector("a.cf-search-result-card");
+    expect(searchResultCard).toHaveAttribute("href", "/canonical");
+    expect(searchResultCard).toHaveAttribute("aria-label", "Canonical design");
+    expect(searchResultCard?.querySelectorAll("a")).toHaveLength(0);
     expect(container.querySelector(".cf-search-result-card__title mark")).toHaveTextContent("design");
     expect(container.querySelector(".cf-search-result-card__tags mark")).toHaveTextContent("design");
     expect(container.querySelector(".cf-search-result-card .cf-post-card__content")).toBeNull();
@@ -252,35 +287,54 @@ describe("static components", () => {
     expect(container.querySelectorAll('time[datetime="2026-07-20"]')).toHaveLength(3);
   });
 
-  it("renders chat avatars without adding accessible noise", () => {
+  it("groups consecutive chat senders without adding accessible noise", () => {
     const { container } = render(
       <ChatThread
         messages={[
-          { id: "text", author: "cofob", body: "Text avatar" },
+          { id: "text", author: "cofob", body: "Text avatar", timestamp: "19:19" },
+          { id: "text-two", author: "cofob", body: "Grouped text", timestamp: "19:20" },
           {
             id: "image",
             author: "reader",
             body: "Image avatar",
             avatar: { src: "/avatar.webp", alt: "Reader avatar", width: 40, height: 40 },
+            own: true,
+            timestamp: "19:21",
           },
           {
             id: "link",
-            author: "cofob",
+            author: "reader",
             text: "Source code",
             link: "https://example.com/source",
             linkLabel: "Open source",
             linkExternal: true,
+            avatar: { src: "/avatar.webp", alt: "Reader avatar", width: 40, height: 40 },
+            own: true,
+            timestamp: "19:22",
           },
         ]}
       />,
     );
 
+    const rows = container.querySelectorAll(".cf-chat__row");
+    expect(rows).toHaveLength(4);
+    expect(rows[0]).toHaveAttribute("data-group-start", "true");
+    expect(rows[0]).not.toHaveAttribute("data-group-end");
+    expect(rows[1]).not.toHaveAttribute("data-group-start");
+    expect(rows[1]).toHaveAttribute("data-group-end", "true");
+    expect(rows[2]).toHaveAttribute("data-group-start", "true");
+    expect(rows[2]).not.toHaveAttribute("data-group-end");
+    expect(rows[3]).not.toHaveAttribute("data-group-start");
+    expect(rows[3]).toHaveAttribute("data-group-end", "true");
+    expect(container.querySelectorAll(".cf-chat__author")).toHaveLength(2);
+    expect(container.querySelectorAll(".cf-chat__timestamp")).toHaveLength(4);
+    expect(container.querySelectorAll(".cf-chat__bubble .cf-visually-hidden")).toHaveLength(2);
     expect(container.querySelector("span.cf-chat__avatar")).toHaveTextContent("C");
     expect(container.querySelector("img.cf-chat__avatar")).toHaveAttribute("src", "/avatar.webp");
     expect(container.querySelector("img.cf-chat__avatar")).toHaveAttribute("alt", "");
     expect(screen.getByRole("link", { name: "Open source" })).toHaveAttribute("target", "_blank");
     expect(screen.getByRole("link", { name: "Open source" })).toHaveAttribute("rel", "noopener noreferrer");
     expect(container.querySelector(".cf-chat__bubble")).toHaveTextContent("Text avatar");
-    expect(container.querySelectorAll(".cf-chat__bubble")[2]).toHaveTextContent("Source code");
+    expect(container.querySelectorAll(".cf-chat__bubble")[3]).toHaveTextContent("Source code");
   });
 });

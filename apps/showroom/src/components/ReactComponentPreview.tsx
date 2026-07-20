@@ -160,7 +160,7 @@ export function ReactComponentPreview({ name, animatedSticker }: Props) {
       return <DS.Link href="#installation">Read the installation guide</DS.Link>;
     case "Prose":
       return (
-        <DS.Prose className="astro-preview-copy">
+        <DS.Prose size="default">
           <h3>Long-form rhythm</h3>
           <p>
             Headings, paragraphs, links, and inline <code>code</code> share a comfortable reading measure.
@@ -626,13 +626,25 @@ export function ReactComponentPreview({ name, animatedSticker }: Props) {
             { id: "one", author: "cofob", body: "Ship the semantic contract first.", timestamp: "19:19" },
             {
               id: "two",
+              author: "cofob",
+              body: "Then every adapter stays aligned.",
+              timestamp: "19:20",
+            },
+            {
+              id: "three",
               author: "reader",
-              text: "Then every adapter stays aligned.",
+              text: "The consecutive messages read as one group.",
+              own: true,
+              timestamp: "19:21",
+            },
+            {
+              id: "four",
+              author: "reader",
               link: "https://cofob.dev/blog",
               linkLabel: "Read the implementation notes",
               linkExternal: true,
               own: true,
-              timestamp: "19:20",
+              timestamp: "19:22",
             },
           ]}
         />

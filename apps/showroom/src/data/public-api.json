@@ -913,6 +913,13 @@
               "entrypoints": [".", "./static"]
             },
             {
+              "name": "ProseProps",
+              "kind": "interface",
+              "signature": "interface ProseProps extends HTMLAttributes<HTMLElement>",
+              "summary": "Narrow, default, or full prose measure and native article attributes.",
+              "entrypoints": [".", "./static"]
+            },
+            {
               "name": "ContainerProps",
               "kind": "interface",
               "signature": "interface ContainerProps",
@@ -1112,21 +1119,21 @@
               "name": "PostCardProps",
               "kind": "interface",
               "signature": "interface PostCardProps",
-              "summary": "Post model, heading level, and article attributes.",
+              "summary": "Linked post model, heading level, and anchor attributes.",
               "entrypoints": [".", "./static"]
             },
             {
               "name": "LatestPostCardProps",
               "kind": "interface",
               "signature": "interface LatestPostCardProps",
-              "summary": "Post-card props plus the latest-post label.",
+              "summary": "Linked latest-post card data, heading level, label, and anchor attributes.",
               "entrypoints": [".", "./static"]
             },
             {
               "name": "SearchResultCardProps",
               "kind": "interface",
               "signature": "interface SearchResultCardProps",
-              "summary": "Search result data and post-card presentation props.",
+              "summary": "Linked search result data, highlighting, heading level, and anchor attributes.",
               "entrypoints": [".", "./static"]
             },
             {

@@ -461,6 +461,133 @@ test("ChatThread keeps its background dots visible in the light theme", async ({
   }
 });
 
+test("ChatThread groups consecutive messages from the same sender", async ({ page }) => {
+  await page.goto("/components/chat-thread/");
+
+  for (const framework of frameworkNames) {
+    const panel = await selectFramework(page, framework);
+    const rows = panel.locator(".cf-chat__row");
+    await expect(rows).toHaveCount(4);
+    await expect(rows.nth(0)).toHaveAttribute("data-group-start", "true");
+    await expect(rows.nth(0)).not.toHaveAttribute("data-group-end");
+    await expect(rows.nth(1)).not.toHaveAttribute("data-group-start");
+    await expect(rows.nth(1)).toHaveAttribute("data-group-end", "true");
+    await expect(rows.nth(2)).toHaveAttribute("data-group-start", "true");
+    await expect(rows.nth(2)).not.toHaveAttribute("data-group-end");
+    await expect(rows.nth(3)).not.toHaveAttribute("data-group-start");
+    await expect(rows.nth(3)).toHaveAttribute("data-group-end", "true");
+    await expect(panel.locator(".cf-chat__author")).toHaveCount(2);
+    await expect(panel.locator(".cf-chat__timestamp")).toHaveCount(4);
+
+    const avatarVisibility = await rows.evaluateAll((items) =>
+      items.map((row) => getComputedStyle(row.querySelector(".cf-chat__avatar") as Element).visibility),
+    );
+    expect(avatarVisibility).toEqual(["hidden", "visible", "hidden", "visible"]);
+    const avatarBorders = await rows.evaluateAll((items) =>
+      items.map((row) => getComputedStyle(row.querySelector(".cf-chat__avatar") as Element).borderTopWidth),
+    );
+    expect(avatarBorders).toEqual(["0px", "0px", "0px", "0px"]);
+  }
+});
+
+test("Post cards use their full surfaces as their only links", async ({ page }) => {
+  const cases = [
+    {
+      path: "/components/post-card/",
+      selector: "a.cf-post-card",
+      clickTarget: ".cf-post-card__excerpt",
+    },
+    {
+      path: "/components/latest-post-card/",
+      selector: "a.cf-latest-post-card",
+      clickTarget: ".cf-latest-post-card__description",
+    },
+    {
+      path: "/components/search-result-card/",
+      selector: "a.cf-search-result-card",
+      clickTarget: ".cf-search-result-card__description",
+    },
+  ] as const;
+
+  for (const item of cases) {
+    await page.goto(item.path);
+    for (const framework of frameworkNames) {
+      const panel = await selectFramework(page, framework);
+      const card = panel.locator(item.selector);
+      await expect(card).toHaveCount(1);
+      await expect(card).toHaveAttribute("href", "#post");
+      await expect(card).toHaveAttribute("aria-label", "Building a calmer interface");
+      await expect(card.locator("a")).toHaveCount(0);
+      await card.locator(item.clickTarget).click();
+      await expect(page).toHaveURL(/#post$/);
+      await page.evaluate(() => history.replaceState(null, "", location.pathname));
+    }
+
+    const card = page.locator(`[data-framework-panel="svelte"] ${item.selector}`);
+    await card.focus();
+    await expect(card).toBeFocused();
+    await page.keyboard.press("Enter");
+    await expect(page).toHaveURL(/#post$/);
+  }
+});
+
+test("Avatar component surfaces are borderless", async ({ page }) => {
+  await page.goto("/components/avatar/");
+
+  for (const framework of frameworkNames) {
+    const panel = await selectFramework(page, framework);
+    const borders = await panel
+      .locator(".cf-avatar")
+      .evaluateAll((avatars) => avatars.map((avatar) => getComputedStyle(avatar).borderTopWidth));
+    expect(borders.length).toBeGreaterThan(0);
+    expect(borders.every((width) => width === "0px")).toBe(true);
+  }
+});
+
+test("Footer keeps horizontal padding on narrow viewports", async ({ page }) => {
+  await page.setViewportSize({ width: 360, height: 800 });
+  await page.goto("/components/footer/");
+
+  for (const framework of frameworkNames) {
+    const panel = await selectFramework(page, framework);
+    const padding = await panel.locator(".cf-footer").evaluate((footer) => {
+      const style = getComputedStyle(footer);
+      return { left: style.paddingLeft, right: style.paddingRight };
+    });
+    expect(padding).toEqual({ left: "16px", right: "16px" });
+  }
+});
+
+test("Prose exposes a wider default content measure", async ({ page }) => {
+  await page.goto("/components/prose/");
+
+  for (const framework of frameworkNames) {
+    const panel = await selectFramework(page, framework);
+    const prose = panel.locator(".cf-prose");
+    await expect(prose).toHaveAttribute("data-size", "default");
+    await expect(prose).toHaveCSS("max-inline-size", "1024px");
+  }
+});
+
+test("large Section spacing contracts at the tablet navbar breakpoint", async ({ page }) => {
+  await page.setViewportSize({ width: 900, height: 800 });
+  await page.goto("/components/section/");
+
+  for (const framework of frameworkNames) {
+    const panel = await selectFramework(page, framework);
+    const section = panel.locator(".cf-section");
+    await section.evaluate((element) => element.setAttribute("data-spacing", "lg"));
+    await expect(section).toHaveCSS("margin-top", "40px");
+    await expect(section).toHaveCSS("margin-bottom", "40px");
+  }
+
+  await page.setViewportSize({ width: 1100, height: 800 });
+  for (const framework of frameworkNames) {
+    const panel = await selectFramework(page, framework);
+    await expect(panel.locator('.cf-section[data-spacing="lg"]')).toHaveCSS("margin-top", "64px");
+  }
+});
+
 test("CodeBlock and TerminalCodeBlock copy only their explicit sources", async ({ page }) => {
   await page.addInitScript(() => {
     Object.defineProperty(navigator, "clipboard", {
@@ -1133,6 +1260,27 @@ test("ResponsiveImage swaps to the dark artwork for an explicit dark theme", asy
     });
     await expect(light).toBeHidden();
     await expect(dark).toBeVisible();
+    await page.locator("html").evaluate((root) => {
+      root.dataset.theme = "light";
+      root.dataset.themePreference = "light";
+    });
+  }
+});
+
+test("ResponsiveImage keeps its only artwork visible in a dark theme", async ({ page }) => {
+  await page.goto("/components/responsive-image/");
+  for (const framework of frameworkNames) {
+    const panel = await selectFramework(page, framework);
+    const image = panel.locator(".cf-responsive-image__light");
+    await panel.locator(".cf-responsive-image").evaluate((figure) => {
+      figure.removeAttribute("data-has-dark-image");
+      figure.querySelector(".cf-responsive-image__dark")?.remove();
+    });
+    await page.locator("html").evaluate((root) => {
+      root.dataset.theme = "dark";
+      root.dataset.themePreference = "dark";
+    });
+    await expect(image).toBeVisible();
     await page.locator("html").evaluate((root) => {
       root.dataset.theme = "light";
       root.dataset.themePreference = "light";

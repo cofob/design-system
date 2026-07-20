@@ -1,9 +1,9 @@
 <script lang="ts">
-  import type { HTMLAttributes } from "svelte/elements";
+  import type { HTMLAnchorAttributes } from "svelte/elements";
   import { cx } from "../internal.js";
   import type { PostSummary } from "../types.js";
 
-  interface Props extends Omit<HTMLAttributes<HTMLElement>, "title"> {
+  interface Props extends Omit<HTMLAnchorAttributes, "href" | "title"> {
     post: PostSummary;
     eyebrow?: string;
     headingLevel?: 2 | 3 | 4;
@@ -19,12 +19,10 @@
   const HeadingElement = $derived(`h${headingLevel}` as "h2" | "h3" | "h4");
 </script>
 
-<article class={cx("cf-latest-post-card", className)} {...rest}>
+<a class={cx("cf-latest-post-card", className)} href={post.href} aria-label={post.title} {...rest}>
   <div class="cf-latest-post-card__content">
     <p class="cf-latest-post-card__eyebrow">{eyebrow}</p>
-    <svelte:element this={HeadingElement} class="cf-latest-post-card__title"
-      ><a href={post.href}>{post.title}</a></svelte:element
-    >
+    <svelte:element this={HeadingElement} class="cf-latest-post-card__title">{post.title}</svelte:element>
     {#if description}<p class="cf-latest-post-card__description">{description}</p>{/if}
     {#if dateLabel || updatedDateLabel || post.readingTime}<p class="cf-latest-post-card__meta">
         {#if dateLabel}<span>Published <time datetime={dateTime}>{dateLabel}</time></span
@@ -38,7 +36,7 @@
             aria-hidden="true">·</span
           >{/if}{post.readingTime}
       </p>{/if}
-    <a class="cf-link" href={post.href}>Read article <span aria-hidden="true">→</span></a>
+    <span class="cf-link" aria-hidden="true">Read article <span aria-hidden="true">→</span></span>
   </div>
   {#if image}
     <img
@@ -52,4 +50,4 @@
       loading="eager"
     />
   {/if}
-</article>
+</a>

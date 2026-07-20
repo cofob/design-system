@@ -1,9 +1,9 @@
 <script lang="ts">
-  import type { HTMLAttributes } from "svelte/elements";
+  import type { HTMLAnchorAttributes } from "svelte/elements";
   import { cx } from "../internal.js";
   import type { PostSummary } from "../types.js";
 
-  interface Props extends Omit<HTMLAttributes<HTMLElement>, "title"> {
+  interface Props extends Omit<HTMLAnchorAttributes, "href" | "title"> {
     post: PostSummary;
     headingLevel?: 2 | 3 | 4;
   }
@@ -18,9 +18,9 @@
   const HeadingElement = $derived(`h${headingLevel}` as "h2" | "h3" | "h4");
 </script>
 
-<article class={cx("cf-post-card", className)} {...rest}>
+<a class={cx("cf-post-card", className)} href={post.href} aria-label={post.title} {...rest}>
   {#if image}
-    <a class="cf-post-card__media" href={post.href} tabindex="-1" aria-hidden="true">
+    <span class="cf-post-card__media" aria-hidden="true">
       <img
         class="cf-post-card__cover"
         src={image.src}
@@ -31,7 +31,7 @@
         sizes={image.sizes}
         loading="lazy"
       />
-    </a>
+    </span>
   {/if}
   <div class="cf-post-card__content">
     {#if dateLabel || updatedDateLabel || post.readingTime}
@@ -42,9 +42,7 @@
         {#if post.readingTime}<span>{post.readingTime}</span>{/if}
       </p>
     {/if}
-    <svelte:element this={HeadingElement} class="cf-post-card__title"
-      ><a href={post.href}>{post.title}</a></svelte:element
-    >
+    <svelte:element this={HeadingElement} class="cf-post-card__title">{post.title}</svelte:element>
     {#if description}<p class="cf-post-card__excerpt">{description}</p>{/if}
     {#if post.tags?.length}
       <div class="cf-post-card__tags" aria-label="Tags">
@@ -52,4 +50,4 @@
       </div>
     {/if}
   </div>
-</article>
+</a>

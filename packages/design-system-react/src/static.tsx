@@ -118,8 +118,12 @@ export const Link = forwardRef<HTMLAnchorElement, LinkProps>(function Link(
   );
 });
 
-export function Prose({ className, ...props }: HTMLAttributes<HTMLElement>) {
-  return <article className={cx("cf-prose", className)} {...props} />;
+export interface ProseProps extends HTMLAttributes<HTMLElement> {
+  size?: "narrow" | "default" | "full";
+}
+
+export function Prose({ size = "narrow", className, ...props }: ProseProps) {
+  return <article className={cx("cf-prose", className)} data-size={size} {...props} />;
 }
 
 export interface TableProps extends TableHTMLAttributes<HTMLTableElement> {
@@ -1131,7 +1135,7 @@ export function ResponsiveImage({
   );
 }
 
-export interface PostCardProps extends HTMLAttributes<HTMLElement> {
+export interface PostCardProps extends Omit<AnchorHTMLAttributes<HTMLAnchorElement>, "href" | "title"> {
   post: PostSummary;
   headingLevel?: 2 | 3 | 4;
 }
@@ -1196,9 +1200,9 @@ function PostCardBody({ post, headingLevel = 2 }: Pick<PostCardProps, "post" | "
   return (
     <>
       {image ? (
-        <a className="cf-post-card__media" href={post.href} tabIndex={-1} aria-hidden="true">
+        <span className="cf-post-card__media" aria-hidden="true">
           <PostImage image={image} className="cf-post-card__cover" alt="" />
-        </a>
+        </span>
       ) : null}
       <div className="cf-post-card__content">
         {published || updated || post.readingTime ? (
@@ -1217,7 +1221,7 @@ function PostCardBody({ post, headingLevel = 2 }: Pick<PostCardProps, "post" | "
           </p>
         ) : null}
         <Heading level={headingLevel} className="cf-post-card__title">
-          <a href={post.href}>{post.title}</a>
+          {post.title}
         </Heading>
         {description ? (
           <Text tone="muted" className="cf-post-card__excerpt">
@@ -1240,13 +1244,15 @@ function PostCardBody({ post, headingLevel = 2 }: Pick<PostCardProps, "post" | "
 
 export function PostCard({ post, headingLevel = 2, className, ...props }: PostCardProps) {
   return (
-    <article className={cx("cf-post-card", className)} {...props}>
+    <a className={cx("cf-post-card", className)} href={post.href} aria-label={post.title} {...props}>
       <PostCardBody post={post} headingLevel={headingLevel} />
-    </article>
+    </a>
   );
 }
 
-export interface LatestPostCardProps extends PostCardProps {
+export interface LatestPostCardProps extends Omit<AnchorHTMLAttributes<HTMLAnchorElement>, "href" | "title"> {
+  post: PostSummary;
+  headingLevel?: 2 | 3 | 4;
   eyebrow?: ReactNode;
 }
 
@@ -1264,11 +1270,11 @@ export function LatestPostCard({
   const updated = postUpdatedDateLabel(post);
   const description = postDescription(post);
   return (
-    <article className={cx("cf-latest-post-card", className)} {...props}>
+    <a className={cx("cf-latest-post-card", className)} href={post.href} aria-label={post.title} {...props}>
       <div className="cf-latest-post-card__content">
         <p className="cf-latest-post-card__eyebrow">{eyebrow}</p>
         <Heading level={headingLevel} className="cf-latest-post-card__title">
-          <a href={post.href}>{post.title}</a>
+          {post.title}
         </Heading>
         {description ? <p className="cf-latest-post-card__description">{description}</p> : null}
         {published || updated || post.readingTime ? (
@@ -1296,12 +1302,12 @@ export function LatestPostCard({
             {post.readingTime}
           </p>
         ) : null}
-        <a className="cf-link" href={post.href}>
+        <span className="cf-link" aria-hidden="true">
           Read article <span aria-hidden="true">→</span>
-        </a>
+        </span>
       </div>
       {image ? <PostImage image={image} className="cf-latest-post-card__image" loading="eager" /> : null}
-    </article>
+    </a>
   );
 }
 
@@ -1338,7 +1344,13 @@ export function SearchResultCard({
   const updated = postUpdatedDateLabel(result);
   const description = postDescription(result);
   return (
-    <article className={cx("cf-search-result-card", className)} data-query={query || undefined} {...props}>
+    <a
+      className={cx("cf-search-result-card", className)}
+      href={result.href}
+      aria-label={result.title}
+      data-query={query || undefined}
+      {...props}
+    >
       {published || updated || result.readingTime ? (
         <p className="cf-search-result-card__meta">
           {published ? (
@@ -1365,7 +1377,7 @@ export function SearchResultCard({
         </p>
       ) : null}
       <Heading level={headingLevel} className="cf-search-result-card__title">
-        <a href={result.href}>{highlightText(result.title, query)}</a>
+        {highlightText(result.title, query)}
       </Heading>
       {description ? (
         <p className="cf-search-result-card__description">{highlightText(description, query)}</p>
@@ -1379,7 +1391,7 @@ export function SearchResultCard({
           ))}
         </div>
       ) : null}
-    </article>
+    </a>
   );
 }
 
@@ -1388,42 +1400,63 @@ export interface ChatThreadProps extends HTMLAttributes<HTMLOListElement> {
   label?: string;
 }
 
+function isSameChatSender(left: ChatMessage | undefined, right: ChatMessage | undefined) {
+  return Boolean(left && right && left.author === right.author && Boolean(left.own) === Boolean(right.own));
+}
+
 export function ChatThread({ messages, label = "Conversation", className, ...props }: ChatThreadProps) {
   return (
     <ol className={cx("cf-chat-thread", className)} aria-label={label} {...props}>
-      {messages.map((message) => (
-        <li className="cf-chat__row" data-own={message.own || undefined} key={message.id}>
-          {message.avatar ? (
-            <PostImage image={message.avatar} className="cf-chat__avatar" alt="" />
-          ) : (
-            <span className="cf-chat__avatar" aria-hidden="true">
-              {message.author.slice(0, 1).toLocaleUpperCase()}
-            </span>
-          )}
-          <div className="cf-chat__message">
-            <p className="cf-chat__author">
-              <strong>{message.author}</strong>
-              {message.timestamp ? <time dateTime={message.timestamp}>{message.timestamp}</time> : null}
-            </p>
-            <div className="cf-chat__bubble">
-              {message.body ?? message.text}
-              {message.link ? (
-                <>
-                  {message.body !== undefined || message.text ? <br /> : null}
-                  <a
-                    className="cf-link"
-                    href={message.link}
-                    target={message.linkExternal ? "_blank" : undefined}
-                    rel={message.linkExternal ? "noopener noreferrer" : undefined}
-                  >
-                    {message.linkLabel ?? message.link}
-                  </a>
-                </>
+      {messages.map((message, index) => {
+        const groupStart = !isSameChatSender(messages[index - 1], message);
+        const groupEnd = !isSameChatSender(message, messages[index + 1]);
+        return (
+          <li
+            className="cf-chat__row"
+            data-own={message.own || undefined}
+            data-group-start={groupStart || undefined}
+            data-group-end={groupEnd || undefined}
+            key={message.id}
+          >
+            {message.avatar ? (
+              <PostImage image={message.avatar} className="cf-chat__avatar" alt="" />
+            ) : (
+              <span className="cf-chat__avatar" aria-hidden="true">
+                {message.author.slice(0, 1).toLocaleUpperCase()}
+              </span>
+            )}
+            <div className="cf-chat__message">
+              {groupStart ? (
+                <p className="cf-chat__author">
+                  <strong>{message.author}</strong>
+                </p>
               ) : null}
+              <div className="cf-chat__bubble">
+                {!groupStart ? <span className="cf-visually-hidden">{message.author}: </span> : null}
+                {message.body ?? message.text}
+                {message.link ? (
+                  <>
+                    {message.body !== undefined || message.text ? <br /> : null}
+                    <a
+                      className="cf-link"
+                      href={message.link}
+                      target={message.linkExternal ? "_blank" : undefined}
+                      rel={message.linkExternal ? "noopener noreferrer" : undefined}
+                    >
+                      {message.linkLabel ?? message.link}
+                    </a>
+                  </>
+                ) : null}
+                {message.timestamp ? (
+                  <time className="cf-chat__timestamp" dateTime={message.timestamp}>
+                    {message.timestamp}
+                  </time>
+                ) : null}
+              </div>
             </div>
-          </div>
-        </li>
-      ))}
+          </li>
+        );
+      })}
     </ol>
   );
 }
