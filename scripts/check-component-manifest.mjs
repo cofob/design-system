@@ -58,6 +58,7 @@ const expected = [
   "ChatThread",
   "Sticker",
   "AnimatedSticker",
+  "AnimatedStickerToggle",
 ];
 
 for (const name of expected) {
