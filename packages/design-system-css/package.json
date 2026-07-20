@@ -1,6 +1,6 @@
 {
   "name": "@cofob/design-system-css",
-  "version": "0.3.0",
+  "version": "0.4.0",
   "description": "CSS foundation, design tokens, and framework-agnostic controllers for the cofob design system.",
   "type": "module",
   "license": "SEE LICENSE IN LICENSE",

@@ -1,6 +1,6 @@
 {
   "name": "@cofob/design-system-stickers",
-  "version": "0.1.0",
+  "version": "0.2.0",
   "description": "Optimized, attributed Telegram sticker assets with generated React and Svelte components.",
   "type": "module",
   "sideEffects": false,
@@ -99,8 +99,8 @@
   },
   "devDependencies": {
     "@cofob/design-system-assets": "0.1.0",
-    "@cofob/design-system-react": ">=0.1.1 <1",
-    "@cofob/design-system-svelte": ">=0.1.1 <1",
+    "@cofob/design-system-react": ">=0.4.0",
+    "@cofob/design-system-svelte": ">=0.4.0",
     "@sveltejs/package": "^2.3.7",
     "@sveltejs/vite-plugin-svelte": "^6.0.0",
     "@types/node": "^24.0.0",

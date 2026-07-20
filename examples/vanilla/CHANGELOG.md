@@ -1,5 +1,13 @@
 # @cofob/example-vanilla
 
+## 0.0.4
+
+### Patch Changes
+
+- Updated dependencies [fa162ed]
+- Updated dependencies [ed47d11]
+  - @cofob/design-system-css@0.4.0
+
 ## 0.0.3
 
 ### Patch Changes
