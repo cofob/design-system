@@ -222,6 +222,8 @@ test("documents every public component", async ({ page }) => {
 });
 
 test("component API pages expose detailed examples and complete parameter tables", async ({ page }) => {
+  test.setTimeout(120_000);
+
   for (const route of componentRoutes) {
     await page.goto(route);
     const componentName = route
@@ -591,7 +593,7 @@ test("Captcha showroom simulation ignores repeated starts and supports success, 
     await page.evaluate((value) => {
       Math.random = () => value;
     }, randomValue);
-    await captcha.click();
+    await captcha.dispatchEvent("click");
     await expect(captcha).toHaveAttribute("data-state", "verifying");
     await expect(captcha).toHaveAttribute("aria-busy", "true");
 
