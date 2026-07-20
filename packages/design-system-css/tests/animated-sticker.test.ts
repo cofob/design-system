@@ -1,4 +1,4 @@
-import { afterEach, describe, expect, it, vi } from "vitest";
+import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import {
   createAnimatedStickerController,
   getAnimatedStickersEnabled,
@@ -6,9 +6,22 @@ import {
   setAnimatedStickersEnabled,
 } from "../src/index.js";
 
+beforeEach(() => {
+  const values = new Map<string, string>();
+  Object.defineProperty(window, "localStorage", {
+    configurable: true,
+    value: {
+      getItem: (key: string) => values.get(key) ?? null,
+      setItem: (key: string, value: string) => values.set(key, value),
+      removeItem: (key: string) => values.delete(key),
+    },
+  });
+});
+
 afterEach(() => {
   document.body.innerHTML = "";
   document.documentElement.removeAttribute("data-cf-animated-stickers");
+  window.localStorage.removeItem("cf-animated-stickers");
   vi.restoreAllMocks();
   vi.unstubAllGlobals();
 });
@@ -218,6 +231,29 @@ describe("animated sticker controller", () => {
     expect(video.hasAttribute("src")).toBe(false);
     expect(load).toHaveBeenCalledOnce();
     expect(root.querySelector(".cf-animated-sticker__skeleton > svg")).not.toBeNull();
+    controller.destroy();
+  });
+
+  it("restores the persisted disabled preference before assigning video src", () => {
+    mockMotion();
+    const intersection = mockIntersection();
+    setAnimatedStickersEnabled(false);
+    expect(window.localStorage.getItem("cf-animated-stickers")).toBe("disabled");
+
+    document.documentElement.removeAttribute("data-cf-animated-stickers");
+    const { root, video } = renderSticker();
+    const play = vi.fn(() => Promise.resolve());
+    Object.defineProperties(video, {
+      play: { configurable: true, value: play },
+      pause: { configurable: true, value: vi.fn() },
+    });
+
+    const controller = createAnimatedStickerController(root);
+    intersection.enter(root);
+    expect(document.documentElement.dataset.cfAnimatedStickers).toBe("disabled");
+    expect(root.dataset.state).toBe("disabled");
+    expect(video.hasAttribute("src")).toBe(false);
+    expect(play).not.toHaveBeenCalled();
     controller.destroy();
   });
 

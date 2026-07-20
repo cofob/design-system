@@ -40,13 +40,19 @@ export interface ResponsiveImageModel {
   height?: number;
 }
 
-/** Output of the trusted build-time TGS converter consumed by AnimatedSticker. */
-export interface AnimatedStickerModel {
+interface AnimatedStickerModelBase {
   src: string;
-  skeletonSvg: string;
   width: number;
   height: number;
 }
+
+/**
+ * Converted animated sticker consumed by AnimatedSticker.
+ * Vector animations keep a trusted inline SVG first frame, while video-based
+ * stickers reference an optimized WebP first frame.
+ */
+export type AnimatedStickerModel = AnimatedStickerModelBase &
+  ({ skeletonSvg: string; firstFrameSrc?: never } | { skeletonSvg?: never; firstFrameSrc: string });
 
 export interface PostModel {
   slug?: string;

@@ -1,5 +1,6 @@
 ---
 import type { GallerySticker } from "../data/sticker-gallery";
+import { stickerMediaUrl } from "../data/sticker-gallery";
 
 interface Props {
   sticker: GallerySticker;
@@ -9,6 +10,10 @@ interface Props {
 }
 
 const { sticker, src, alt, decorative = false } = Astro.props;
+const firstFrameSrc =
+  sticker.kind === "animated" && sticker.sourceFormat === "video"
+    ? stickerMediaUrl({ assetPath: sticker.firstFrameAssetPath })
+    : undefined;
 ---
 
 {
@@ -21,7 +26,20 @@ const { sticker, src, alt, decorative = false } = Astro.props;
       aria-label={decorative ? undefined : alt}
       aria-hidden={decorative || undefined}
     >
-      <span class="cf-animated-sticker__skeleton" aria-hidden="true" set:html={sticker.skeletonSvg} />
+      <span class="cf-animated-sticker__skeleton" aria-hidden="true">
+        {sticker.sourceFormat === "tgs" ? (
+          <Fragment set:html={sticker.skeletonSvg} />
+        ) : (
+          <img
+            src={firstFrameSrc}
+            width={sticker.width}
+            height={sticker.height}
+            loading="lazy"
+            decoding="async"
+            alt=""
+          />
+        )}
+      </span>
       <video
         data-cf-animated-sticker-video
         data-cf-animated-sticker-src={src}

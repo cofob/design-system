@@ -15,17 +15,24 @@ export function resolveAnimatedSticker(
   sticker: AnimatedStickerAsset,
   baseUrl = DEFAULT_STICKER_ASSET_BASE,
 ): AnimatedStickerModel {
-  return {
+  const base = {
     src: resolveStickerAsset(sticker, baseUrl),
-    skeletonSvg: sticker.skeletonSvg,
     width: sticker.width,
     height: sticker.height,
   };
+  return sticker.sourceFormat === "tgs"
+    ? { ...base, skeletonSvg: sticker.skeletonSvg }
+    : {
+        ...base,
+        firstFrameSrc: resolveStickerAsset({ assetPath: sticker.firstFrameAssetPath }, baseUrl),
+      };
 }
 
-export interface AnimatedStickerModel {
+interface AnimatedStickerModelBase {
   src: string;
-  skeletonSvg: string;
   width: number;
   height: number;
 }
+
+export type AnimatedStickerModel = AnimatedStickerModelBase &
+  ({ skeletonSvg: string; firstFrameSrc?: never } | { skeletonSvg?: never; firstFrameSrc: string });

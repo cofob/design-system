@@ -49,6 +49,19 @@ describe("client components", () => {
     expect(staticHtml).not.toContain("<video");
   });
 
+  it("server-renders a WebP first frame for video-based stickers", () => {
+    const sticker = {
+      src: "/stickers/vibe.webm",
+      firstFrameSrc: "/stickers/vibe.first-frame.123456789abc.webp",
+      width: 192,
+      height: 192,
+    };
+    const html = renderToString(<AnimatedSticker sticker={sticker} alt="Vibe flag" playback="static" />);
+    expect(html).toContain('<img src="/stickers/vibe.first-frame.123456789abc.webp"');
+    expect(html).not.toContain("<svg");
+    expect(html).not.toContain("<video");
+  });
+
   it("controls the global animated sticker flag", async () => {
     const onEnabledChange = vi.fn();
     render(
@@ -68,6 +81,20 @@ describe("client components", () => {
     expect(onEnabledChange).toHaveBeenCalledWith(true);
     expect(onEnabledChange).toHaveBeenCalledTimes(1);
     document.documentElement.removeAttribute("data-cf-animated-stickers");
+    localStorage.removeItem("cf-animated-stickers");
+  });
+
+  it("hydrates the animated sticker toggle from persisted storage", async () => {
+    localStorage.setItem("cf-animated-stickers", "disabled");
+    document.documentElement.removeAttribute("data-cf-animated-stickers");
+    render(<AnimatedStickerToggle label="Animated stickers" />);
+
+    const toggle = screen.getByRole("switch", { name: "Animated stickers" });
+    await waitFor(() => expect(toggle).not.toBeChecked());
+    expect(document.documentElement.dataset.cfAnimatedStickers).toBe("disabled");
+    expect(localStorage.getItem("cf-animated-stickers")).toBe("disabled");
+    document.documentElement.removeAttribute("data-cf-animated-stickers");
+    localStorage.removeItem("cf-animated-stickers");
   });
 
   it("shows the copy action by default and allows the toolbar to be disabled", () => {

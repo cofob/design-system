@@ -841,6 +841,11 @@ test("AnimatedStickerToggle synchronizes the global flag across adapters", async
 
   await selectFramework(page, "Native");
   await expect(nativeToggle).not.toBeChecked();
+
+  await page.reload();
+  await expect(page.locator("html")).toHaveAttribute("data-cf-animated-stickers", "disabled");
+  const reloadedNativePanel = await selectFramework(page, "Native");
+  await expect(reloadedNativePanel.getByRole("switch", { name: "Animated stickers" })).not.toBeChecked();
 });
 
 test("sticker gallery shards packs, lazy-loads WebM, and copies names or framework snippets", async ({
@@ -872,7 +877,8 @@ test("sticker gallery shards packs, lazy-loads WebM, and copies names or framewo
   if (!response) throw new Error("Animated Chris gallery did not return an HTTP response.");
   const html = await response.text();
   expect(html.match(/class="astro-sticker-card"/gu)).toHaveLength(37);
-  expect(html.match(/<svg\b/gu)?.length).toBeGreaterThanOrEqual(36);
+  expect(html.match(/class="cf-animated-sticker__skeleton"[^>]*>[\s\S]*?<svg\b/gu)).toHaveLength(35);
+  expect(html.match(/first-frame\.[a-f0-9]{12}\.webp/gu)).toHaveLength(1);
   const videoTags = html.match(/<video\b[^>]*>/gu) ?? [];
   expect(videoTags).toHaveLength(36);
   expect(videoTags.every((tag) => !/\ssrc=/u.test(tag))).toBe(true);
@@ -910,6 +916,17 @@ test("sticker gallery shards packs, lazy-loads WebM, and copies names or framewo
   await lastAnimated.scrollIntoViewIfNeeded();
   await expect(deferredVideo).toHaveAttribute("src", /\.webm$/u);
   expect(externalSkeletonRequests).toEqual([]);
+
+  const videoResponse = await page.goto("/stickers/vibe-flag/", { waitUntil: "domcontentloaded" });
+  if (!videoResponse) throw new Error("Vibe Flag gallery did not return an HTTP response.");
+  const videoHtml = await videoResponse.text();
+  expect(videoHtml.match(/first-frame\.[a-f0-9]{12}\.webp/gu)).toHaveLength(48);
+  expect(videoHtml.match(/class="cf-animated-sticker__skeleton"[^>]*>[\s\S]*?<img\b/gu)).toHaveLength(48);
+  const firstVideoCard = page.locator('.astro-sticker-card[data-sticker-kind="animated"]').first();
+  await expect(firstVideoCard.locator(".cf-animated-sticker__skeleton > img")).toHaveAttribute(
+    "src",
+    /first-frame\.[a-f0-9]{12}\.webp$/u,
+  );
 });
 
 test("BlueLine preserves the original marker geometry and motion in every adapter", async ({ page }) => {

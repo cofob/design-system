@@ -244,12 +244,12 @@
       },
       {
         "name": "AnimatedSticker",
-        "description": "Converted Telegram animation with an inline first-frame SVG fallback.",
+        "description": "Converted Telegram animation with an inline SVG or optimized WebP first frame.",
         "interactive": true
       },
       {
         "name": "AnimatedStickerToggle",
-        "description": "Global switch between animated WebM stickers and static SVG/WebP fallbacks.",
+        "description": "Persisted global switch between animated WebM stickers and static SVG/WebP first frames.",
         "interactive": true
       }
     ]

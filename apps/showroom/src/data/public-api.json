@@ -482,8 +482,8 @@
             {
               "name": "AnimatedStickerModel",
               "kind": "interface",
-              "signature": "interface AnimatedStickerModel { src; skeletonSvg; width; height }",
-              "summary": "Converted animation URL, trusted sanitized inline SVG first frame, and intrinsic dimensions.",
+              "signature": "type AnimatedStickerModel = { src; width; height } & ({ skeletonSvg } | { firstFrameSrc })",
+              "summary": "Converted animation URL, intrinsic dimensions, and an inline SVG or WebP first frame.",
               "entrypoints": [".", "./types"]
             },
             {
@@ -550,6 +550,13 @@
               "entrypoints": ["."]
             },
             {
+              "name": "ANIMATED_STICKERS_STORAGE_KEY",
+              "kind": "constant",
+              "signature": "const ANIMATED_STICKERS_STORAGE_KEY = cf-animated-stickers",
+              "summary": "localStorage key used to preserve the global animated sticker preference across reloads.",
+              "entrypoints": ["."]
+            },
+            {
               "name": "createAnimatedStickerController",
               "kind": "function",
               "signature": "createAnimatedStickerController(root: HTMLElement): AnimatedStickerController",
@@ -567,14 +574,14 @@
               "name": "getAnimatedStickersEnabled",
               "kind": "function",
               "signature": "getAnimatedStickersEnabled(root?: HTMLElement | null): boolean",
-              "summary": "Reads whether animated WebM stickers are globally enabled; missing markup defaults to true.",
+              "summary": "Restores and reads whether animated WebM stickers are globally enabled; missing storage and markup default to true.",
               "entrypoints": ["."]
             },
             {
               "name": "setAnimatedStickersEnabled",
               "kind": "function",
               "signature": "setAnimatedStickersEnabled(enabled: boolean, root?: HTMLElement | null): void",
-              "summary": "Updates the global HTML flag and all mounted animated stickers and controls.",
+              "summary": "Persists the preference and updates the global HTML flag, mounted stickers, and controls.",
               "entrypoints": ["."]
             },
             {
@@ -763,7 +770,7 @@
               "name": "AnimatedStickerModel",
               "kind": "type",
               "signature": "type AnimatedStickerModel = CssAnimatedStickerModel",
-              "summary": "React-facing alias for a converted animated sticker and its trusted inline SVG skeleton.",
+              "summary": "React-facing alias for a converted animated sticker with an inline SVG or WebP first frame.",
               "entrypoints": [".", "./types"]
             },
             {
@@ -1403,7 +1410,7 @@
               "name": "AnimatedStickerModel",
               "kind": "type",
               "signature": "type AnimatedStickerModel = CssAnimatedStickerModel",
-              "summary": "Svelte-facing alias for a converted animated sticker and its trusted inline SVG skeleton.",
+              "summary": "Svelte-facing alias for a converted animated sticker with an inline SVG or WebP first frame.",
               "entrypoints": ["."]
             },
             {
@@ -1606,9 +1613,23 @@
             },
             {
               "name": "AnimatedStickerAsset",
+              "kind": "type",
+              "signature": "type AnimatedStickerAsset = VectorAnimatedStickerAsset | VideoAnimatedStickerAsset",
+              "summary": "Full animated metadata with optimized WebM and an inline SVG or WebP first frame.",
+              "entrypoints": ["."]
+            },
+            {
+              "name": "VectorAnimatedStickerAsset",
               "kind": "interface",
-              "signature": "interface AnimatedStickerAsset",
-              "summary": "Full animated metadata including trusted inline SVG and optimized WebM information.",
+              "signature": "interface VectorAnimatedStickerAsset { sourceFormat: \"tgs\"; skeletonSvg; ... }",
+              "summary": "TGS-derived WebM metadata with a trusted inline SVG first frame.",
+              "entrypoints": ["."]
+            },
+            {
+              "name": "VideoAnimatedStickerAsset",
+              "kind": "interface",
+              "signature": "interface VideoAnimatedStickerAsset { sourceFormat: \"video\"; firstFrameAssetPath; firstFrameSrc; ... }",
+              "summary": "Video-derived WebM metadata with an optimized content-hashed WebP first frame.",
               "entrypoints": ["."]
             },
             {

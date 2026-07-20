@@ -6,10 +6,10 @@ import { fileURLToPath } from "node:url";
 
 import { convertTgs } from "@cofob/design-system-assets";
 import sharp from "sharp";
-import { optimize } from "svgo";
 
-const OUTPUT_SIZE = 192;
-const VIDEO_SKELETON_SIZE = 128;
+import { renderVideoFirstFrameWebp, VIDEO_FIRST_FRAME_SIZE } from "./video-first-frame.mjs";
+
+const OUTPUT_SIZE = VIDEO_FIRST_FRAME_SIZE;
 const CONCURRENCY = 3;
 const root = fileURLToPath(new URL("../", import.meta.url));
 const cacheRoot = path.join(root, ".cache", "telegram");
@@ -165,137 +165,6 @@ function inspectVideo(filename) {
   };
 }
 
-function firstVideoFrame(filename) {
-  const result = spawnSync(
-    "ffmpeg",
-    [
-      "-hide_banner",
-      "-loglevel",
-      "error",
-      "-i",
-      filename,
-      "-vf",
-      `scale=${VIDEO_SKELETON_SIZE}:${VIDEO_SKELETON_SIZE}:force_original_aspect_ratio=decrease,pad=${VIDEO_SKELETON_SIZE}:${VIDEO_SKELETON_SIZE}:(ow-iw)/2:(oh-ih)/2:color=0x00000000`,
-      "-frames:v",
-      "1",
-      "-f",
-      "rawvideo",
-      "-pix_fmt",
-      "rgba",
-      "pipe:1",
-    ],
-    { encoding: null, maxBuffer: 8_000_000, shell: false },
-  );
-  if (result.status !== 0)
-    throw new Error(`Could not decode the first video frame: ${result.stderr.toString()}`);
-  const expected = VIDEO_SKELETON_SIZE * VIDEO_SKELETON_SIZE * 4;
-  if (result.stdout.byteLength !== expected) {
-    throw new Error(`Decoded video frame has ${result.stdout.byteLength} bytes; expected ${expected}.`);
-  }
-  return result.stdout;
-}
-
-function channelRange(pixels, channel) {
-  let minimum = 255;
-  let maximum = 0;
-  for (const pixel of pixels) {
-    minimum = Math.min(minimum, pixel[channel]);
-    maximum = Math.max(maximum, pixel[channel]);
-  }
-  return maximum - minimum;
-}
-
-function paletteFor(pixels, maximumColors = 32) {
-  if (pixels.length === 0) return [];
-  const buckets = [pixels];
-  while (buckets.length < maximumColors) {
-    let selectedIndex = -1;
-    let selectedChannel = 0;
-    let selectedScore = 0;
-    for (let index = 0; index < buckets.length; index += 1) {
-      const bucket = buckets[index];
-      if (bucket.length < 2) continue;
-      const ranges = [0, 1, 2, 3].map((channel) => channelRange(bucket, channel));
-      const channel = ranges.indexOf(Math.max(...ranges));
-      const score = ranges[channel] * bucket.length;
-      if (score > selectedScore) {
-        selectedIndex = index;
-        selectedChannel = channel;
-        selectedScore = score;
-      }
-    }
-    if (selectedIndex < 0) break;
-    const bucket = buckets[selectedIndex].toSorted(
-      (left, right) => left[selectedChannel] - right[selectedChannel],
-    );
-    const midpoint = Math.floor(bucket.length / 2);
-    buckets.splice(selectedIndex, 1, bucket.slice(0, midpoint), bucket.slice(midpoint));
-  }
-  return buckets.map((bucket) =>
-    [0, 1, 2, 3].map((channel) =>
-      Math.round(bucket.reduce((sum, pixel) => sum + pixel[channel], 0) / bucket.length),
-    ),
-  );
-}
-
-function nearestColor(pixel, palette) {
-  let selected = 0;
-  let selectedDistance = Number.POSITIVE_INFINITY;
-  for (let index = 0; index < palette.length; index += 1) {
-    const color = palette[index];
-    const distance =
-      (pixel[0] - color[0]) ** 2 +
-      (pixel[1] - color[1]) ** 2 +
-      (pixel[2] - color[2]) ** 2 +
-      (pixel[3] - color[3]) ** 2 * 0.5;
-    if (distance < selectedDistance) {
-      selected = index;
-      selectedDistance = distance;
-    }
-  }
-  return selected;
-}
-
-function vectorizeFrame(buffer) {
-  const pixels = [];
-  for (let offset = 0; offset < buffer.byteLength; offset += 4) {
-    pixels.push([buffer[offset], buffer[offset + 1], buffer[offset + 2], buffer[offset + 3]]);
-  }
-  const opaque = pixels.filter((pixel) => pixel[3] >= 8);
-  const palette = paletteFor(opaque);
-  const groups = new Map();
-  for (let y = 0; y < VIDEO_SKELETON_SIZE; y += 1) {
-    let x = 0;
-    while (x < VIDEO_SKELETON_SIZE) {
-      const pixel = pixels[y * VIDEO_SKELETON_SIZE + x];
-      if (pixel[3] < 8 || palette.length === 0) {
-        x += 1;
-        continue;
-      }
-      const colorIndex = nearestColor(pixel, palette);
-      let end = x + 1;
-      while (end < VIDEO_SKELETON_SIZE) {
-        const next = pixels[y * VIDEO_SKELETON_SIZE + end];
-        if (next[3] < 8 || nearestColor(next, palette) !== colorIndex) break;
-        end += 1;
-      }
-      const commands = groups.get(colorIndex) ?? [];
-      commands.push(`M${x} ${y}h${end - x}v1h-${end - x}z`);
-      groups.set(colorIndex, commands);
-      x = end;
-    }
-  }
-  const paths = [...groups.entries()]
-    .map(([index, commands]) => {
-      const [red, green, blue, alpha] = palette[index];
-      const opacity = alpha < 250 ? ` fill-opacity="${(alpha / 255).toFixed(3)}"` : "";
-      return `<path fill="rgb(${red} ${green} ${blue})"${opacity} d="${commands.join("")}"/>`;
-    })
-    .join("");
-  const svg = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 ${VIDEO_SKELETON_SIZE} ${VIDEO_SKELETON_SIZE}" width="${OUTPUT_SIZE}" height="${OUTPUT_SIZE}" preserveAspectRatio="xMidYMid meet" aria-hidden="true" focusable="false">${paths}</svg>`;
-  return optimize(svg, { multipass: true }).data;
-}
-
 async function optimizeStatic(input) {
   return sharp(input, { animated: false })
     .rotate()
@@ -386,6 +255,10 @@ async function processSticker(token, pack, packMetadata, sticker, index, outputR
     const filename = `${position}.${hash.slice(0, 12)}.webm`;
     const destination = path.join(packOutput, filename);
     await rename(temporary, destination);
+    const firstFrame = await renderVideoFirstFrameWebp(destination);
+    const firstFrameHash = sha256(firstFrame);
+    const firstFrameFilename = `${position}.first-frame.${firstFrameHash.slice(0, 12)}.webp`;
+    await writeFile(path.join(packOutput, firstFrameFilename), firstFrame);
     const media = inspectVideo(destination);
     if (media.width !== OUTPUT_SIZE || media.height !== OUTPUT_SIZE) {
       throw new Error(
@@ -401,7 +274,8 @@ async function processSticker(token, pack, packMetadata, sticker, index, outputR
         sourceFormat: "video",
         assetPath: `${pack.slug}/${filename}`,
         src: `/stickers/${pack.slug}/${filename}`,
-        skeletonSvg: vectorizeFrame(firstVideoFrame(destination)),
+        firstFrameAssetPath: `${pack.slug}/${firstFrameFilename}`,
+        firstFrameSrc: `/stickers/${pack.slug}/${firstFrameFilename}`,
         fps: media.fps,
         frameCount: media.frameCount,
         duration: media.duration,
@@ -425,12 +299,13 @@ function svelteWrapper(entry) {
 }
 
 function rootIndex(packCatalog) {
-  return `import type { StickerPack } from "./types.js";\n\nexport { DEFAULT_STICKER_ASSET_BASE, resolveAnimatedSticker, resolveStickerAsset } from "./shared.js";\nexport type { AnimatedStickerAsset, AnimatedStickerSourceFormat, StaticStickerAsset, StickerAsset, StickerAssetIndexEntry, StickerAssetKind, StickerPack } from "./types.js";\n\nexport const packs = ${JSON.stringify(packCatalog, undefined, 2)} as const satisfies readonly StickerPack[];\n`;
+  return `import type { StickerPack } from "./types.js";\n\nexport { DEFAULT_STICKER_ASSET_BASE, resolveAnimatedSticker, resolveStickerAsset } from "./shared.js";\nexport type { AnimatedStickerAsset, AnimatedStickerSourceFormat, StaticStickerAsset, StickerAsset, StickerAssetIndexEntry, StickerAssetKind, StickerPack, VectorAnimatedStickerAsset, VideoAnimatedStickerAsset } from "./types.js";\n\nexport const packs = ${JSON.stringify(packCatalog, undefined, 2)} as const satisfies readonly StickerPack[];\n`;
 }
 
 function indexEntry(entry) {
   const asset = { ...entry.asset };
   delete asset.skeletonSvg;
+  delete asset.firstFrameSrc;
   delete asset.src;
   return { ...asset, manifestPath: `${entry.asset.id}.json` };
 }

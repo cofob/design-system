@@ -689,7 +689,7 @@ export function ReactComponentPreview({ name, animatedSticker }: Props) {
       return (
         <DS.AnimatedStickerToggle
           label="Animated stickers"
-          description="Turn off WebM playback and keep static SVG/WebP stickers."
+          description="Turn off WebM playback, persist the choice, and keep SVG/WebP first frames."
         />
       );
     default:
