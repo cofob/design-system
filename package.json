@@ -9,11 +9,11 @@
     "node": ">=24.11.0"
   },
   "workspaces": [
-    "packages/design-system-assets",
-    "packages/design-system-stickers",
     "packages/design-system-css",
     "packages/design-system-react",
     "packages/design-system-svelte",
+    "packages/design-system-assets",
+    "packages/design-system-stickers",
     "apps/showroom",
     "examples/vanilla",
     "examples/react",
@@ -43,7 +43,7 @@
     "changeset": "changeset",
     "version-packages": "changeset version",
     "release": "npm run build && changeset publish",
-    "deploy:showroom": "npm run build --workspace @cofob/design-system-css && npm run build --workspace @cofob/design-system-react && npm run build --workspace @cofob/design-system-svelte && npm run build --workspace @cofob/design-system-showroom && wrangler pages deploy apps/showroom/dist --project-name cofob-design-system --branch main"
+    "deploy:showroom": "npm run build --workspace @cofob/design-system-css && npm run build --workspace @cofob/design-system-react && npm run build --workspace @cofob/design-system-svelte && npm run build --workspace @cofob/design-system-assets && npm run build --workspace @cofob/design-system-stickers && npm run build --workspace @cofob/design-system-showroom && wrangler pages deploy apps/showroom/dist --project-name cofob-design-system --branch main"
   },
   "devDependencies": {
     "@arethetypeswrong/cli": "^0.18.2",

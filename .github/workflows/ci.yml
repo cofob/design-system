@@ -41,6 +41,7 @@ jobs:
       - run: npm run build --workspace @cofob/design-system-css
       - run: npm run build --workspace @cofob/design-system-react
       - run: npm run build --workspace @cofob/design-system-svelte
+      - run: npm run build --workspace @cofob/design-system-stickers
       - run: npm run build --workspace @cofob/design-system-showroom
       - run: npx playwright install chromium
       - run: npm run test:visual
