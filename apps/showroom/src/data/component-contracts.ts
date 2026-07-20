@@ -508,7 +508,8 @@ const parameterDescriptions: Record<string, string> = {
   copiedLabel: "Temporary success label after copying.",
   copyErrorLabel: "Error label when clipboard access fails.",
   copyResetAfter: "Delay before the copy action returns to its initial label.",
-  entries: "Ordered terminal commands with optional output kept separate from copyable commands.",
+  entries:
+    "Ordered terminal commands with optional automatically parsed ANSI output kept separate from copyable commands.",
   prompt: "Visual prompt prefix; it is never included in copied command text.",
   outputLabel: "Accessible name for command output regions.",
   density: "Controls table cell and caption padding.",
@@ -903,7 +904,14 @@ const stateOverrides: Record<string, readonly string[]> = {
   Alert: ["info", "success", "warning", "danger", "dismissible"],
   Card: ["default", "outlined", "elevated", "interactive"],
   CodeBlock: ["without toolbar", "language", "copyable", "copied", "copy error"],
-  TerminalCodeBlock: ["command", "output", "copied command", "copy error"],
+  TerminalCodeBlock: [
+    "command",
+    "plain output",
+    "ANSI color/style output",
+    "OSC 8 hyperlink",
+    "copied command",
+    "copy error",
+  ],
   Table: ["comfortable", "compact", "strong/muted header", "striped", "horizontal overflow", "focus-visible"],
   Dialog: ["closed", "open", "cancelled"],
   Popover: ["closed", "open", "light-dismiss"],
@@ -947,7 +955,8 @@ const reactUsage: Record<string, string> = {
   Captcha: '<Captcha state="idle" onClick={startVerification} />',
   EmptyState: '<EmptyState title="No posts" />',
   CodeBlock: '<CodeBlock code={source} language="typescript" />',
-  TerminalCodeBlock: "<TerminalCodeBlock entries={commands} />",
+  TerminalCodeBlock:
+    '<TerminalCodeBlock entries={[{ command: "npm run build", output: "\\u001b[1;32mBuild complete\\u001b[0m" }]} />',
   Table: '<Table label="Package comparison"><thead>…</thead><tbody>…</tbody></Table>',
   Pagination: "<Pagination currentPage={1} items={items} />",
   Dialog: '<Dialog trigger="Open" title="Confirm">Content</Dialog>',
@@ -988,7 +997,8 @@ const svelteUsage: Record<string, string> = {
   Switch: '<Switch label="Dark mode" bind:checked />',
   Captcha: "<Captcha state={captchaState} onclick={startVerification} />",
   CodeBlock: '<CodeBlock code={source} language="typescript" />',
-  TerminalCodeBlock: "<TerminalCodeBlock entries={commands} />",
+  TerminalCodeBlock:
+    '<TerminalCodeBlock entries={[{ command: "npm run build", output: "\\u001b[1;32mBuild complete\\u001b[0m" }]} />',
   Table: '<Table label="Package comparison"><thead>…</thead><tbody>…</tbody></Table>',
   Sticker:
     '<figure><Sticker data-image="true"><img src="/sticker.webp" alt="A delighted fox" /></Sticker><figcaption>Source: …</figcaption></figure>',
@@ -1032,7 +1042,7 @@ const nativeUsage: Record<string, string> = {
   CodeBlock:
     '<div class="cf-code-block" data-cf-copy-scope><button data-cf-copy-button>Copy</button><pre><code data-cf-copy-source>const value = 1;</code></pre></div>',
   TerminalCodeBlock:
-    '<div class="cf-terminal-code-block"><div data-cf-copy-scope><code data-cf-copy-source>npm run build</code><button data-cf-copy-button>Copy command</button><pre>Build complete</pre></div></div>',
+    '<div class="cf-terminal-code-block"><div data-cf-copy-scope><code data-cf-copy-source>npm run build</code><button data-cf-copy-button>Copy command</button><pre><code><span class="cf-terminal-output__token" data-bold="true" style="--cf-terminal-token-foreground:var(--cf-terminal-foreground-2)">Build complete</span></code></pre></div></div>',
   Table:
     '<div class="cf-table-container" role="region" aria-label="Package comparison" tabindex="0"><table class="cf-table" data-header-tone="strong" data-striped="true"><thead>…</thead><tbody>…</tbody></table></div>',
   Pagination: '<nav class="cf-pagination" aria-label="Pagination">…</nav>',

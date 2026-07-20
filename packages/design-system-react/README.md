@@ -45,11 +45,15 @@ the application boundary to add outside-click, Escape, and link dismissal:
 `CodeBlock` displays a language when `language` is provided and includes clipboard feedback by
 default; set `showLanguage={false}` to hide the language or `copyable={false}` to remove the copy
 action. `TerminalCodeBlock` keeps command and output nodes separate, highlights commands as Bash,
-and provides a copy action for every command by default. Captured output remains unhighlighted.
+and provides a copy action for every command by default. Captured output automatically interprets
+ANSI standard, 256-color, truecolor, text-style, and safe OSC 8 HTTP(S)/mail hyperlink sequences;
+screen controls are not emulated.
 
 ```tsx
 <CodeBlock code={'const theme = "system";'} language="typescript" />
-<TerminalCodeBlock entries={[{ command: "npm run build", output: "Build complete" }]} />
+<TerminalCodeBlock
+  entries={[{ command: "npm run build", output: "\u001b[1;32mBuild complete\u001b[0m" }]}
+/>
 ```
 
 ## Tables

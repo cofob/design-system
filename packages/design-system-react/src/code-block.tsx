@@ -1,9 +1,19 @@
 "use client";
 
-import { useEffect, useRef, useState } from "react";
-import type { HTMLAttributes } from "react";
-import { copyText, tokenizeBashCommand } from "@cofob/design-system-css";
-import type { BashToken, TerminalCodeEntry } from "@cofob/design-system-css";
+import { Fragment, useEffect, useRef, useState } from "react";
+import type { CSSProperties, HTMLAttributes } from "react";
+import {
+  copyText,
+  terminalColorToCss,
+  tokenizeBashCommand,
+  tokenizeTerminalOutput,
+} from "@cofob/design-system-css";
+import type {
+  BashToken,
+  TerminalCodeEntry,
+  TerminalOutputToken,
+  TerminalTextStyle,
+} from "@cofob/design-system-css";
 import { cx } from "./utils.js";
 
 type CopyState = "idle" | "copied" | "error";
@@ -26,6 +36,98 @@ function BashTokenView({ token }: { token: BashToken }) {
       {token.value}
     </span>
   );
+}
+
+type TerminalTokenCssProperties = CSSProperties & {
+  "--cf-terminal-token-foreground"?: string;
+  "--cf-terminal-token-background"?: string;
+  "--cf-terminal-token-underline"?: string;
+  "--cf-terminal-token-decoration-line"?: string;
+  "--cf-terminal-token-decoration-style"?: string;
+};
+
+function terminalTokenStyle(style: TerminalTextStyle): TerminalTokenCssProperties | undefined {
+  const decorations = [
+    style.underline ? "underline" : undefined,
+    style.strikethrough ? "line-through" : undefined,
+    style.overline ? "overline" : undefined,
+  ].filter(Boolean);
+  const properties: TerminalTokenCssProperties = {};
+  if (style.foreground) properties["--cf-terminal-token-foreground"] = terminalColorToCss(style.foreground);
+  if (style.background) {
+    properties["--cf-terminal-token-background"] = terminalColorToCss(style.background, "background");
+  }
+  if (style.underlineColor) {
+    properties["--cf-terminal-token-underline"] = terminalColorToCss(style.underlineColor);
+  }
+  if (decorations.length) properties["--cf-terminal-token-decoration-line"] = decorations.join(" ");
+  if (style.underline) {
+    properties["--cf-terminal-token-decoration-style"] =
+      style.underline === "curly" ? "wavy" : style.underline === "single" ? "solid" : style.underline;
+  }
+  return Object.keys(properties).length ? properties : undefined;
+}
+
+function hasTerminalStyle(style: TerminalTextStyle): boolean {
+  return Object.keys(style).length > 0;
+}
+
+function TerminalOutputTokenView({ token }: { token: TerminalOutputToken }) {
+  if (!hasTerminalStyle(token.style)) return token.value;
+  return (
+    <span
+      className="cf-terminal-output__token"
+      data-bold={token.style.bold || undefined}
+      data-dim={token.style.dim || undefined}
+      data-italic={token.style.italic || undefined}
+      data-underline={token.style.underline}
+      data-inverse={token.style.inverse || undefined}
+      data-concealed={token.style.concealed || undefined}
+      data-strikethrough={token.style.strikethrough || undefined}
+      data-overline={token.style.overline || undefined}
+      aria-hidden={token.style.concealed || undefined}
+      style={terminalTokenStyle(token.style)}
+    >
+      {token.value}
+    </span>
+  );
+}
+
+interface TerminalOutputRun {
+  href?: string;
+  tokens: TerminalOutputToken[];
+}
+
+function groupTerminalOutput(tokens: TerminalOutputToken[]): TerminalOutputRun[] {
+  const runs: TerminalOutputRun[] = [];
+  for (const token of tokens) {
+    const previous = runs.at(-1);
+    if (previous && previous.href === token.href) previous.tokens.push(token);
+    else runs.push({ ...(token.href ? { href: token.href } : {}), tokens: [token] });
+  }
+  return runs;
+}
+
+function TerminalOutputView({ output }: { output: string }) {
+  return groupTerminalOutput(tokenizeTerminalOutput(output)).map((run, runIndex) => {
+    const content = run.tokens.map((token, tokenIndex) => (
+      <TerminalOutputTokenView token={token} key={tokenIndex} />
+    ));
+    if (!run.href || run.tokens.every((token) => token.style.concealed)) {
+      return <Fragment key={runIndex}>{content}</Fragment>;
+    }
+    return (
+      <a
+        className="cf-terminal-output__link"
+        href={run.href}
+        target="_blank"
+        rel="noopener noreferrer"
+        key={runIndex}
+      >
+        {content}
+      </a>
+    );
+  });
 }
 
 function CopyButton({
@@ -204,7 +306,9 @@ export function TerminalCodeBlock({
                 tabIndex={0}
                 aria-label={`${outputLabel} ${index + 1}`}
               >
-                <code>{entry.output}</code>
+                <code>
+                  <TerminalOutputView output={entry.output} />
+                </code>
               </pre>
             ) : null}
             <span className="cf-visually-hidden" aria-live="polite" data-cf-copy-status />

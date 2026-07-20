@@ -1,7 +1,12 @@
 <script lang="ts">
   import type { HTMLAttributes } from "svelte/elements";
-  import { copyText, tokenizeBashCommand } from "@cofob/design-system-css";
-  import type { TerminalCodeEntry } from "@cofob/design-system-css";
+  import {
+    copyText,
+    terminalColorToCss,
+    tokenizeBashCommand,
+    tokenizeTerminalOutput,
+  } from "@cofob/design-system-css";
+  import type { TerminalCodeEntry, TerminalOutputToken, TerminalTextStyle } from "@cofob/design-system-css";
   import { cx } from "../internal.js";
 
   interface Props extends Omit<HTMLAttributes<HTMLDivElement>, "children"> {
@@ -55,7 +60,71 @@
     for (const timer of resetTimers.values()) clearTimeout(timer);
     resetTimers.clear();
   });
+
+  interface TerminalOutputRun {
+    href?: string;
+    tokens: TerminalOutputToken[];
+  }
+
+  function groupTerminalOutput(output: string): TerminalOutputRun[] {
+    const runs: TerminalOutputRun[] = [];
+    for (const token of tokenizeTerminalOutput(output)) {
+      const previous = runs.at(-1);
+      if (previous && previous.href === token.href) previous.tokens.push(token);
+      else runs.push({ ...(token.href ? { href: token.href } : {}), tokens: [token] });
+    }
+    return runs;
+  }
+
+  function hasTerminalStyle(style: TerminalTextStyle): boolean {
+    return Object.keys(style).length > 0;
+  }
+
+  function terminalTokenStyle(style: TerminalTextStyle): string | undefined {
+    const properties: string[] = [];
+    const decorations = [
+      style.underline ? "underline" : undefined,
+      style.strikethrough ? "line-through" : undefined,
+      style.overline ? "overline" : undefined,
+    ].filter(Boolean);
+    if (style.foreground) {
+      properties.push(`--cf-terminal-token-foreground:${terminalColorToCss(style.foreground)}`);
+    }
+    if (style.background) {
+      properties.push(`--cf-terminal-token-background:${terminalColorToCss(style.background, "background")}`);
+    }
+    if (style.underlineColor) {
+      properties.push(`--cf-terminal-token-underline:${terminalColorToCss(style.underlineColor)}`);
+    }
+    if (decorations.length) {
+      properties.push(`--cf-terminal-token-decoration-line:${decorations.join(" ")}`);
+    }
+    if (style.underline) {
+      properties.push(
+        `--cf-terminal-token-decoration-style:${style.underline === "curly" ? "wavy" : style.underline === "single" ? "solid" : style.underline}`,
+      );
+    }
+    return properties.length ? properties.join(";") : undefined;
+  }
 </script>
+
+{#snippet terminalOutputToken(token: TerminalOutputToken)}
+  {#if hasTerminalStyle(token.style)}
+    <span
+      class="cf-terminal-output__token"
+      data-bold={token.style.bold || undefined}
+      data-dim={token.style.dim || undefined}
+      data-italic={token.style.italic || undefined}
+      data-underline={token.style.underline}
+      data-inverse={token.style.inverse || undefined}
+      data-concealed={token.style.concealed || undefined}
+      data-strikethrough={token.style.strikethrough || undefined}
+      data-overline={token.style.overline || undefined}
+      aria-hidden={token.style.concealed || undefined}
+      style={terminalTokenStyle(token.style)}>{token.value}</span
+    >
+  {:else}{token.value}{/if}
+{/snippet}
 
 <div class={cx("cf-terminal-code-block", className)} role="region" aria-label={label} {...rest}>
   <div class="cf-terminal-code-block__toolbar">
@@ -95,12 +164,23 @@
           {/if}
         </div>
         {#if entry.output !== undefined}
+          {@const outputRuns = groupTerminalOutput(entry.output)}
           <!-- svelte-ignore a11y_no_noninteractive_tabindex (keyboard access for horizontally scrollable output) -->
           <pre
             class="cf-terminal-code-block__output"
             role="region"
             tabindex="0"
-            aria-label={`${outputLabel} ${index + 1}`}><code>{entry.output}</code></pre>
+            aria-label={`${outputLabel} ${index + 1}`}><code
+              >{#each outputRuns as run}{#if run.href && !run.tokens.every((token) => token.style.concealed)}<a
+                    class="cf-terminal-output__link"
+                    href={run.href}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    >{#each run.tokens as token}{@render terminalOutputToken(token)}{/each}</a
+                  >{:else}{#each run.tokens as token}{@render terminalOutputToken(
+                      token,
+                    )}{/each}{/if}{/each}</code
+            ></pre>
         {/if}
         <span class="cf-visually-hidden" aria-live="polite" data-cf-copy-status
           >{state === "copied"

@@ -116,7 +116,15 @@ describe("client components", () => {
       const { container } = render(
         <>
           <CodeBlock code={'const theme = "dark";'} language="typescript" />
-          <TerminalCodeBlock entries={[{ command: "npm run build", output: "output must not be copied" }]} />
+          <TerminalCodeBlock
+            entries={[
+              {
+                command: "npm run build",
+                output:
+                  "\u001b[1;32moutput\u001b[0m <strong>must not be markup</strong> · \u001b]8;;https://design.cofob.dev\u0007report\u001b]8;;\u0007",
+              },
+            ]}
+          />
         </>,
       );
 
@@ -125,13 +133,27 @@ describe("client components", () => {
       expect(command).toHaveTextContent(/^npm run build$/);
       expect(command.querySelector('[data-token="command"]')).toHaveTextContent("npm");
       expect(container.querySelector(".cf-terminal-code-block__output .cf-syntax-token")).toBeNull();
+      expect(container.querySelector('.cf-terminal-output__token[data-bold="true"]')).toHaveTextContent(
+        "output",
+      );
+      expect(container.querySelector(".cf-terminal-code-block__output")).not.toHaveTextContent("\u001b");
+      expect(container.querySelector(".cf-terminal-code-block__output strong")).toBeNull();
+      expect(container.querySelector(".cf-terminal-code-block__output")).toHaveTextContent(
+        "<strong>must not be markup</strong>",
+      );
+      expect(screen.getByRole("link", { name: "report" })).toHaveAttribute(
+        "href",
+        "https://design.cofob.dev",
+      );
+      expect(screen.getByRole("link", { name: "report" })).toHaveAttribute("target", "_blank");
+      expect(screen.getByRole("link", { name: "report" })).toHaveAttribute("rel", "noopener noreferrer");
       fireEvent.click(screen.getByRole("button", { name: "Copy typescript code" }));
       await waitFor(() => expect(writeText).toHaveBeenCalledWith('const theme = "dark";'));
       expect(screen.getByRole("button", { name: "Code copied to clipboard" })).toHaveTextContent("Copied");
 
       fireEvent.click(screen.getByRole("button", { name: "Copy command 1" }));
       await waitFor(() => expect(writeText).toHaveBeenLastCalledWith("npm run build"));
-      expect(writeText).not.toHaveBeenCalledWith(expect.stringContaining("output must not be copied"));
+      expect(writeText).not.toHaveBeenCalledWith(expect.stringContaining("output"));
     } finally {
       if (originalClipboard) Object.defineProperty(navigator, "clipboard", originalClipboard);
       else Reflect.deleteProperty(navigator, "clipboard");

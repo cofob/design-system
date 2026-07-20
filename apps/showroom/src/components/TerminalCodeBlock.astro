@@ -1,6 +1,7 @@
 ---
 import { tokenizeBashCommand } from "@cofob/design-system-css";
 import type { TerminalCodeEntry } from "@cofob/design-system-css";
+import { renderTerminalOutput } from "./terminal-output";
 
 interface Props {
   entries: readonly TerminalCodeEntry[];
@@ -31,7 +32,6 @@ const renderBashCommand = (command: string) =>
     .join("");
 const renderBashCode = (command: string) =>
   `<code data-cf-copy-source data-language="bash">${renderBashCommand(command)}</code>`;
-const renderTerminalOutput = (output: string) => `<code>${escapeHtml(output)}</code>`;
 ---
 
 <div class="cf-terminal-code-block" role="region" aria-label={label}>

@@ -101,6 +101,35 @@ export interface TerminalCodeEntry {
   output?: string;
 }
 
+/** A terminal color selected from the ANSI palette or an exact RGB value. */
+export type TerminalColor =
+  { mode: "indexed"; index: number } | { mode: "rgb"; red: number; green: number; blue: number };
+
+/** Underline variants supported by modern terminal SGR sequences. */
+export type TerminalUnderlineStyle = "single" | "double" | "curly" | "dotted" | "dashed";
+
+/** Presentation state attached to one terminal output token. */
+export interface TerminalTextStyle {
+  foreground?: TerminalColor;
+  background?: TerminalColor;
+  underlineColor?: TerminalColor;
+  bold?: boolean;
+  dim?: boolean;
+  italic?: boolean;
+  underline?: TerminalUnderlineStyle;
+  inverse?: boolean;
+  concealed?: boolean;
+  strikethrough?: boolean;
+  overline?: boolean;
+}
+
+/** One printable terminal output segment and its active presentation state. */
+export interface TerminalOutputToken {
+  value: string;
+  style: TerminalTextStyle;
+  href?: string;
+}
+
 export type BashTokenKind =
   "plain" | "command" | "option" | "string" | "variable" | "operator" | "comment" | "number";
 

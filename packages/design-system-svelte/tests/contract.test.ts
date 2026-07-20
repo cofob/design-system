@@ -205,7 +205,15 @@ describe("Svelte adapter contract", () => {
       props: { code: 'const theme = "dark";', language: "typescript" },
     });
     const terminal = render(TerminalCodeBlock, {
-      props: { entries: [{ command: "npm run build", output: "Build complete" }] },
+      props: {
+        entries: [
+          {
+            command: "npm run build",
+            output:
+              "\u001b[1;32mBuild\u001b[0m complete <strong>as text</strong> · \u001b]8;;https://design.cofob.dev\u0007report\u001b]8;;\u0007",
+          },
+        ],
+      },
     });
 
     expect(plainCode.body).toContain("cf-code-block__toolbar");
@@ -221,7 +229,15 @@ describe("Svelte adapter contract", () => {
     expect(terminal.body).toContain('class="cf-syntax-token" data-token="command">npm</span>');
     expect(terminal.body.match(/class="cf-syntax-token"/g)).toHaveLength(1);
     expect(terminal.body).toContain(" run build");
-    expect(terminal.body).toContain("Build complete");
+    expect(terminal.body).toContain(">Build</span>");
+    expect(terminal.body).toContain(" complete");
+    expect(terminal.body).toContain("&lt;strong>as text&lt;/strong>");
+    expect(terminal.body).toContain('class="cf-terminal-output__token"');
+    expect(terminal.body).toContain('data-bold="true"');
+    expect(terminal.body).toContain(
+      'class="cf-terminal-output__link" href="https://design.cofob.dev" target="_blank" rel="noopener noreferrer"',
+    );
+    expect(terminal.body).not.toContain("\u001b");
   });
 
   it("server-renders an accessible responsive table contract", () => {

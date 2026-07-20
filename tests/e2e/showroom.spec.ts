@@ -602,6 +602,8 @@ test("CodeBlock and TerminalCodeBlock copy only their explicit sources", async (
   });
 
   await page.goto("/components/code-block/");
+  await page.evaluate(() => localStorage.setItem("cf-theme", "light"));
+  await page.reload();
   for (const framework of frameworkNames) {
     const panel = await selectFramework(page, framework);
     await expect(panel.locator(".cf-code-block__language")).toHaveText("typescript");
@@ -627,9 +629,19 @@ test("CodeBlock and TerminalCodeBlock copy only their explicit sources", async (
     );
     await expect(command.locator('[data-token="command"]')).toHaveText("npm");
     await expect(firstEntry.locator(".cf-terminal-code-block__output .cf-syntax-token")).toHaveCount(0);
+    const outputTokens = firstEntry.locator(".cf-terminal-output__token");
+    await expect(outputTokens).toHaveCount(2);
+    await expect(outputTokens.first()).toHaveAttribute("data-bold", "true");
+    await expect(outputTokens.first()).toHaveCSS("color", "rgb(22, 101, 52)");
+    await expect(outputTokens.nth(1)).toHaveCSS("text-decoration-color", "rgb(255, 135, 0)");
     expect(
       await firstEntry.locator(".cf-terminal-code-block__output").evaluate((element) => element.textContent),
     ).toBe("added 1 package in 842ms");
+    expect(
+      await firstEntry
+        .locator(".cf-terminal-code-block__output")
+        .evaluate((element) => element.textContent?.includes("\u001b")),
+    ).toBe(false);
     await firstEntry.getByRole("button", { name: "Copy command 1", exact: true }).click();
     await expect(firstEntry.locator(".cf-code-copy")).toHaveAttribute("data-copy-state", "copied");
     expect(
@@ -637,6 +649,28 @@ test("CodeBlock and TerminalCodeBlock copy only their explicit sources", async (
     ).toBe("npm install @cofob/design-system-css");
     await expect(firstEntry.locator(".cf-terminal-code-block__output")).toContainText(
       "added 1 package in 842ms",
+    );
+
+    const secondEntry = panel.locator(".cf-terminal-code-block__entry").nth(1);
+    const truecolor = secondEntry.locator(".cf-terminal-output__token").first();
+    const underline = secondEntry.locator('[data-underline="curly"]');
+    await expect(truecolor).toHaveCSS("text-decoration-color", "rgb(125, 211, 252)");
+    await expect(underline).toHaveCSS("text-decoration-style", "wavy");
+    const reportLink = secondEntry.getByRole("link", { name: "design.cofob.dev" });
+    await expect(reportLink).toHaveAttribute("href", "https://design.cofob.dev");
+    await expect(reportLink).toHaveAttribute("target", "_blank");
+    await expect(reportLink).toHaveAttribute("rel", "noopener noreferrer");
+    await reportLink.focus();
+    await expect(reportLink).toBeFocused();
+  }
+
+  await page.evaluate(() => localStorage.setItem("cf-theme", "dark"));
+  await page.reload();
+  for (const framework of frameworkNames) {
+    const panel = await selectFramework(page, framework);
+    await expect(panel.locator(".cf-terminal-output__token").first()).toHaveCSS(
+      "color",
+      "rgb(134, 239, 172)",
     );
   }
 });
@@ -1566,6 +1600,26 @@ test("reduced motion and forced colors preserve usable feedback", async ({ page 
   expect(presentation.duration).toBeLessThanOrEqual(0.01);
   expect(presentation.outlineStyle).not.toBe("none");
   expect(presentation.outlineWidth).toBeGreaterThanOrEqual(3);
+
+  await page.goto("/components/terminal-code-block/");
+  const terminalPanel = await selectFramework(page, "Native");
+  const styledOutput = terminalPanel.locator(".cf-terminal-output__token").nth(1);
+  const forcedPresentation = await styledOutput.evaluate((element) => {
+    const styles = getComputedStyle(element);
+    return {
+      color: styles.color,
+      decorationColor: styles.textDecorationColor,
+      backgroundColor: styles.backgroundColor,
+    };
+  });
+  expect(forcedPresentation.decorationColor).toBe(forcedPresentation.color);
+  expect(forcedPresentation.backgroundColor).toMatch(/^rgba\(.+, 0\)$/);
+  const terminalLink = terminalPanel.getByRole("link", { name: "design.cofob.dev" });
+  await terminalLink.focus();
+  await expect(terminalLink).toBeFocused();
+  expect(
+    Number.parseFloat(await terminalLink.evaluate((element) => getComputedStyle(element).outlineWidth)),
+  ).toBe(3);
 });
 
 for (const framework of frameworkNames) {

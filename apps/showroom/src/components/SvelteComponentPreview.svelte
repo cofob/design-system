@@ -94,8 +94,15 @@
   const codeBlockExample = `const preference = "system";
 applyTheme(preference);`;
   const terminalEntries = [
-    { command: "npm install @cofob/design-system-css", output: "added 1 package in 842ms" },
-    { command: "npm run build -- --mode production", output: "✓ 51 pages built" },
+    {
+      command: "npm install @cofob/design-system-css",
+      output: "\u001b[1;32madded 1 package\u001b[0m in \u001b[4;58;5;208m842ms\u001b[0m",
+    },
+    {
+      command: "npm run build -- --mode production",
+      output:
+        "\u001b[4:3;58:2::125:211:252m✓ 51 pages built\u001b[0m\n\u001b[4:2mReport\u001b[24m: \u001b]8;;https://design.cofob.dev\u0007design.cofob.dev\u001b]8;;\u0007",
+    },
   ];
   const menuItems = [
     { id: "edit", label: "Edit" },

@@ -413,7 +413,35 @@
               "name": "TerminalCodeEntry",
               "kind": "interface",
               "signature": "interface TerminalCodeEntry { command: string; output?: string }",
-              "summary": "Portable terminal command and optional captured output.",
+              "summary": "Portable terminal command and optional plain or ANSI-styled captured output.",
+              "entrypoints": [".", "./types"]
+            },
+            {
+              "name": "TerminalColor",
+              "kind": "type",
+              "signature": "type TerminalColor = { mode: indexed; index } | { mode: rgb; red; green; blue }",
+              "summary": "ANSI indexed or exact RGB terminal color.",
+              "entrypoints": [".", "./types"]
+            },
+            {
+              "name": "TerminalUnderlineStyle",
+              "kind": "type",
+              "signature": "type TerminalUnderlineStyle = single | double | curly | dotted | dashed",
+              "summary": "Modern terminal underline variants mapped to CSS decoration styles.",
+              "entrypoints": [".", "./types"]
+            },
+            {
+              "name": "TerminalTextStyle",
+              "kind": "interface",
+              "signature": "interface TerminalTextStyle { foreground?; background?; underlineColor?; bold?; dim?; italic?; underline?; inverse?; concealed?; strikethrough?; overline? }",
+              "summary": "Active SGR presentation state for terminal output text.",
+              "entrypoints": [".", "./types"]
+            },
+            {
+              "name": "TerminalOutputToken",
+              "kind": "interface",
+              "signature": "interface TerminalOutputToken { value: string; style: TerminalTextStyle; href?: string }",
+              "summary": "Printable terminal text carrying safe style and optional OSC 8 hyperlink metadata.",
               "entrypoints": [".", "./types"]
             },
             {
@@ -435,6 +463,20 @@
               "kind": "function",
               "signature": "tokenizeBashCommand(source: string): BashToken[]",
               "summary": "Classifies Bash command text for syntax presentation without changing its content.",
+              "entrypoints": ["."]
+            },
+            {
+              "name": "tokenizeTerminalOutput",
+              "kind": "function",
+              "signature": "tokenizeTerminalOutput(source: string): TerminalOutputToken[]",
+              "summary": "Converts ANSI SGR and safe OSC 8 output into portable tokens without emulating a terminal screen.",
+              "entrypoints": ["."]
+            },
+            {
+              "name": "terminalColorToCss",
+              "kind": "function",
+              "signature": "terminalColorToCss(color: TerminalColor, usage?: foreground | background): string",
+              "summary": "Resolves theme-aware ANSI, xterm indexed, and RGB colors to safe CSS values.",
               "entrypoints": ["."]
             },
             {
