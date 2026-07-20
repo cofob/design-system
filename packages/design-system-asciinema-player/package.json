@@ -1,6 +1,6 @@
 {
   "name": "@cofob/design-system-asciinema-player",
-  "version": "0.4.1",
+  "version": "0.5.0",
   "description": "Accessible Native, React, and Svelte adapters for asciinema-player using the cofob design system.",
   "type": "module",
   "license": "SEE LICENSE IN LICENSE",
@@ -76,7 +76,7 @@
     }
   },
   "devDependencies": {
-    "@cofob/design-system-css": "0.4.1",
+    "@cofob/design-system-css": "0.5.0",
     "@sveltejs/package": "^2.3.7",
     "@sveltejs/vite-plugin-svelte": "^6.0.0",
     "@testing-library/jest-dom": "^6.6.3",

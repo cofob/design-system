@@ -1,6 +1,6 @@
 {
   "name": "@cofob/example-react",
-  "version": "0.0.5",
+  "version": "0.0.6",
   "private": true,
   "type": "module",
   "scripts": {
@@ -8,8 +8,8 @@
     "typecheck": "tsc --noEmit"
   },
   "dependencies": {
-    "@cofob/design-system-css": "0.4.1",
-    "@cofob/design-system-react": "0.4.1",
+    "@cofob/design-system-css": "0.5.0",
+    "@cofob/design-system-react": "0.5.0",
     "lucide-react": "^0.545.0",
     "react": "^19.2.0",
     "react-dom": "^19.2.0"
