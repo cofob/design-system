@@ -108,8 +108,9 @@ const componentMappings = [
     <h2>Components that intentionally stay in the site</h2>
     <p>
       SEO metadata, structured data, feed rendering, Fediverse fetching and sanitization, blog asset
-      processing, CommentThread, Comments, CommentMedia, and the Asciinema player remain application concerns.
-      They may compose design-system primitives but are not package APIs.
+      processing, recording URL validation, dedicated player routes, CommentThread, Comments, and CommentMedia
+      remain application concerns. The Asciinema browser runtime and its adapter shells are available through
+      the optional <code>@cofob/design-system-asciinema-player</code> package.
     </p>
 
     <h2>Acceptance checks</h2>

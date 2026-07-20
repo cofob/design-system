@@ -42,6 +42,20 @@ import {
 
 // CSS stays an explicit application-level import.
 import "@cofob/design-system-css/index.css";`,
+  "asciinema-player": `import "@cofob/design-system-css/index.css";
+import "@cofob/design-system-asciinema-player/styles.css";
+import {
+  createAsciinemaPlayerController,
+} from "@cofob/design-system-asciinema-player";
+
+const controller = createAsciinemaPlayerController(figure, {
+  source: "/recordings/example.cast",
+  label: "Build demonstration",
+  fallbackHref: "/recordings/example",
+});
+
+await controller.ready;
+controller.destroy();`,
   stickers: `import AnimatedChris001 from "@cofob/design-system-stickers/react/AnimatedChris001";
 import animatedChris from "@cofob/design-system-stickers/catalogs/animated-chris" with { type: "json" };
 

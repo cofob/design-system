@@ -1,4 +1,5 @@
 import * as DS from "@cofob/design-system-react";
+import { AsciinemaPlayer } from "@cofob/design-system-asciinema-player/react";
 import { Plus } from "lucide-react";
 
 interface Props {
@@ -178,6 +179,20 @@ export function ReactComponentPreview({ name, animatedSticker }: Props) {
       return <DS.CodeBlock code={codeBlockExample} language="typescript" copyable />;
     case "TerminalCodeBlock":
       return <DS.TerminalCodeBlock entries={terminalEntries} />;
+    case "AsciinemaPlayer":
+      return (
+        <AsciinemaPlayer
+          source="/asciinema/design-system-demo.cast"
+          options={{ cols: 72, rows: 9, poster: "npt:0.1", preload: true }}
+          label="cofob design system terminal demonstration"
+          fallbackHref="/asciinema/design-system-demo.cast"
+          labels={{
+            loadingTitle: "Terminal demonstration",
+            errorTitle: "Terminal player unavailable",
+            fallbackLink: "Open recording",
+          }}
+        />
+      );
     case "Table":
       return (
         <DS.Table label="Package comparison" density="compact" striped minWidth="28rem">

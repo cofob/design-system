@@ -280,6 +280,52 @@ const renderBashCode = (command: string) =>
     )
   }
   {
+    name === "AsciinemaPlayer" && (
+      <figure
+        class="cf-asciinema-player"
+        data-cf-asciinema-player
+        data-native-asciinema-player
+        data-source="/asciinema/design-system-demo.cast"
+        data-state="loading"
+        aria-label="cofob design system terminal demonstration"
+        aria-busy="true"
+      >
+        <div class="cf-stack" data-gap="sm" data-align="stretch" data-cf-asciinema-player-shell>
+          <div
+            class="cf-card cf-asciinema-player__stage"
+            data-variant="default"
+            data-padding="none"
+            data-cf-asciinema-player-stage
+            hidden
+          >
+            <div data-cf-asciinema-player-mount />
+          </div>
+          <div
+            class="cf-alert cf-asciinema-player__fallback"
+            data-tone="info"
+            role="status"
+            data-cf-asciinema-player-fallback
+          >
+            <div class="cf-alert__content">
+              <div class="cf-alert__title" data-cf-asciinema-player-fallback-title>
+                Terminal demonstration
+              </div>
+              <div class="cf-alert__description">
+                <a
+                  class="cf-link"
+                  href="/asciinema/design-system-demo.cast"
+                  data-cf-asciinema-player-fallback-link
+                >
+                  Open recording
+                </a>
+              </div>
+            </div>
+          </div>
+        </div>
+      </figure>
+    )
+  }
+  {
     name === "Table" && (
       <div
         class="cf-table-container"
@@ -1350,3 +1396,30 @@ const renderBashCode = (command: string) =>
     )
   }
 </div>
+
+<script>
+  import { createAsciinemaPlayerController } from "@cofob/design-system-asciinema-player";
+
+  const asciinemaControllers = Array.from(
+    document.querySelectorAll<HTMLElement>("[data-native-asciinema-player]"),
+    (root) =>
+      createAsciinemaPlayerController(root, {
+        source: root.dataset.source ?? "/asciinema/design-system-demo.cast",
+        options: { cols: 72, rows: 9, poster: "npt:0.1", preload: true },
+        fallbackHref: "/asciinema/design-system-demo.cast",
+        labels: {
+          loadingTitle: "Terminal demonstration",
+          errorTitle: "Terminal player unavailable",
+          fallbackLink: "Open recording",
+        },
+      }),
+  );
+
+  window.addEventListener(
+    "pagehide",
+    () => {
+      for (const controller of asciinemaControllers) controller.destroy();
+    },
+    { once: true },
+  );
+</script>

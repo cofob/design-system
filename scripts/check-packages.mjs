@@ -4,6 +4,26 @@ import { tmpdir } from "node:os";
 import path from "node:path";
 
 const packageRequirements = {
+  "@cofob/design-system-asciinema-player": {
+    files: [
+      "LICENSE",
+      "LICENSES/asciinema-player-Apache-2.0.txt",
+      "README.md",
+      "THIRD_PARTY_NOTICES.md",
+      "dist/index.js",
+      "dist/index.d.ts",
+      "dist/react/index.js",
+      "dist/react/index.d.ts",
+      "dist/svelte/index.js",
+      "dist/svelte/index.d.ts",
+      "dist/styles.css",
+    ],
+    patterns: [
+      { description: "compiled JavaScript", test: (file) => /^dist\/.+\.js$/.test(file) },
+      { description: "TypeScript declarations", test: (file) => /^dist\/.+\.d\.ts$/.test(file) },
+      { description: "compiled player stylesheet", test: (file) => file === "dist/styles.css" },
+    ],
+  },
   "@cofob/design-system-assets": {
     files: [
       "LICENSE",
@@ -108,6 +128,7 @@ const packageDirectories = [
   "design-system-assets",
   "design-system-stickers",
   "design-system-css",
+  "design-system-asciinema-player",
   "design-system-react",
   "design-system-svelte",
 ];

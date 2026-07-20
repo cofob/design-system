@@ -1,6 +1,6 @@
 # Migrating cofob.dev
 
-Version 0.1.1 adds the application and publishing contracts required to migrate the neighboring `cofob.dev` repository without local presentation CSS. Migrate the consumer only after all three fixed packages are published at the same version.
+Version 0.1.1 adds the application and publishing contracts required to migrate the neighboring `cofob.dev` repository without local presentation CSS. Migrate the consumer only after all four fixed packages are published at the same version.
 
 1. Install the CSS and Svelte packages and import `index.css` once in the root layout.
 2. Add `ThemeScript` in the document head and `ThemeProvider` around `AppShell`.
@@ -10,7 +10,7 @@ Version 0.1.1 adds the application and publishing contracts required to migrate 
 6. Move article descendant utilities to `Prose`; use PostCard, LatestPostCard, SearchResultCard, ResponsiveImage, Avatar, InlineEmoji, MediaGrid, ChatThread, and Sticker where appropriate.
 7. Remove the legacy utility pipeline only after source searches and every deployment test pass.
 
-Application behavior stays in cofob.dev: metadata and JSON-LD, RSS/Atom portable rendering, Fediverse fetching/sanitization, blog asset processing, and Asciinema runtime. Those features compose the design system but are not public package APIs.
+Application behavior stays in cofob.dev: metadata and JSON-LD, RSS/Atom portable rendering, Fediverse fetching/sanitization, blog asset processing, recording URL validation, and dedicated fallback routes. The browser player and its Native, React, and Svelte shells are provided by `@cofob/design-system-asciinema-player`.
 
 Representative mappings:
 
@@ -28,23 +28,24 @@ Representative mappings:
 
 Local component replacements:
 
-| Existing cofob.dev component         | Design-system replacement                      |
-| ------------------------------------ | ---------------------------------------------- |
-| `Navbar.svelte` / `Footer.svelte`    | `Navbar` / `Footer`                            |
-| `Section.svelte` / `Heading.svelte`  | `Section` / `Heading`                          |
-| `BlueLine.svelte`                    | `BlueLine`                                     |
-| `blog/PostCard.svelte`               | `PostCard`                                     |
-| `blog/LatestPostLink.svelte`         | `LatestPostCard`                               |
-| `blog/ResponsiveImage.svelte`        | `ResponsiveImage`                              |
-| `blog/ChatThread.svelte`             | `ChatThread`                                   |
-| `blog/Sticker.svelte`                | `Sticker`                                      |
-| comment avatar / initials fallback   | `Avatar`                                       |
-| custom emoji image                   | `InlineEmoji`                                  |
-| comment attachment layout            | `MediaGrid`                                    |
-| `blog/RichText.svelte`               | `Prose`                                        |
-| `blog/NoticeBlock.svelte`            | `Alert` with `info` tone                       |
-| `blog/WarningBlock.svelte`           | `Alert` with `warning` tone                    |
-| `CommentThread`, `Comments`, media   | Remain application-owned Fediverse composition |
-| `Meta`, feed rendering, `Asciinema*` | Remain application infrastructure              |
+| Existing cofob.dev component        | Design-system replacement                      |
+| ----------------------------------- | ---------------------------------------------- |
+| `Navbar.svelte` / `Footer.svelte`   | `Navbar` / `Footer`                            |
+| `Section.svelte` / `Heading.svelte` | `Section` / `Heading`                          |
+| `BlueLine.svelte`                   | `BlueLine`                                     |
+| `blog/PostCard.svelte`              | `PostCard`                                     |
+| `blog/LatestPostLink.svelte`        | `LatestPostCard`                               |
+| `blog/ResponsiveImage.svelte`       | `ResponsiveImage`                              |
+| `blog/ChatThread.svelte`            | `ChatThread`                                   |
+| `blog/Sticker.svelte`               | `Sticker`                                      |
+| comment avatar / initials fallback  | `Avatar`                                       |
+| custom emoji image                  | `InlineEmoji`                                  |
+| comment attachment layout           | `MediaGrid`                                    |
+| `blog/RichText.svelte`              | `Prose`                                        |
+| `blog/NoticeBlock.svelte`           | `Alert` with `info` tone                       |
+| `blog/WarningBlock.svelte`          | `Alert` with `warning` tone                    |
+| `blog/AsciinemaPlayer.svelte`       | `@cofob/design-system-asciinema-player/svelte` |
+| `CommentThread`, `Comments`, media  | Remain application-owned Fediverse composition |
+| `Meta`, feed/player route rendering | Remain application infrastructure              |
 
 Run the original repository's check, lint, unit, accessibility, Node smoke, static/IPFS, and Cloudflare suites before removing the legacy styling layer.

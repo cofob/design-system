@@ -236,6 +236,17 @@ const props: Record<string, readonly string[]> = {
     "onEnabledChange",
     "input attributes",
   ],
+  AsciinemaPlayer: [
+    "source",
+    "options",
+    "label",
+    "fallbackHref",
+    "labels",
+    "player",
+    "onPlayerReady",
+    "onPlayerLoadError",
+    "figure attributes",
+  ],
 };
 
 const allAdapters = ["React", "Svelte", "HTML"] as const;
@@ -376,6 +387,12 @@ const parameterTypes: Record<string, string> = {
   playback: '"auto" | "static"',
   "enabled/defaultEnabled": "boolean; controlled or initial global state",
   onEnabledChange: "(enabled: boolean) => void",
+  source: "Source",
+  options: "Options",
+  fallbackHref: "string",
+  player: "Player (bindable in Svelte)",
+  onPlayerReady: "(player: Player) => void",
+  onPlayerLoadError: "(error: unknown) => void",
 };
 
 const parameterDefaults: Record<string, string> = {
@@ -443,6 +460,8 @@ const parameterDefaults: Record<string, string> = {
   priority: "false",
   rotation: "-3",
   "enabled/defaultEnabled": "true",
+  fallbackHref: "—",
+  player: "undefined",
 };
 
 const parameterDescriptions: Record<string, string> = {
@@ -587,6 +606,14 @@ const parameterDescriptions: Record<string, string> = {
   "enabled/defaultEnabled":
     "Controls the persisted document-wide data-cf-animated-stickers flag. Disabled mode unloads WebM and restores each SVG/WebP first frame; ordinary static stickers are unchanged.",
   onEnabledChange: "Runs after the global animated sticker preference changes through this control.",
+  source: "Recording URL, URL configuration, or in-memory recording data passed to asciinema-player.",
+  options: "Complete upstream player options; the wrapper supplies the cofob theme when theme is omitted.",
+  fallbackHref:
+    "Optional validated application route or direct recording link shown before mounting and on load failure.",
+  player:
+    "Exposes the current upstream imperative handle to Svelte and clears it during remount or disposal.",
+  onPlayerReady: "Runs when the upstream UI is mounted; recording data may still be loading.",
+  onPlayerLoadError: "Runs when the player module cannot be imported or its UI cannot be created.",
 };
 
 const requiredParameters: Record<string, readonly string[]> = {
@@ -610,6 +637,7 @@ const requiredParameters: Record<string, readonly string[]> = {
   InlineEmoji: ["image"],
   ChatThread: ["messages"],
   AnimatedSticker: ["sticker", "alt"],
+  AsciinemaPlayer: ["source"],
 };
 
 const adapterOverrides: Record<string, readonly Adapter[]> = {
@@ -632,6 +660,9 @@ const adapterOverrides: Record<string, readonly Adapter[]> = {
 };
 
 const componentAdapterOverrides: Record<string, Record<string, readonly Adapter[]>> = {
+  AsciinemaPlayer: {
+    player: ["Svelte"],
+  },
   ThemeToggle: {
     preference: ["Svelte", "HTML"],
     showLabel: ["Svelte", "HTML"],
@@ -666,6 +697,10 @@ const componentAdapterOverrides: Record<string, Record<string, readonly Adapter[
 };
 
 const componentParameterTypes: Record<string, Record<string, string>> = {
+  AsciinemaPlayer: {
+    labels: "Partial<AsciinemaPlayerLabels>",
+    label: "string",
+  },
   Container: {
     size: '"sm" | "md" | "lg" | "full" (React) · "narrow" | "default" | "wide" | "full" (Svelte)',
   },
@@ -724,6 +759,11 @@ const componentParameterDefaults: Record<string, Record<string, string>> = {
   ChatThread: { label: '"Conversation"' },
   AnimatedSticker: { playback: '"auto"', preload: '"metadata"' },
   AnimatedStickerToggle: { label: '"Animated stickers"', size: '"md"' },
+  AsciinemaPlayer: {
+    label: '"Terminal recording"',
+    options: '{ theme: "cofob" } plus upstream defaults',
+    labels: "English loading, error, and link defaults",
+  },
 };
 
 const attributeParameter = (name: string) => name.endsWith(" attributes");
@@ -782,6 +822,10 @@ const parameterExamples: Record<string, string> = {
   "referrerPolicy/referrerpolicy": '"no-referrer"',
   "data-image": 'data-image="true"',
   playback: '"static"',
+  source: '"/recordings/demo.cast"',
+  options: '{{ cols: 100, fit: "width" }}',
+  fallbackHref: '"/recordings/demo"',
+  player: "bind:player",
 };
 
 const componentParameterExamples: Record<string, Record<string, string>> = {
@@ -806,6 +850,10 @@ const componentParameterExamples: Record<string, Record<string, string>> = {
   },
   InlineEmoji: {
     image: "{emoji}",
+  },
+  AsciinemaPlayer: {
+    labels:
+      '{{ loadingTitle: "Terminal demo", errorTitle: "Player unavailable", fallbackLink: "Open recording" }}',
   },
 };
 
@@ -935,6 +983,7 @@ const stateOverrides: Record<string, readonly string[]> = {
     "load/play fallback",
   ],
   AnimatedStickerToggle: ["enabled", "disabled", "focus-visible", "form disabled"],
+  AsciinemaPlayer: ["SSR fallback", "loading", "ready", "error", "light", "dark", "reduced motion"],
 };
 
 const reactUsage: Record<string, string> = {
@@ -983,6 +1032,8 @@ const reactUsage: Record<string, string> = {
     '<><AnimatedSticker sticker={manifest.sticker} alt="Animated cartoon rat Chris" /><AnimatedSticker sticker={manifest.sticker} alt="Static first frame" playback="static" /></>',
   AnimatedStickerToggle:
     '<AnimatedStickerToggle defaultEnabled label="Animated stickers" onEnabledChange={setEnabled} />',
+  AsciinemaPlayer:
+    '<AsciinemaPlayer source="/recordings/demo.cast" options={{ cols: 100, fit: "width" }} label="Deployment walkthrough" fallbackHref="/recordings/demo" labels={{ loadingTitle: "Terminal demo", errorTitle: "Player unavailable", fallbackLink: "Open recording" }} onPlayerReady={setPlayer} onPlayerLoadError={reportError} />',
 };
 
 const svelteUsage: Record<string, string> = {
@@ -1006,6 +1057,8 @@ const svelteUsage: Record<string, string> = {
     '<AnimatedSticker sticker={manifest.sticker} alt="Animated cartoon rat Chris" />\n<AnimatedSticker sticker={manifest.sticker} alt="Static first frame" playback="static" />',
   AnimatedStickerToggle:
     '<AnimatedStickerToggle bind:enabled label="Animated stickers" onEnabledChange={setEnabled} />',
+  AsciinemaPlayer:
+    '<AsciinemaPlayer source="/recordings/demo.cast" options={{ cols: 100, fit: "width" }} label="Deployment walkthrough" fallbackHref="/recordings/demo" labels={{ loadingTitle: "Terminal demo", errorTitle: "Player unavailable", fallbackLink: "Open recording" }} bind:player onPlayerReady={setPlayer} onPlayerLoadError={reportError} />',
   Pagination: "<Pagination bind:page totalPages={12} />",
   Dialog:
     '<Dialog title="Confirm">{#snippet trigger({ open })}<Button onclick={open}>Open</Button>{/snippet}Content</Dialog>',
@@ -1072,6 +1125,8 @@ const nativeUsage: Record<string, string> = {
     '<span class="cf-animated-sticker" data-cf-animated-sticker data-playback="auto" role="img" aria-label="Animated cartoon rat Chris"><span class="cf-animated-sticker__skeleton" aria-hidden="true"><svg viewBox="0 0 512 512">…</svg></span><video data-cf-animated-sticker-video data-cf-animated-sticker-src="/sticker.hash.webm" muted loop playsinline preload="metadata" aria-hidden="true"></video></span>\n<span class="cf-animated-sticker" data-playback="static" role="img" aria-label="Static first frame"><span class="cf-animated-sticker__skeleton" aria-hidden="true"><svg viewBox="0 0 512 512">…</svg></span></span>',
   AnimatedStickerToggle:
     '<label class="cf-switch cf-animated-sticker-toggle" data-cf-animated-sticker-toggle-root><input class="cf-switch__control" type="checkbox" role="switch" data-cf-animated-sticker-toggle checked><span class="cf-switch__track" aria-hidden="true"><span class="cf-switch__thumb"></span></span><span class="cf-switch__content"><span class="cf-switch__label">Animated stickers</span></span></label>',
+  AsciinemaPlayer:
+    '<figure class="cf-asciinema-player" data-cf-asciinema-player data-state="loading" aria-label="Deployment walkthrough" aria-busy="true"><div class="cf-stack" data-gap="sm" data-align="stretch"><div class="cf-card cf-asciinema-player__stage" data-padding="none" data-variant="default" data-cf-asciinema-player-stage hidden><div data-cf-asciinema-player-mount></div></div><div class="cf-alert cf-asciinema-player__fallback" data-tone="info" role="status" data-cf-asciinema-player-fallback><div class="cf-alert__content"><div class="cf-alert__title" data-cf-asciinema-player-fallback-title>Terminal demo</div><div class="cf-alert__description"><a class="cf-link" href="/recordings/demo" data-cf-asciinema-player-fallback-link>Open recording</a></div></div></div></div></figure>',
 };
 
 export function getComponentContract(name: string): ComponentContract {
@@ -1125,7 +1180,11 @@ export function getComponentExample(name: string, adapter: Lowercase<Adapter>, i
 
   if (adapter === "react") {
     const reference = parameterReference(contract, adapterLabel, " * @param ");
-    return `import { ${name} } from "@cofob/design-system-react";
+    const packageName =
+      name === "AsciinemaPlayer"
+        ? "@cofob/design-system-asciinema-player/react"
+        : "@cofob/design-system-react";
+    return `import { ${name} } from "${packageName}";
 
 /**
  * Complete ${name} parameter reference.
@@ -1140,8 +1199,12 @@ ${indent(contract.react, 4)}
 
   if (adapter === "svelte") {
     const reference = parameterReference(contract, adapterLabel, "  // ");
+    const packageName =
+      name === "AsciinemaPlayer"
+        ? "@cofob/design-system-asciinema-player/svelte"
+        : "@cofob/design-system-svelte";
     return `<script lang="ts">
-  import { ${name} } from "@cofob/design-system-svelte";
+  import { ${name} } from "${packageName}";
 
   // Complete ${name} parameter reference.
 ${reference}
@@ -1151,8 +1214,26 @@ ${contract.svelte}`;
   }
 
   const reference = parameterReference(contract, adapterLabel, "  ");
-  const controller = interactive
-    ? `
+  const controller =
+    name === "AsciinemaPlayer"
+      ? `
+
+<script type="module">
+  import { createAsciinemaPlayerController } from "@cofob/design-system-asciinema-player";
+
+  const root = document.querySelector("[data-cf-asciinema-player]");
+  const player = createAsciinemaPlayerController(root, {
+    source: "/recordings/demo.cast",
+    options: { cols: 100, fit: "width" },
+    fallbackHref: "/recordings/demo",
+    labels: { loadingTitle: "Terminal demo", errorTitle: "Player unavailable", fallbackLink: "Open recording" },
+    onPlayerReady: setPlayer,
+    onPlayerLoadError: reportError,
+  });
+  window.addEventListener("pagehide", () => player.destroy(), { once: true });
+</script>`
+      : interactive
+        ? `
 
 <script type="module">
   import { initDesignSystem } from "@cofob/design-system-css";
@@ -1160,7 +1241,7 @@ ${contract.svelte}`;
   const designSystem = initDesignSystem(document);
   window.addEventListener("pagehide", () => designSystem.destroy(), { once: true });
 </script>`
-    : "";
+        : "";
   return `<!--
   Complete ${name} parameter reference.
 ${reference}

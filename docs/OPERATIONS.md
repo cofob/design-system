@@ -12,7 +12,7 @@ Add a Changeset for every public change:
 npm run changeset
 ```
 
-The CSS, React, and Svelte packages are a fixed group. The build-time assets and sticker assets packages are versioned independently. On `main`, `changesets/action` maintains a version pull request. Merging that pull request builds and publishes all packages with the workflow `GITHUB_TOKEN`; no long-lived npm token is stored.
+The CSS, React, Svelte, and Asciinema Player packages are a fixed group. The build-time assets and sticker assets packages are versioned independently. On `main`, `changesets/action` maintains a version pull request. Merging that pull request builds and publishes all packages with the workflow `GITHUB_TOKEN`; no long-lived npm token is stored.
 
 ## Showroom
 

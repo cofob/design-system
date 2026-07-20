@@ -1,0 +1,99 @@
+{
+  "name": "@cofob/design-system-asciinema-player",
+  "version": "0.4.1",
+  "description": "Accessible Native, React, and Svelte adapters for asciinema-player using the cofob design system.",
+  "type": "module",
+  "license": "SEE LICENSE IN LICENSE",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/cofob/design-system.git",
+    "directory": "packages/design-system-asciinema-player"
+  },
+  "homepage": "https://design.cofob.dev",
+  "bugs": {
+    "url": "https://github.com/cofob/design-system/issues"
+  },
+  "publishConfig": {
+    "registry": "https://npm.pkg.github.com",
+    "access": "public"
+  },
+  "sideEffects": [
+    "*.css",
+    "dist/*.css"
+  ],
+  "files": [
+    "dist",
+    "README.md",
+    "LICENSE",
+    "LICENSES",
+    "THIRD_PARTY_NOTICES.md"
+  ],
+  "main": "./dist/index.js",
+  "module": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "import": "./dist/index.js",
+      "default": "./dist/index.js"
+    },
+    "./react": {
+      "types": "./dist/react/index.d.ts",
+      "import": "./dist/react/index.js",
+      "default": "./dist/react/index.js"
+    },
+    "./svelte": {
+      "types": "./dist/svelte/index.d.ts",
+      "svelte": "./dist/svelte/index.js",
+      "default": "./dist/svelte/index.js"
+    },
+    "./styles.css": "./dist/styles.css",
+    "./package.json": "./package.json"
+  },
+  "engines": {
+    "node": ">=24.11.0"
+  },
+  "scripts": {
+    "build": "npm run clean && tsc -p tsconfig.build.json && svelte-package -i src/svelte -o dist/svelte && node ./scripts/build-css.mjs",
+    "clean": "node ./scripts/clean.mjs",
+    "typecheck": "tsc -p tsconfig.build.json --noEmit && svelte-check --tsconfig ./tsconfig.json",
+    "test": "vitest run"
+  },
+  "dependencies": {
+    "asciinema-player": "3.17.0"
+  },
+  "peerDependencies": {
+    "@cofob/design-system-css": ">=0.4.1 <1",
+    "react": "^18.3.0 || ^19.0.0",
+    "svelte": "^5.0.0"
+  },
+  "peerDependenciesMeta": {
+    "react": {
+      "optional": true
+    },
+    "svelte": {
+      "optional": true
+    }
+  },
+  "devDependencies": {
+    "@cofob/design-system-css": "0.4.1",
+    "@sveltejs/package": "^2.3.7",
+    "@sveltejs/vite-plugin-svelte": "^6.0.0",
+    "@testing-library/jest-dom": "^6.6.3",
+    "@testing-library/react": "^16.3.0",
+    "@types/react": "^19.1.8",
+    "@types/react-dom": "^19.1.6",
+    "autoprefixer": "^10.4.21",
+    "cssnano": "^7.1.1",
+    "jsdom": "^26.1.0",
+    "postcss": "^8.5.6",
+    "postcss-import": "^16.1.1",
+    "react": "^19.1.0",
+    "react-dom": "^19.1.0",
+    "svelte": "^5.0.0",
+    "svelte-check": "^4.0.0",
+    "typescript": "^5.9.2",
+    "vite": "^7.0.0",
+    "vitest": "^3.2.4"
+  }
+}

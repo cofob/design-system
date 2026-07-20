@@ -1,0 +1,8 @@
+{"version":2,"width":72,"height":9,"timestamp":1784563200,"env":{"SHELL":"/bin/zsh","TERM":"xterm-256color"}}
+[0.05,"o","\u001b[1;36mcofob design system\u001b[0m\r\n"]
+[0.25,"o","$ npm run check\r\n"]
+[0.65,"o","\u001b[32m✓\u001b[0m semantic CSS contract\r\n"]
+[1.05,"o","\u001b[32m✓\u001b[0m Native adapter\r\n"]
+[1.35,"o","\u001b[32m✓\u001b[0m React adapter\r\n"]
+[1.65,"o","\u001b[32m✓\u001b[0m Svelte adapter\r\n"]
+[2.05,"o","\r\n\u001b[1;34mAll checks passed.\u001b[0m\r\n"]

@@ -6,16 +6,17 @@ The system uses authored semantic CSS rather than utility generation or CSS-in-J
 
 ## Packages
 
-| Package                         | Purpose                                                                                                  |
-| ------------------------------- | -------------------------------------------------------------------------------------------------------- |
-| `@cofob/design-system-assets`   | Node-only Telegram TGS conversion to transparent WebM and an inline SVG manifest                         |
-| `@cofob/design-system-stickers` | Optimized Telegram sticker assets with sharded catalogs and generated React/Svelte components            |
-| `@cofob/design-system-css`      | Semantic tokens, light/dark themes, Manrope, base/component CSS, PostCSS source, and vanilla controllers |
-| `@cofob/design-system-react`    | Typed React 18.3/19 components                                                                           |
-| `@cofob/design-system-svelte`   | Svelte 5 components compatible with SvelteKit 2                                                          |
-| `@cofob/design-system-showroom` | Private Astro application deployed to [design.cofob.dev](https://design.cofob.dev)                       |
+| Package                                 | Purpose                                                                                                  |
+| --------------------------------------- | -------------------------------------------------------------------------------------------------------- |
+| `@cofob/design-system-assets`           | Node-only Telegram TGS conversion to transparent WebM and an inline SVG manifest                         |
+| `@cofob/design-system-stickers`         | Optimized Telegram sticker assets with sharded catalogs and generated React/Svelte components            |
+| `@cofob/design-system-css`              | Semantic tokens, light/dark themes, Manrope, base/component CSS, PostCSS source, and vanilla controllers |
+| `@cofob/design-system-react`            | Typed React 18.3/19 components                                                                           |
+| `@cofob/design-system-svelte`           | Svelte 5 components compatible with SvelteKit 2                                                          |
+| `@cofob/design-system-asciinema-player` | SSR-safe Native, React, and Svelte adapters for Asciinema Player                                         |
+| `@cofob/design-system-showroom`         | Private Astro application deployed to [design.cofob.dev](https://design.cofob.dev)                       |
 
-The three UI packages share a fixed Changesets version. The two asset packages are versioned independently. All public packages are published to GitHub Packages.
+The four UI and runtime packages share a fixed Changesets version. The two asset packages are versioned independently. All public packages are published to GitHub Packages.
 
 ## Requirements
 
@@ -51,6 +52,12 @@ Svelte or SvelteKit:
 npm install @cofob/design-system-css @cofob/design-system-svelte @lucide/svelte
 ```
 
+Asciinema Player for Native HTML, React, or Svelte:
+
+```sh
+npm install @cofob/design-system-css @cofob/design-system-asciinema-player
+```
+
 Build-time TGS conversion:
 
 ```sh
@@ -69,6 +76,12 @@ Import the complete stylesheet once at the application root:
 
 ```ts
 import "@cofob/design-system-css/index.css";
+```
+
+Asciinema consumers also import its compiled upstream base styles and cofob theme:
+
+```ts
+import "@cofob/design-system-asciinema-player/styles.css";
 ```
 
 The CSS package also exposes granular `tokens.css`, `fonts.css`, `base.css`, `components.css`, and PostCSS authoring entries. Framework packages never inject styles.
@@ -103,6 +116,7 @@ packages/
   design-system-css/       tokens, CSS, public contracts, vanilla controllers
   design-system-react/     React adapter
   design-system-svelte/    Svelte 5 adapter
+  design-system-asciinema-player/  Asciinema controller and Native/React/Svelte adapters
 apps/
   showroom/                Astro documentation and live examples
 tests/e2e/                 cross-adapter accessibility and interaction checks
