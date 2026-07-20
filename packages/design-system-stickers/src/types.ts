@@ -30,19 +30,31 @@ export interface StaticStickerAsset extends StickerAssetBase {
   mediaType: "image/webp";
 }
 
-export interface AnimatedStickerAsset extends StickerAssetBase {
+interface AnimatedStickerAssetBase extends StickerAssetBase {
   kind: "animated";
   mediaType: "video/webm";
-  sourceFormat: AnimatedStickerSourceFormat;
   src: string;
-  skeletonSvg: string;
   fps: number;
   frameCount: number;
   duration: number;
 }
 
+export interface VectorAnimatedStickerAsset extends AnimatedStickerAssetBase {
+  sourceFormat: "tgs";
+  skeletonSvg: string;
+}
+
+export interface VideoAnimatedStickerAsset extends AnimatedStickerAssetBase {
+  sourceFormat: "video";
+  firstFrameAssetPath: string;
+  firstFrameSrc: string;
+}
+
+export type AnimatedStickerAsset = VectorAnimatedStickerAsset | VideoAnimatedStickerAsset;
+
 export type StickerAsset = StaticStickerAsset | AnimatedStickerAsset;
 
 export type StickerAssetIndexEntry =
   | (StaticStickerAsset & { manifestPath: string })
-  | (Omit<AnimatedStickerAsset, "skeletonSvg" | "src"> & { manifestPath: string });
+  | (Omit<VectorAnimatedStickerAsset, "skeletonSvg" | "src"> & { manifestPath: string })
+  | (Omit<VideoAnimatedStickerAsset, "firstFrameSrc" | "src"> & { manifestPath: string });

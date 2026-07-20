@@ -33,8 +33,18 @@
   aria-label={alt}
 >
   <span class="cf-animated-sticker__skeleton" aria-hidden="true">
-    <!-- skeletonSvg must come from the trusted @cofob/design-system-assets converter. -->
-    {@html sticker.skeletonSvg}
+    {#if sticker.skeletonSvg}
+      <!-- skeletonSvg must come from the trusted @cofob/design-system-assets converter. -->
+      {@html sticker.skeletonSvg}
+    {:else}
+      <img
+        src={sticker.firstFrameSrc}
+        alt=""
+        width={sticker.width}
+        height={sticker.height}
+        decoding="async"
+      />
+    {/if}
   </span>
   {#if playback === "auto"}
     <video

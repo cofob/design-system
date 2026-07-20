@@ -73,6 +73,7 @@
     "build": "npm run clean && tsc -p tsconfig.build.json && svelte-package -i src/svelte -o dist/svelte && node ./scripts/copy-assets.mjs && node ./scripts/mark-cli.mjs",
     "clean": "node ./scripts/clean.mjs",
     "generate": "npm run build --workspace @cofob/design-system-assets && node ./scripts/generate.mjs",
+    "refresh:video-first-frames": "node ./scripts/refresh-video-first-frames.mjs",
     "typecheck": "tsc -p tsconfig.build.json --noEmit && svelte-check --tsconfig ./tsconfig.json",
     "test": "vitest run"
   },
@@ -108,7 +109,6 @@
     "sharp": "^0.35.3",
     "svelte": "^5.0.0",
     "svelte-check": "^4.0.0",
-    "svgo": "^4.0.0",
     "typescript": "^5.9.2",
     "vite": "^7.0.0",
     "vitest": "^3.2.4"

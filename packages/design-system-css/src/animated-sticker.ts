@@ -8,6 +8,7 @@ export type AnimatedStickerToggleController = Controller;
 export type AnimatedStickersEnabledListener = (enabled: boolean) => void;
 
 export const ANIMATED_STICKERS_ATTRIBUTE = "data-cf-animated-stickers";
+export const ANIMATED_STICKERS_STORAGE_KEY = "cf-animated-stickers";
 
 interface AnimatedStickerPreferenceStore {
   enabled: boolean;
@@ -26,9 +27,33 @@ function readAnimatedStickersEnabled(root: HTMLElement): boolean {
   return root.getAttribute(ANIMATED_STICKERS_ATTRIBUTE) !== "disabled";
 }
 
+function hydrateAnimatedStickersPreference(root: HTMLElement): void {
+  if (root.hasAttribute(ANIMATED_STICKERS_ATTRIBUTE)) return;
+  try {
+    const stored = root.ownerDocument?.defaultView?.localStorage.getItem(ANIMATED_STICKERS_STORAGE_KEY);
+    if (stored === "enabled" || stored === "disabled") {
+      root.setAttribute(ANIMATED_STICKERS_ATTRIBUTE, stored);
+    }
+  } catch {
+    // Storage may be denied. The markup/default contract remains usable.
+  }
+}
+
+function persistAnimatedStickersPreference(root: HTMLElement, enabled: boolean): void {
+  try {
+    root.ownerDocument?.defaultView?.localStorage.setItem(
+      ANIMATED_STICKERS_STORAGE_KEY,
+      enabled ? "enabled" : "disabled",
+    );
+  } catch {
+    // Storage denial must not prevent the current document from updating.
+  }
+}
+
 function getPreferenceStore(root: HTMLElement): AnimatedStickerPreferenceStore {
   const existing = preferenceStores.get(root);
   if (existing) return existing;
+  hydrateAnimatedStickersPreference(root);
   const store: AnimatedStickerPreferenceStore = {
     enabled: readAnimatedStickersEnabled(root),
     observer: undefined,
@@ -48,16 +73,19 @@ function syncPreferenceStore(store: AnimatedStickerPreferenceStore): void {
 
 /** Reads the document-wide animated sticker flag. Missing markup defaults to enabled. */
 export function getAnimatedStickersEnabled(root: HTMLElement | null = defaultPreferenceRoot()): boolean {
-  return root ? readAnimatedStickersEnabled(root) : true;
+  if (!root) return true;
+  hydrateAnimatedStickersPreference(root);
+  return readAnimatedStickersEnabled(root);
 }
 
-/** Sets `data-cf-animated-stickers` on the document root and updates every mounted sticker. */
+/** Persists the preference, updates the document flag, and refreshes every mounted sticker. */
 export function setAnimatedStickersEnabled(
   enabled: boolean,
   root: HTMLElement | null = defaultPreferenceRoot(),
 ): void {
   if (!root) return;
   root.setAttribute(ANIMATED_STICKERS_ATTRIBUTE, enabled ? "enabled" : "disabled");
+  persistAnimatedStickersPreference(root, enabled);
   syncPreferenceStore(getPreferenceStore(root));
 }
 

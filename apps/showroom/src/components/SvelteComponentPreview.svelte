@@ -525,7 +525,7 @@ applyTheme(preference);`;
 {:else if name === "AnimatedStickerToggle"}
   <AnimatedStickerToggle
     label="Animated stickers"
-    description="Turn off WebM playback and keep static SVG/WebP stickers."
+    description="Turn off WebM playback, persist the choice, and keep SVG/WebP first frames."
   />
 {:else}
   <Alert title="Unknown component" tone="warning">No Svelte preview is registered for {name}.</Alert>

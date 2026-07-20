@@ -578,13 +578,13 @@ const parameterDescriptions: Record<string, string> = {
   "data-image": "Removes label-like padding when Sticker wraps an attributed image.",
   children: "Idiomatic adapter composition content.",
   sticker:
-    "Converted WebM URL, dimensions, and trusted sanitized inline SVG. Never pass unchecked user SVG as skeletonSvg.",
+    "Converted WebM URL, dimensions, and either a trusted sanitized skeletonSvg for vector animation or firstFrameSrc for a video-based WebP first frame. Never pass unchecked user SVG.",
   preload:
-    "Native video preload hint; the inline SVG is present independently in SSR HTML and is removed from the DOM after playback starts. Auto playback pauses outside the viewport and resumes when visible again.",
+    "Native video preload hint; the SVG/WebP first frame is present in SSR HTML and is removed from the DOM after playback starts. Auto playback pauses outside the viewport and resumes when visible again.",
   playback:
-    'Use "static" to render only the inline first-frame SVG and omit video entirely, guaranteeing no WebM request.',
+    'Use "static" to render only the SVG/WebP first frame and omit video entirely, guaranteeing no WebM request.',
   "enabled/defaultEnabled":
-    "Controls the document-wide data-cf-animated-stickers flag. Disabled mode unloads WebM and restores each trusted inline SVG; ordinary SVG/WebP stickers are unchanged.",
+    "Controls the persisted document-wide data-cf-animated-stickers flag. Disabled mode unloads WebM and restores each SVG/WebP first frame; ordinary static stickers are unchanged.",
   onEnabledChange: "Runs after the global animated sticker preference changes through this control.",
 };
 

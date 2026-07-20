@@ -14,7 +14,7 @@ const manifest = await convertTgs({
   publicBase: "/stickers/chris",
 });
 
-// Render manifest.sticker.skeletonSvg inline; do not pass unchecked user SVG.`,
+// TGS manifests keep a trusted skeletonSvg inline. Video sticker manifests use firstFrameSrc.`,
   css: `import "@cofob/design-system-css/index.css";
 import {
   getThemeScript,

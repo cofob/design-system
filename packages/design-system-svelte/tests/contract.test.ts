@@ -140,6 +140,24 @@ describe("Svelte adapter contract", () => {
     expect(staticOutput.body).not.toContain("<video");
   });
 
+  it("server-renders a WebP first frame for video-based stickers", () => {
+    const output = render(AnimatedSticker, {
+      props: {
+        sticker: {
+          src: "/stickers/vibe.webm",
+          firstFrameSrc: "/stickers/vibe.first-frame.123456789abc.webp",
+          width: 192,
+          height: 192,
+        },
+        alt: "Vibe flag",
+        playback: "static",
+      },
+    });
+    expect(output.body).toContain('src="/stickers/vibe.first-frame.123456789abc.webp"');
+    expect(output.body).not.toContain("<svg");
+    expect(output.body).not.toContain("<video");
+  });
+
   it("server-renders the global animated sticker switch", () => {
     const output = render(AnimatedStickerToggle, {
       props: { defaultEnabled: false, label: "Animated stickers" },

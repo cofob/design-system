@@ -84,12 +84,14 @@ const firstCatalogEntry = catalog.stickers[0];`;
       <div class="cf-alert__content">
         <strong class="cf-alert__title">Animation is progressive</strong>
         <p class="cf-alert__description">
-          The generated component starts with inline SVG. It assigns the video URL on viewport intersection,
-          removes the SVG after playback starts, pauses on the current video frame outside the viewport, and
-          keeps or restores the SVG on reduced motion, load failure, rejected playback, or <code
-            >playback="static"</code
-          >. Set <code>data-cf-animated-stickers="disabled"</code> on <code>&lt;html&gt;</code> or use
-          <code>AnimatedStickerToggle</code> to unload every WebM globally; static SVG/WebP stickers remain available.
+          The generated component starts with an inline SVG for TGS or a WebP first frame for video stickers.
+          It assigns the video URL on viewport intersection, removes the first frame after playback starts,
+          pauses on the current video frame outside the viewport, and restores the first frame on reduced
+          motion, load failure, rejected playback, or <code>playback="static"</code>. Set <code
+            >data-cf-animated-stickers="disabled"</code
+          > on <code>&lt;html&gt;</code> or use
+          <code>AnimatedStickerToggle</code> to persist the preference and unload every WebM globally; static SVG/WebP
+          first frames and ordinary stickers remain available.
         </p>
       </div>
     </div>
@@ -98,7 +100,7 @@ const firstCatalogEntry = catalog.stickers[0];`;
   <section class="astro-section" aria-labelledby="sticker-packs-heading">
     <div class="astro-section-header">
       <h2 id="sticker-packs-heading">Sticker packs</h2>
-      <p>Each route loads one small catalog and only that pack's inline first-frame manifests.</p>
+      <p>Each route loads one small catalog and only that pack's first-frame manifests and media.</p>
     </div>
     <div class="astro-sticker-pack-grid">
       {

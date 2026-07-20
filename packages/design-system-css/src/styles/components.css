@@ -2996,10 +2996,15 @@
     transition: opacity var(--cf-duration-normal) var(--cf-ease-standard);
   }
 
-  .cf-animated-sticker__skeleton > svg {
+  .cf-animated-sticker__skeleton > svg,
+  .cf-animated-sticker__skeleton > img {
     display: block;
     inline-size: 100%;
     block-size: 100%;
+  }
+
+  .cf-animated-sticker__skeleton > img {
+    object-fit: contain;
   }
 
   .cf-animated-sticker video {

@@ -728,7 +728,8 @@
       "frameCount": 48,
       "duration": 1.6,
       "sha256": "1ec1edba2a6f2207369b211db08afee243c669e8e67b5f250a71b6fe8d811730",
-      "manifestPath": "animated-chris/036.json"
+      "manifestPath": "animated-chris/036.json",
+      "firstFrameAssetPath": "animated-chris/036.first-frame.8c37e62f25e5.webp"
     },
     {
       "id": "animated-chris/037",

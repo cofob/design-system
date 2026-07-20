@@ -3,6 +3,7 @@
   import type { HTMLInputAttributes } from "svelte/elements";
   import {
     ANIMATED_STICKERS_ATTRIBUTE,
+    getAnimatedStickersEnabled,
     setAnimatedStickersEnabled,
     subscribeAnimatedStickersEnabled,
   } from "@cofob/design-system-css";
@@ -37,6 +38,7 @@
   onMount(() => {
     mounted = true;
     const preferenceRoot = document.documentElement;
+    getAnimatedStickersEnabled(preferenceRoot);
     if (enabled !== undefined || !preferenceRoot.hasAttribute(ANIMATED_STICKERS_ATTRIBUTE)) {
       setAnimatedStickersEnabled(currentEnabled, preferenceRoot);
     }

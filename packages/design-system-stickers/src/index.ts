@@ -1,7 +1,7 @@
 import type { StickerPack } from "./types.js";
 
 export { DEFAULT_STICKER_ASSET_BASE, resolveAnimatedSticker, resolveStickerAsset } from "./shared.js";
-export type { AnimatedStickerAsset, AnimatedStickerSourceFormat, StaticStickerAsset, StickerAsset, StickerAssetIndexEntry, StickerAssetKind, StickerPack } from "./types.js";
+export type { AnimatedStickerAsset, AnimatedStickerSourceFormat, StaticStickerAsset, StickerAsset, StickerAssetIndexEntry, StickerAssetKind, StickerPack, VectorAnimatedStickerAsset, VideoAnimatedStickerAsset } from "./types.js";
 
 export const packs = [
   {

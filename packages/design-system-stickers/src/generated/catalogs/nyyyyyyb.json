@@ -28,7 +28,8 @@
       "frameCount": 87,
       "duration": 2.9,
       "sha256": "4fbdefcc6bb782ebbeaf202a8e90923d5dbc107a61fd02f34d0ee8e5c1cce6f3",
-      "manifestPath": "nyyyyyyb/001.json"
+      "manifestPath": "nyyyyyyb/001.json",
+      "firstFrameAssetPath": "nyyyyyyb/001.first-frame.f2962e415983.webp"
     },
     {
       "id": "nyyyyyyb/002",
@@ -48,7 +49,8 @@
       "frameCount": 87,
       "duration": 2.9,
       "sha256": "5b47bf337c3065c5bde053795b165cc9ff9eb9180f6346beadcd5c1a4f55873a",
-      "manifestPath": "nyyyyyyb/002.json"
+      "manifestPath": "nyyyyyyb/002.json",
+      "firstFrameAssetPath": "nyyyyyyb/002.first-frame.851a4b108362.webp"
     },
     {
       "id": "nyyyyyyb/003",
@@ -68,7 +70,8 @@
       "frameCount": 87,
       "duration": 2.9,
       "sha256": "85485f7c48512e35856c07f190306938ac1dbb2e5abed59dc4a9bdbccccaf380",
-      "manifestPath": "nyyyyyyb/003.json"
+      "manifestPath": "nyyyyyyb/003.json",
+      "firstFrameAssetPath": "nyyyyyyb/003.first-frame.39b32d6688ce.webp"
     },
     {
       "id": "nyyyyyyb/004",
@@ -88,7 +91,8 @@
       "frameCount": 87,
       "duration": 2.9,
       "sha256": "c3061313a3e9111a271496cbcd4bd4c4feb0e4eeda1b791d16b7b39b558731fa",
-      "manifestPath": "nyyyyyyb/004.json"
+      "manifestPath": "nyyyyyyb/004.json",
+      "firstFrameAssetPath": "nyyyyyyb/004.first-frame.d51da6af9bca.webp"
     },
     {
       "id": "nyyyyyyb/005",
@@ -108,7 +112,8 @@
       "frameCount": 87,
       "duration": 2.9,
       "sha256": "a0f20fb1b42f0ce2c9b3d597a1b9ef35ee5fc039fe713ad8ef8b8a26e8270b14",
-      "manifestPath": "nyyyyyyb/005.json"
+      "manifestPath": "nyyyyyyb/005.json",
+      "firstFrameAssetPath": "nyyyyyyb/005.first-frame.75a814d55ded.webp"
     },
     {
       "id": "nyyyyyyb/006",
@@ -128,7 +133,8 @@
       "frameCount": 87,
       "duration": 2.9,
       "sha256": "16645e0c1356371788225f12a1ff26b30eda0044718fd8eb10a0119f0ef3b4c4",
-      "manifestPath": "nyyyyyyb/006.json"
+      "manifestPath": "nyyyyyyb/006.json",
+      "firstFrameAssetPath": "nyyyyyyb/006.first-frame.0d8ca0e1b402.webp"
     },
     {
       "id": "nyyyyyyb/007",
@@ -148,7 +154,8 @@
       "frameCount": 26,
       "duration": 1.08,
       "sha256": "4698598d8316abef4bb6e6f5fe77f6efd9580927a9c53fe259655a0f2d40de01",
-      "manifestPath": "nyyyyyyb/007.json"
+      "manifestPath": "nyyyyyyb/007.json",
+      "firstFrameAssetPath": "nyyyyyyb/007.first-frame.3985c10f5884.webp"
     },
     {
       "id": "nyyyyyyb/008",
@@ -168,7 +175,8 @@
       "frameCount": 87,
       "duration": 2.9,
       "sha256": "f49be12575c090e6d0b49b5586fc0a984a8e80e5631dd0f7cb068480da754283",
-      "manifestPath": "nyyyyyyb/008.json"
+      "manifestPath": "nyyyyyyb/008.json",
+      "firstFrameAssetPath": "nyyyyyyb/008.first-frame.74a5af9496df.webp"
     },
     {
       "id": "nyyyyyyb/009",
@@ -188,7 +196,8 @@
       "frameCount": 87,
       "duration": 2.9,
       "sha256": "d14c347af60ec77885a19ece34ffad09897dbf1795e9dfb1f2558861920a942a",
-      "manifestPath": "nyyyyyyb/009.json"
+      "manifestPath": "nyyyyyyb/009.json",
+      "firstFrameAssetPath": "nyyyyyyb/009.first-frame.c7a2ebe04557.webp"
     },
     {
       "id": "nyyyyyyb/010",
@@ -208,7 +217,8 @@
       "frameCount": 87,
       "duration": 2.9,
       "sha256": "e435d44f6920b807c0c63936f0e574af4a38a3cd234a897fd7558a7e32a4008f",
-      "manifestPath": "nyyyyyyb/010.json"
+      "manifestPath": "nyyyyyyb/010.json",
+      "firstFrameAssetPath": "nyyyyyyb/010.first-frame.e9cfe3c706db.webp"
     },
     {
       "id": "nyyyyyyb/011",
@@ -228,7 +238,8 @@
       "frameCount": 87,
       "duration": 2.9,
       "sha256": "c61000a876cbed0703ed16dbbf951d5fb6b9b6edf1604cb319e4d34743a13f5d",
-      "manifestPath": "nyyyyyyb/011.json"
+      "manifestPath": "nyyyyyyb/011.json",
+      "firstFrameAssetPath": "nyyyyyyb/011.first-frame.c33057c6ea50.webp"
     },
     {
       "id": "nyyyyyyb/012",
@@ -248,7 +259,8 @@
       "frameCount": 87,
       "duration": 2.9,
       "sha256": "6bf8dc66e7f2a9789de25b48f79e94d021e48dc3649b3547b2cf5ec8931f1173",
-      "manifestPath": "nyyyyyyb/012.json"
+      "manifestPath": "nyyyyyyb/012.json",
+      "firstFrameAssetPath": "nyyyyyyb/012.first-frame.9a3f05c79ded.webp"
     },
     {
       "id": "nyyyyyyb/013",
@@ -268,7 +280,8 @@
       "frameCount": 87,
       "duration": 2.9,
       "sha256": "a70655ddb1052ced6766e81eef49f972bea0098963d9be62fb5532bc889051d3",
-      "manifestPath": "nyyyyyyb/013.json"
+      "manifestPath": "nyyyyyyb/013.json",
+      "firstFrameAssetPath": "nyyyyyyb/013.first-frame.2673d67c807b.webp"
     },
     {
       "id": "nyyyyyyb/014",
@@ -288,7 +301,8 @@
       "frameCount": 87,
       "duration": 2.9,
       "sha256": "9b081c0c679c7a3dc1b4e65f2e161d65d89221f351ad4c4f91a73fab13409c21",
-      "manifestPath": "nyyyyyyb/014.json"
+      "manifestPath": "nyyyyyyb/014.json",
+      "firstFrameAssetPath": "nyyyyyyb/014.first-frame.7359e583f18e.webp"
     },
     {
       "id": "nyyyyyyb/015",
@@ -308,7 +322,8 @@
       "frameCount": 87,
       "duration": 2.9,
       "sha256": "63265698c06e3b2458e94cd93f391db2f1cc3d8cbd3e27baf43cb6ead67445f5",
-      "manifestPath": "nyyyyyyb/015.json"
+      "manifestPath": "nyyyyyyb/015.json",
+      "firstFrameAssetPath": "nyyyyyyb/015.first-frame.2ae5f4295625.webp"
     },
     {
       "id": "nyyyyyyb/016",
@@ -328,7 +343,8 @@
       "frameCount": 87,
       "duration": 2.9,
       "sha256": "330eaabc140ca62d6020416b2e7654a73eff905c2b78a6703c90b35585b52cc3",
-      "manifestPath": "nyyyyyyb/016.json"
+      "manifestPath": "nyyyyyyb/016.json",
+      "firstFrameAssetPath": "nyyyyyyb/016.first-frame.6093b84872d3.webp"
     },
     {
       "id": "nyyyyyyb/017",
@@ -348,7 +364,8 @@
       "frameCount": 87,
       "duration": 2.903,
       "sha256": "bb15b552f8e22724029db17b22f53c1cc532253108f499b6d41617b0764be0c7",
-      "manifestPath": "nyyyyyyb/017.json"
+      "manifestPath": "nyyyyyyb/017.json",
+      "firstFrameAssetPath": "nyyyyyyb/017.first-frame.e95c1c0baf70.webp"
     },
     {
       "id": "nyyyyyyb/018",
@@ -368,7 +385,8 @@
       "frameCount": 74,
       "duration": 2.551,
       "sha256": "c68bcfaea9789e3222263a8758d820ab2cc4b9c736d31bdea23202de1b659eb6",
-      "manifestPath": "nyyyyyyb/018.json"
+      "manifestPath": "nyyyyyyb/018.json",
+      "firstFrameAssetPath": "nyyyyyyb/018.first-frame.70ce2a914657.webp"
     },
     {
       "id": "nyyyyyyb/019",
@@ -388,7 +406,8 @@
       "frameCount": 87,
       "duration": 2.9,
       "sha256": "8252cce1b7d3550702340929c16bceea7caccfda1c6b16836f702c798488d420",
-      "manifestPath": "nyyyyyyb/019.json"
+      "manifestPath": "nyyyyyyb/019.json",
+      "firstFrameAssetPath": "nyyyyyyb/019.first-frame.9e5aa2275d6a.webp"
     },
     {
       "id": "nyyyyyyb/020",
@@ -408,7 +427,8 @@
       "frameCount": 87,
       "duration": 2.9,
       "sha256": "2a55f8314b10190ae991a3fe22c3c6359b8f92451f22b4f0c32324958ca29a0a",
-      "manifestPath": "nyyyyyyb/020.json"
+      "manifestPath": "nyyyyyyb/020.json",
+      "firstFrameAssetPath": "nyyyyyyb/020.first-frame.a9c196a65f62.webp"
     },
     {
       "id": "nyyyyyyb/021",
@@ -428,7 +448,8 @@
       "frameCount": 87,
       "duration": 2.9,
       "sha256": "478e92c1fd810ee9c9b6bd3ac8bbe5116562bdb0fdfb5596d634ab958ec2cf54",
-      "manifestPath": "nyyyyyyb/021.json"
+      "manifestPath": "nyyyyyyb/021.json",
+      "firstFrameAssetPath": "nyyyyyyb/021.first-frame.ba092a58833f.webp"
     },
     {
       "id": "nyyyyyyb/022",
@@ -448,7 +469,8 @@
       "frameCount": 87,
       "duration": 2.9,
       "sha256": "1ea251c2ffb0b7150384c9ca525f2c165d35c4dceb7945ab229a03f5a1d071f3",
-      "manifestPath": "nyyyyyyb/022.json"
+      "manifestPath": "nyyyyyyb/022.json",
+      "firstFrameAssetPath": "nyyyyyyb/022.first-frame.7b85c03813d3.webp"
     },
     {
       "id": "nyyyyyyb/023",
@@ -468,7 +490,8 @@
       "frameCount": 87,
       "duration": 2.9,
       "sha256": "28cf4abab3d1e832344238bfc798c199454a5f9d10dba1c851cf967be4008d90",
-      "manifestPath": "nyyyyyyb/023.json"
+      "manifestPath": "nyyyyyyb/023.json",
+      "firstFrameAssetPath": "nyyyyyyb/023.first-frame.bf033e447315.webp"
     },
     {
       "id": "nyyyyyyb/024",
@@ -488,7 +511,8 @@
       "frameCount": 87,
       "duration": 2.9,
       "sha256": "7f93a126ec0ad6754f86654082a1082656bc6952855abf52d955ce366331845e",
-      "manifestPath": "nyyyyyyb/024.json"
+      "manifestPath": "nyyyyyyb/024.json",
+      "firstFrameAssetPath": "nyyyyyyb/024.first-frame.2526025f9837.webp"
     },
     {
       "id": "nyyyyyyb/025",
@@ -508,7 +532,8 @@
       "frameCount": 87,
       "duration": 2.9,
       "sha256": "2a03bc6decc0e7e659e308a86218a7677ab4c3de18321046a149b5956e9fde29",
-      "manifestPath": "nyyyyyyb/025.json"
+      "manifestPath": "nyyyyyyb/025.json",
+      "firstFrameAssetPath": "nyyyyyyb/025.first-frame.1884c2fb9601.webp"
     },
     {
       "id": "nyyyyyyb/026",
@@ -528,7 +553,8 @@
       "frameCount": 57,
       "duration": 2.287,
       "sha256": "4c0ab3a73dd50bde2107cb507534e9939a46122bfac95634276ff834a2f99ade",
-      "manifestPath": "nyyyyyyb/026.json"
+      "manifestPath": "nyyyyyyb/026.json",
+      "firstFrameAssetPath": "nyyyyyyb/026.first-frame.49edb0d8a235.webp"
     },
     {
       "id": "nyyyyyyb/027",
@@ -548,7 +574,8 @@
       "frameCount": 174,
       "duration": 2.9,
       "sha256": "ade6c6b2c0c1a5f40c5718c317467bcff792e7a5d5086de237b0f83c4ec9b761",
-      "manifestPath": "nyyyyyyb/027.json"
+      "manifestPath": "nyyyyyyb/027.json",
+      "firstFrameAssetPath": "nyyyyyyb/027.first-frame.2e211d96852b.webp"
     },
     {
       "id": "nyyyyyyb/028",
@@ -568,7 +595,8 @@
       "frameCount": 87,
       "duration": 2.9,
       "sha256": "26e626fdc4767b24f30f956702a2809c10939a1a1d2a5bccacb50f7d635eea7f",
-      "manifestPath": "nyyyyyyb/028.json"
+      "manifestPath": "nyyyyyyb/028.json",
+      "firstFrameAssetPath": "nyyyyyyb/028.first-frame.df032b1ccd19.webp"
     },
     {
       "id": "nyyyyyyb/029",
@@ -588,7 +616,8 @@
       "frameCount": 27,
       "duration": 0.9,
       "sha256": "0417b316e8e1cc0b71f01a4dbd6e9aba15e3a9be9df1c743337590054280e81b",
-      "manifestPath": "nyyyyyyb/029.json"
+      "manifestPath": "nyyyyyyb/029.json",
+      "firstFrameAssetPath": "nyyyyyyb/029.first-frame.021562b33ad7.webp"
     },
     {
       "id": "nyyyyyyb/030",
@@ -608,7 +637,8 @@
       "frameCount": 35,
       "duration": 1.166,
       "sha256": "7d8a779d6b1f410880cba37be627e294d3455523940901df53d1e7b04d95c12f",
-      "manifestPath": "nyyyyyyb/030.json"
+      "manifestPath": "nyyyyyyb/030.json",
+      "firstFrameAssetPath": "nyyyyyyb/030.first-frame.b869d360bac4.webp"
     },
     {
       "id": "nyyyyyyb/031",
@@ -628,7 +658,8 @@
       "frameCount": 35,
       "duration": 1.166,
       "sha256": "2795dc24f01573d96390739d7962b18849cb4c9975682a6788d4075542df3e15",
-      "manifestPath": "nyyyyyyb/031.json"
+      "manifestPath": "nyyyyyyb/031.json",
+      "firstFrameAssetPath": "nyyyyyyb/031.first-frame.63390804ded9.webp"
     },
     {
       "id": "nyyyyyyb/032",
@@ -648,7 +679,8 @@
       "frameCount": 135,
       "duration": 4.504,
       "sha256": "6139632ef89defd4f36bda6d6094f3425749705d7f5d7b50d80ad6160fcba5c8",
-      "manifestPath": "nyyyyyyb/032.json"
+      "manifestPath": "nyyyyyyb/032.json",
+      "firstFrameAssetPath": "nyyyyyyb/032.first-frame.1f2ef7571959.webp"
     },
     {
       "id": "nyyyyyyb/033",
@@ -668,7 +700,8 @@
       "frameCount": 180,
       "duration": 6,
       "sha256": "56e7d22dd0f15dd4852616060a6a3b58a74c5aa9c11888a56bf38c68257cd7ed",
-      "manifestPath": "nyyyyyyb/033.json"
+      "manifestPath": "nyyyyyyb/033.json",
+      "firstFrameAssetPath": "nyyyyyyb/033.first-frame.084b39afe316.webp"
     },
     {
       "id": "nyyyyyyb/034",
@@ -688,7 +721,8 @@
       "frameCount": 44,
       "duration": 1.466,
       "sha256": "27817ae31e417fbee49365bf5c038acc0608181522c0adb19618b2e85958d2d8",
-      "manifestPath": "nyyyyyyb/034.json"
+      "manifestPath": "nyyyyyyb/034.json",
+      "firstFrameAssetPath": "nyyyyyyb/034.first-frame.b0e7738d8343.webp"
     }
   ]
 }

@@ -35,6 +35,7 @@ import {
   createPopoverController,
   createThemeController,
   createTooltipController,
+  getAnimatedStickersEnabled,
   setAnimatedStickersEnabled,
   subscribeAnimatedStickersEnabled,
   THEME_STORAGE_KEY,
@@ -69,8 +70,8 @@ export interface AnimatedStickerProps extends Omit<
 }
 
 /**
- * Plays a converted Telegram sticker while keeping its trusted first-frame SVG
- * in the server-rendered HTML. Never pass unsanitized user SVG as skeletonSvg.
+ * Plays a converted Telegram sticker over its server-rendered first frame.
+ * Never pass unsanitized user SVG as skeletonSvg.
  */
 export const AnimatedSticker = forwardRef<HTMLSpanElement, AnimatedStickerProps>(function AnimatedSticker(
   { sticker, alt, playback = "auto", preload = "metadata", className, ...props },
@@ -103,11 +104,23 @@ export const AnimatedSticker = forwardRef<HTMLSpanElement, AnimatedStickerProps>
       role="img"
       aria-label={alt}
     >
-      <span
-        className="cf-animated-sticker__skeleton"
-        aria-hidden="true"
-        dangerouslySetInnerHTML={{ __html: sticker.skeletonSvg }}
-      />
+      {sticker.skeletonSvg ? (
+        <span
+          className="cf-animated-sticker__skeleton"
+          aria-hidden="true"
+          dangerouslySetInnerHTML={{ __html: sticker.skeletonSvg }}
+        />
+      ) : (
+        <span className="cf-animated-sticker__skeleton" aria-hidden="true">
+          <img
+            src={sticker.firstFrameSrc}
+            alt=""
+            width={sticker.width}
+            height={sticker.height}
+            decoding="async"
+          />
+        </span>
+      )}
       {playback === "auto" ? (
         <video
           data-cf-animated-sticker-video
@@ -162,6 +175,7 @@ export const AnimatedStickerToggle = forwardRef<HTMLInputElement, AnimatedSticke
 
     useEffect(() => {
       const preferenceRoot = document.documentElement;
+      getAnimatedStickersEnabled(preferenceRoot);
       if (controlled || !preferenceRoot.hasAttribute(ANIMATED_STICKERS_ATTRIBUTE)) {
         setAnimatedStickersEnabled(initialEnabled.current, preferenceRoot);
       }
