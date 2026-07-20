@@ -64,6 +64,10 @@ export function SkipLink({
   );
 }
 
+export function AppShell({ className, ...props }: HTMLAttributes<HTMLDivElement>) {
+  return <div className={cx("cf-app-shell", className)} {...props} />;
+}
+
 export interface HeadingProps extends HTMLAttributes<HTMLHeadingElement> {
   level?: 1 | 2 | 3 | 4 | 5 | 6;
   size?: Size | "xl" | "2xl";
@@ -980,6 +984,104 @@ export interface ResponsiveImageProps extends Omit<ImgHTMLAttributes<HTMLImageEl
   aspectRatio?: string;
 }
 
+export interface AvatarProps extends HTMLAttributes<HTMLSpanElement> {
+  image?: ImageSource;
+  name: string;
+  alt?: string;
+  size?: Size;
+  loading?: "eager" | "lazy";
+  referrerPolicy?: ImgHTMLAttributes<HTMLImageElement>["referrerPolicy"];
+}
+
+function avatarInitials(name: string) {
+  return (
+    name
+      .trim()
+      .split(/\s+/)
+      .slice(0, 2)
+      .map((part) => part.slice(0, 1).toLocaleUpperCase())
+      .join("") || "?"
+  );
+}
+
+export function Avatar({
+  image,
+  name,
+  alt = image?.alt ?? name,
+  size = "md",
+  loading = "lazy",
+  referrerPolicy = "no-referrer",
+  className,
+  ...props
+}: AvatarProps) {
+  return (
+    <span
+      className={cx("cf-avatar", className)}
+      data-size={size}
+      role={!image && alt ? "img" : undefined}
+      aria-label={!image && alt ? alt : undefined}
+      aria-hidden={!alt ? true : undefined}
+      {...props}
+    >
+      {image ? (
+        <img
+          src={image.src}
+          alt={alt}
+          width={image.width}
+          height={image.height}
+          srcSet={image.srcSet ?? image.srcset}
+          sizes={image.sizes}
+          loading={loading}
+          decoding="async"
+          referrerPolicy={referrerPolicy}
+        />
+      ) : (
+        avatarInitials(name)
+      )}
+    </span>
+  );
+}
+
+export interface InlineEmojiProps extends Omit<
+  ImgHTMLAttributes<HTMLImageElement>,
+  "src" | "alt" | "width" | "height" | "srcSet"
+> {
+  image: ImageSource;
+  alt?: string;
+}
+
+export function InlineEmoji({
+  image,
+  alt = image.alt,
+  referrerPolicy = "no-referrer",
+  className,
+  ...props
+}: InlineEmojiProps) {
+  return (
+    <img
+      className={cx("cf-inline-emoji", className)}
+      src={image.src}
+      alt={alt}
+      width={image.width}
+      height={image.height}
+      srcSet={image.srcSet ?? image.srcset}
+      sizes={image.sizes}
+      loading="lazy"
+      decoding="async"
+      referrerPolicy={referrerPolicy}
+      {...props}
+    />
+  );
+}
+
+export interface MediaGridProps extends HTMLAttributes<HTMLElement> {
+  as?: "ul" | "div";
+}
+
+export function MediaGrid({ as: Component = "ul", className, ...props }: MediaGridProps) {
+  return <Component className={cx("cf-media-grid", className)} {...props} />;
+}
+
 export function ResponsiveImage({
   image,
   darkImage,
@@ -1046,6 +1148,14 @@ function postDateLabel(post: PostSummary): string | undefined {
   return post.published ?? post.publishedAt;
 }
 
+function postUpdatedDateTime(post: PostSummary): string | undefined {
+  return post.updatedAt ?? post.updated;
+}
+
+function postUpdatedDateLabel(post: PostSummary): string | undefined {
+  return post.updated ?? post.updatedAt;
+}
+
 function postDescription(post: PostSummary): string | undefined {
   return post.excerpt ?? post.description;
 }
@@ -1080,6 +1190,8 @@ function PostCardBody({ post, headingLevel = 2 }: Pick<PostCardProps, "post" | "
   const image = postImage(post);
   const publishedAt = postDateTime(post);
   const published = postDateLabel(post);
+  const updatedAt = postUpdatedDateTime(post);
+  const updated = postUpdatedDateLabel(post);
   const description = postDescription(post);
   return (
     <>
@@ -1089,11 +1201,16 @@ function PostCardBody({ post, headingLevel = 2 }: Pick<PostCardProps, "post" | "
         </a>
       ) : null}
       <div className="cf-post-card__content">
-        {published || post.readingTime ? (
+        {published || updated || post.readingTime ? (
           <p className="cf-post-card__meta">
             {published ? (
               <span>
                 Published <time dateTime={publishedAt}>{published}</time>
+              </span>
+            ) : null}
+            {updated ? (
+              <span>
+                Updated <time dateTime={updatedAt}>{updated}</time>
               </span>
             ) : null}
             {post.readingTime ? <span>{post.readingTime}</span> : null}
@@ -1108,7 +1225,7 @@ function PostCardBody({ post, headingLevel = 2 }: Pick<PostCardProps, "post" | "
           </Text>
         ) : null}
         {post.tags?.length ? (
-          <div className="cf-post-card__tags">
+          <div className="cf-post-card__tags" aria-label="Tags">
             {post.tags.map((tag) => (
               <span className="cf-tag" key={tag}>
                 {tag}
@@ -1143,6 +1260,8 @@ export function LatestPostCard({
   const image = postImage(post);
   const publishedAt = postDateTime(post);
   const published = postDateLabel(post);
+  const updatedAt = postUpdatedDateTime(post);
+  const updated = postUpdatedDateLabel(post);
   const description = postDescription(post);
   return (
     <article className={cx("cf-latest-post-card", className)} {...props}>
@@ -1152,10 +1271,24 @@ export function LatestPostCard({
           <a href={post.href}>{post.title}</a>
         </Heading>
         {description ? <p className="cf-latest-post-card__description">{description}</p> : null}
-        {published || post.readingTime ? (
+        {published || updated || post.readingTime ? (
           <p className="cf-latest-post-card__meta">
-            {published ? <time dateTime={publishedAt}>{published}</time> : null}
-            {published && post.readingTime ? (
+            {published ? (
+              <span>
+                Published <time dateTime={publishedAt}>{published}</time>
+              </span>
+            ) : null}
+            {published && (updated || post.readingTime) ? (
+              <span className="cf-post-meta__separator" aria-hidden="true">
+                ·
+              </span>
+            ) : null}
+            {updated ? (
+              <span>
+                Updated <time dateTime={updatedAt}>{updated}</time>
+              </span>
+            ) : null}
+            {updated && post.readingTime ? (
               <span className="cf-post-meta__separator" aria-hidden="true">
                 ·
               </span>
@@ -1201,13 +1334,29 @@ export function SearchResultCard({
 }: SearchResultCardProps) {
   const publishedAt = postDateTime(result);
   const published = postDateLabel(result);
+  const updatedAt = postUpdatedDateTime(result);
+  const updated = postUpdatedDateLabel(result);
   const description = postDescription(result);
   return (
     <article className={cx("cf-search-result-card", className)} data-query={query || undefined} {...props}>
-      {published || result.readingTime ? (
+      {published || updated || result.readingTime ? (
         <p className="cf-search-result-card__meta">
-          {published ? <time dateTime={publishedAt}>{published}</time> : null}
-          {published && result.readingTime ? (
+          {published ? (
+            <span>
+              Published <time dateTime={publishedAt}>{published}</time>
+            </span>
+          ) : null}
+          {published && (updated || result.readingTime) ? (
+            <span className="cf-post-meta__separator" aria-hidden="true">
+              ·
+            </span>
+          ) : null}
+          {updated ? (
+            <span>
+              Updated <time dateTime={updatedAt}>{updated}</time>
+            </span>
+          ) : null}
+          {updated && result.readingTime ? (
             <span className="cf-post-meta__separator" aria-hidden="true">
               ·
             </span>
@@ -1220,6 +1369,15 @@ export function SearchResultCard({
       </Heading>
       {description ? (
         <p className="cf-search-result-card__description">{highlightText(description, query)}</p>
+      ) : null}
+      {result.tags?.length ? (
+        <div className="cf-search-result-card__tags" aria-label="Tags">
+          {result.tags.map((tag) => (
+            <span className="cf-tag" key={tag}>
+              {highlightText(tag, query)}
+            </span>
+          ))}
+        </div>
       ) : null}
     </article>
   );
@@ -1243,11 +1401,26 @@ export function ChatThread({ messages, label = "Conversation", className, ...pro
             </span>
           )}
           <div className="cf-chat__message">
-            <div className="cf-chat__author">
+            <p className="cf-chat__author">
               <strong>{message.author}</strong>
-              {message.timestamp ? <time>{message.timestamp}</time> : null}
+              {message.timestamp ? <time dateTime={message.timestamp}>{message.timestamp}</time> : null}
+            </p>
+            <div className="cf-chat__bubble">
+              {message.body ?? message.text}
+              {message.link ? (
+                <>
+                  {message.body !== undefined || message.text ? <br /> : null}
+                  <a
+                    className="cf-link"
+                    href={message.link}
+                    target={message.linkExternal ? "_blank" : undefined}
+                    rel={message.linkExternal ? "noopener noreferrer" : undefined}
+                  >
+                    {message.linkLabel ?? message.link}
+                  </a>
+                </>
+              ) : null}
             </div>
-            <div className="cf-chat__bubble">{message.body}</div>
           </div>
         </li>
       ))}

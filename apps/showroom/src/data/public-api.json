@@ -483,14 +483,14 @@
               "name": "PostModel",
               "kind": "interface",
               "signature": "interface PostModel",
-              "summary": "Portable post-card content model.",
+              "summary": "Portable post-card content model with display and machine-readable published/updated dates.",
               "entrypoints": [".", "./types"]
             },
             {
               "name": "ChatMessageModel",
               "kind": "interface",
               "signature": "interface ChatMessageModel",
-              "summary": "Portable chat message content model.",
+              "summary": "Portable chat message content model with body/text fallback and optional safe links.",
               "entrypoints": [".", "./types"]
             },
             {
@@ -693,7 +693,7 @@
               "name": "PostModel",
               "kind": "interface",
               "signature": "interface PostModel",
-              "summary": "Portable post-card content model.",
+              "summary": "Portable post-card content model with display and machine-readable published/updated dates.",
               "entrypoints": [".", "./types"]
             },
             {
@@ -707,7 +707,7 @@
               "name": "ChatMessageModel",
               "kind": "interface",
               "signature": "interface ChatMessageModel",
-              "summary": "Portable plain-text chat message model.",
+              "summary": "Portable chat message model with body/text fallback and optional safe links.",
               "entrypoints": [".", "./types"]
             },
             {
@@ -994,6 +994,27 @@
               "kind": "interface",
               "signature": "interface ResponsiveImageProps",
               "summary": "Portable source plus loading behavior and native image attributes.",
+              "entrypoints": [".", "./static"]
+            },
+            {
+              "name": "AvatarProps",
+              "kind": "interface",
+              "signature": "interface AvatarProps",
+              "summary": "Responsive avatar source, accessible name or decorative alt, initials fallback, size, loading, and referrer policy.",
+              "entrypoints": [".", "./static"]
+            },
+            {
+              "name": "InlineEmojiProps",
+              "kind": "interface",
+              "signature": "interface InlineEmojiProps",
+              "summary": "Semantic inline image metadata and native image attributes.",
+              "entrypoints": [".", "./static"]
+            },
+            {
+              "name": "MediaGridProps",
+              "kind": "interface",
+              "signature": "interface MediaGridProps",
+              "summary": "Semantic list or div container for responsive image, video, and audio media.",
               "entrypoints": [".", "./static"]
             },
             {
@@ -1291,7 +1312,7 @@
               "name": "PostModel",
               "kind": "interface",
               "signature": "interface PostModel",
-              "summary": "Portable post-card content model.",
+              "summary": "Portable post-card content model with display and machine-readable published/updated dates.",
               "entrypoints": ["."]
             },
             {
@@ -1305,7 +1326,7 @@
               "name": "ChatMessageModel",
               "kind": "interface",
               "signature": "interface ChatMessageModel",
-              "summary": "Portable plain-text chat message model.",
+              "summary": "Portable chat message model with body/text fallback and optional safe links.",
               "entrypoints": ["."]
             },
             {

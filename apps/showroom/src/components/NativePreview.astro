@@ -111,6 +111,27 @@ const renderTerminalOutput = (output: string) => `<code>${escapeHtml(output)}</c
       </div>
     )
   }
+  {
+    name === "AppShell" && (
+      <div class="cf-app-shell" style="min-block-size:18rem">
+        <header>
+          <p class="cf-text" data-size="sm" data-tone="muted">
+            Header
+          </p>
+        </header>
+        <div style="flex:1 0 auto">
+          <h3 class="cf-heading" data-level="3">
+            Main content grows
+          </h3>
+        </div>
+        <footer>
+          <p class="cf-text" data-size="sm" data-tone="muted">
+            Sticky footer
+          </p>
+        </footer>
+      </div>
+    )
+  }
 
   {
     name === "Heading" && (
@@ -999,6 +1020,9 @@ const renderTerminalOutput = (output: string) => `<code>${escapeHtml(output)}</c
               <span>
                 Published <time datetime="2026-07-19">19 July 2026</time>
               </span>
+              <span>
+                Updated <time datetime="2026-07-20">20 July 2026</time>
+              </span>
               <span>4 min read</span>
             </p>
             <h2 class="cf-post-card__title">
@@ -1026,12 +1050,14 @@ const renderTerminalOutput = (output: string) => `<code>${escapeHtml(output)}</c
           </h2>
           <p class="cf-latest-post-card__description">A practical note about content-first design.</p>
           <p class="cf-latest-post-card__meta">
-            <>
-              <time datetime="2026-07-19">19 July 2026</time>
-              <span class="cf-post-meta__separator" aria-hidden="true">
-                ·
-              </span>
-            </>
+            Published <time datetime="2026-07-19">19 July 2026</time>
+            <span class="cf-post-meta__separator" aria-hidden="true">
+              ·
+            </span>
+            Updated <time datetime="2026-07-20">20 July 2026</time>
+            <span class="cf-post-meta__separator" aria-hidden="true">
+              ·
+            </span>
             4 min read
           </p>
           <a class="cf-link" href="#post">
@@ -1045,12 +1071,14 @@ const renderTerminalOutput = (output: string) => `<code>${escapeHtml(output)}</c
     name === "SearchResultCard" && (
       <article class="cf-search-result-card" data-query="design">
         <p class="cf-search-result-card__meta">
-          <>
-            <time datetime="2026-07-19">19 July 2026</time>
-            <span class="cf-post-meta__separator" aria-hidden="true">
-              ·
-            </span>
-          </>
+          Published <time datetime="2026-07-19">19 July 2026</time>
+          <span class="cf-post-meta__separator" aria-hidden="true">
+            ·
+          </span>
+          Updated <time datetime="2026-07-20">20 July 2026</time>
+          <span class="cf-post-meta__separator" aria-hidden="true">
+            ·
+          </span>
           4 min read
         </p>
         <h2 class="cf-search-result-card__title">
@@ -1059,6 +1087,12 @@ const renderTerminalOutput = (output: string) => `<code>${escapeHtml(output)}</c
         <p class="cf-search-result-card__description">
           A practical note about content-first <mark>design</mark>.
         </p>
+        <div class="cf-search-result-card__tags">
+          <span class="cf-tag">
+            <mark>design</mark>
+          </span>
+          <span class="cf-tag">css</span>
+        </div>
       </article>
     )
   }
@@ -1083,6 +1117,46 @@ const renderTerminalOutput = (output: string) => `<code>${escapeHtml(output)}</c
         </span>
         <figcaption>A responsive image with intrinsic dimensions.</figcaption>
       </figure>
+    )
+  }
+  {
+    name === "Avatar" && (
+      <div class="cf-inline" data-gap="sm">
+        <span class="cf-avatar" data-size="lg">
+          <img
+            src={lightImage}
+            alt="Ada Lovelace"
+            width="640"
+            height="360"
+            loading="lazy"
+            referrerpolicy="no-referrer"
+          />
+        </span>
+        <span class="cf-avatar" data-size="md" role="img" aria-label="Grace Hopper">
+          GH
+        </span>
+      </div>
+    )
+  }
+  {
+    name === "InlineEmoji" && (
+      <p class="cf-text">
+        Semantic inline image{" "}
+        <img class="cf-inline-emoji" src={lightImage} alt="Blue landscape" width="640" height="360" /> stays
+        aligned with text.
+      </p>
+    )
+  }
+  {
+    name === "MediaGrid" && (
+      <ul class="cf-media-grid">
+        <li>
+          <img src={lightImage} alt="Abstract blue geometric landscape" width="640" height="360" />
+        </li>
+        <li>
+          <img src={darkImage} alt="Abstract blue geometric landscape at night" width="640" height="360" />
+        </li>
+      </ul>
     )
   }
   {
@@ -1113,7 +1187,13 @@ const renderTerminalOutput = (output: string) => `<code>${escapeHtml(output)}</c
                 <time datetime="19:20">19:20</time>
               </>
             </p>
-            <div class="cf-chat__bubble">Then every adapter stays aligned.</div>
+            <div class="cf-chat__bubble">
+              Then every adapter stays aligned.
+              <br />
+              <a class="cf-link" href="https://cofob.dev/blog" target="_blank" rel="noopener noreferrer">
+                Read the implementation notes
+              </a>
+            </div>
           </div>
         </li>
       </ol>

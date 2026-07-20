@@ -19,6 +19,8 @@ import type {
 } from "../src/lib/index.js";
 import Accordion from "../src/lib/components/Accordion.svelte";
 import Alert from "../src/lib/components/Alert.svelte";
+import AppShell from "../src/lib/components/AppShell.svelte";
+import Avatar from "../src/lib/components/Avatar.svelte";
 import BlueLine from "../src/lib/components/BlueLine.svelte";
 import Button from "../src/lib/components/Button.svelte";
 import Captcha from "../src/lib/components/Captcha.svelte";
@@ -29,6 +31,8 @@ import Dialog from "../src/lib/components/Dialog.svelte";
 import DropdownMenu from "../src/lib/components/DropdownMenu.svelte";
 import EmptyState from "../src/lib/components/EmptyState.svelte";
 import IconButton from "../src/lib/components/IconButton.svelte";
+import InlineEmoji from "../src/lib/components/InlineEmoji.svelte";
+import MediaGrid from "../src/lib/components/MediaGrid.svelte";
 import Navbar from "../src/lib/components/Navbar.svelte";
 import PostCard from "../src/lib/components/PostCard.svelte";
 import Popover from "../src/lib/components/Popover.svelte";
@@ -49,6 +53,7 @@ const componentNames = [
   "ThemeScript",
   "ThemeToggle",
   "SkipLink",
+  "AppShell",
   "Heading",
   "Text",
   "Link",
@@ -90,6 +95,9 @@ const componentNames = [
   "LatestPostCard",
   "SearchResultCard",
   "ResponsiveImage",
+  "Avatar",
+  "InlineEmoji",
+  "MediaGrid",
   "ChatThread",
   "Sticker",
 ] as const;
@@ -170,6 +178,38 @@ describe("Svelte adapter contract", () => {
     expect(output.body).toContain('data-rainbow="true"');
     expect(output.body).not.toContain("<hr");
     expect(output.body).toContain("cf-blue-line__content");
+  });
+
+  it("server-renders application and media foundations", () => {
+    const shell = render(AppShell, {
+      props: {
+        children: createRawSnippet(() => ({ render: () => "<main>Main</main><footer>Footer</footer>" })),
+      },
+    });
+    const imageAvatar = render(Avatar, {
+      props: { name: "Egor", image: { src: "/avatar.webp", alt: "Egor" } },
+    });
+    const fallbackAvatar = render(Avatar, { props: { name: "Reader Name", alt: "Reader profile" } });
+    const emoji = render(InlineEmoji, {
+      props: { image: { src: "/wave.webp", alt: ":wave:", width: 20, height: 20 } },
+    });
+    const media = render(MediaGrid, {
+      props: {
+        "aria-label": "Attachments",
+        children: createRawSnippet(() => ({ render: () => "<li>Attachment</li>" })),
+      },
+    });
+
+    expect(shell.body).toContain('<div class="cf-app-shell"><main>Main</main>');
+    expect(shell.body).toContain("<footer>Footer</footer>");
+    expect(imageAvatar.body).toContain('<span class="cf-avatar" data-size="md">');
+    expect(imageAvatar.body).toContain('<img src="/avatar.webp" alt="Egor"');
+    expect(imageAvatar.body).toContain('referrerpolicy="no-referrer"');
+    expect(fallbackAvatar.body).toContain('role="img" aria-label="Reader profile"');
+    expect(fallbackAvatar.body).toContain("RN");
+    expect(emoji.body).toContain('class="cf-inline-emoji" src="/wave.webp" alt=":wave:" width="20"');
+    expect(emoji.body).toContain('referrerpolicy="no-referrer"');
+    expect(media.body).toContain('<ul class="cf-media-grid" aria-label="Attachments"><li>Attachment</li>');
   });
 
   it("aligns action, selection, and empty-state DOM with the shared adapter contract", () => {
@@ -348,7 +388,7 @@ describe("Svelte adapter contract", () => {
     expectTypeOf<PostModel>().toEqualTypeOf<CssPostModel>();
     expectTypeOf<ResponsiveImageModel>().toEqualTypeOf<CssResponsiveImageModel>();
     expectTypeOf<ChatMessageModel>().toEqualTypeOf<CssChatMessageModel>();
-    expectTypeOf<ChatMessage["body"]>().toEqualTypeOf<string | Snippet>();
+    expectTypeOf<ChatMessage["body"]>().toEqualTypeOf<string | Snippet | undefined>();
     expectTypeOf<ChatMessage["link"]>().toEqualTypeOf<string | undefined>();
   });
 
@@ -412,7 +452,10 @@ describe("Svelte adapter contract", () => {
           title: "Canonical post",
           published: "19 July 2026",
           publishedAt: "2026-07-19",
+          updated: "20 July 2026",
+          updatedAt: "2026-07-20",
           readingTime: "4 min read",
+          tags: ["design systems"],
         },
       },
     });
@@ -421,6 +464,7 @@ describe("Svelte adapter contract", () => {
     expect(responsiveImage.body).toContain('class="cf-responsive-image__light" src="/light.jpg"');
     expect(responsiveImage.body).toContain('class="cf-responsive-image__dark" src="/dark.jpg"');
     expect(postCard.body).toContain('<time datetime="2026-07-19">19 July 2026</time>');
+    expect(postCard.body).toContain('<time datetime="2026-07-20">20 July 2026</time>');
     expect(postCard.body).toContain("4 min read");
   });
 
@@ -435,12 +479,24 @@ describe("Svelte adapter contract", () => {
             body: "Image avatar",
             avatar: { src: "/avatar.webp", alt: "Reader avatar", width: 40, height: 40 },
           },
+          {
+            id: "link",
+            author: "cofob",
+            text: "Source code",
+            link: "https://example.com/source",
+            linkLabel: "Open source",
+            linkExternal: true,
+          },
         ],
       },
     });
 
     expect(output.body).toContain('aria-hidden="true">C</span>');
     expect(output.body).toContain('class="cf-chat__avatar" src="/avatar.webp" alt=""');
+    expect(output.body).toContain(
+      '<a class="cf-link" href="https://example.com/source" target="_blank" rel="noopener noreferrer">Open source</a>',
+    );
+    expect(output.body).toContain("Source code");
   });
 
   it("composes consumer and internal event handlers and respects cancellation", () => {

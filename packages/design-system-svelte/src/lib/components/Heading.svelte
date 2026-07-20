@@ -6,13 +6,22 @@
 
   interface Props extends HTMLAttributes<HTMLElement> {
     as?: "h1" | "h2" | "h3" | "h4" | "h5" | "h6";
+    level?: 1 | 2 | 3 | 4 | 5 | 6;
     size?: Size | "xl" | "2xl";
     children?: Snippet;
   }
 
-  let { as = "h2", size = "lg", children, class: className, ...rest }: Props = $props();
+  let { as, level, size, children, class: className, ...rest }: Props = $props();
+  const resolvedLevel = $derived(level ?? (as ? (Number(as.slice(1)) as 1 | 2 | 3 | 4 | 5 | 6) : 2));
+  const element = $derived(as ?? (`h${resolvedLevel}` as "h1" | "h2" | "h3" | "h4" | "h5" | "h6"));
 </script>
 
-<svelte:element this={as} class={cx("cf-heading", className)} data-size={size} {...rest}>
+<svelte:element
+  this={element}
+  class={cx("cf-heading", className)}
+  data-size={size}
+  data-level={resolvedLevel}
+  {...rest}
+>
   {@render children?.()}
 </svelte:element>

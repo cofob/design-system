@@ -2,6 +2,7 @@ export { default as ThemeProvider } from "./components/ThemeProvider.svelte";
 export { default as ThemeScript } from "./components/ThemeScript.svelte";
 export { default as ThemeToggle } from "./components/ThemeToggle.svelte";
 export { default as SkipLink } from "./components/SkipLink.svelte";
+export { default as AppShell } from "./components/AppShell.svelte";
 export { default as Heading } from "./components/Heading.svelte";
 export { default as Text } from "./components/Text.svelte";
 export { default as Link } from "./components/Link.svelte";
@@ -47,6 +48,9 @@ export { default as PostCard } from "./components/PostCard.svelte";
 export { default as LatestPostCard } from "./components/LatestPostCard.svelte";
 export { default as SearchResultCard } from "./components/SearchResultCard.svelte";
 export { default as ResponsiveImage } from "./components/ResponsiveImage.svelte";
+export { default as Avatar } from "./components/Avatar.svelte";
+export { default as InlineEmoji } from "./components/InlineEmoji.svelte";
+export { default as MediaGrid } from "./components/MediaGrid.svelte";
 export { default as ChatThread } from "./components/ChatThread.svelte";
 export { default as Sticker } from "./components/Sticker.svelte";
 

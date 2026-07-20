@@ -35,6 +35,7 @@ const props: Record<string, readonly string[]> = {
   ThemeScript: ["storageKey", "nonce"],
   ThemeToggle: ["preference", "cycle", "labels", "showLabel", "onPreferenceChange", "button attributes"],
   SkipLink: ["targetId/href", "children", "anchor attributes"],
+  AppShell: ["children", "div attributes"],
   Heading: ["level/as", "size", "children"],
   Text: ["as", "size", "tone", "children"],
   Link: ["href", "external", "quiet/underline", "children", "anchor attributes"],
@@ -221,6 +222,9 @@ const props: Record<string, readonly string[]> = {
   LatestPostCard: ["post", "headingLevel", "eyebrow", "article attributes"],
   SearchResultCard: ["result", "query", "headingLevel", "article attributes"],
   ResponsiveImage: ["image", "darkImage", "caption", "aspectRatio", "fit", "priority", "image attributes"],
+  Avatar: ["image", "name", "alt", "size", "loading", "referrerPolicy/referrerpolicy", "span attributes"],
+  InlineEmoji: ["image", "alt", "referrerPolicy/referrerpolicy", "image attributes"],
+  MediaGrid: ["as", "children", "container attributes"],
   ChatThread: ["messages", "label", "list attributes"],
   Sticker: ["tone", "rotation", "children", "data-image", "span attributes"],
 };
@@ -237,7 +241,7 @@ const parameterTypes: Record<string, string> = {
   labels: "Partial<Record<string, string>>",
   showLabel: "boolean",
   "targetId/href": "string",
-  "level/as": '1–6 (React) | "h1"–"h6" (Svelte/HTML)',
+  "level/as": '1–6 | "h1"–"h6" (Svelte/HTML)',
   as: "element name (adapter-specific union)",
   size: '"sm" | "md" | "lg" (plus heading sizes)',
   tone: '"neutral" | "accent" | "info" | "success" | "warning" | "danger"',
@@ -341,11 +345,14 @@ const parameterTypes: Record<string, string> = {
   groups: "readonly FooterGroup[]",
   "legal/copyright": "renderable content (React) | string (Svelte)",
   post: "PostModel",
-  headingLevel: "2 | 3 | 4 (React)",
+  headingLevel: "2 | 3 | 4",
   eyebrow: "string | ReactNode",
   result: "PostModel",
   query: "string",
   image: "ResponsiveImageModel",
+  name: "string",
+  alt: "string",
+  "referrerPolicy/referrerpolicy": "HTML referrer policy",
   darkImage: "ResponsiveImageModel",
   caption: "string | renderable content",
   aspectRatio: "CSS aspect-ratio string",
@@ -538,11 +545,14 @@ const parameterDescriptions: Record<string, string> = {
   groups: "Footer link columns.",
   "legal/copyright": "Legal/copyright content; adapter naming differs.",
   post: "Portable post metadata including URL, title, dates, tags, and cover image.",
-  headingLevel: "React semantic heading level inside a post card.",
+  headingLevel: "Semantic heading level inside a post card.",
   eyebrow: "Short label above the latest-post title.",
   result: "Portable post record rendered as a search result.",
   query: "Search phrase used to emphasize matching title text.",
   image: "Light-theme responsive source, alternative text, dimensions, and srcset data.",
+  name: "Person or entity name used to derive accessible initials.",
+  alt: "Alternative text; use an empty string when the image is decorative.",
+  "referrerPolicy/referrerpolicy": "Controls referrer data sent while loading a remote avatar.",
   darkImage: "Optional dark-theme source with its own intrinsic metadata.",
   caption: "Visible caption for a figure or table.",
   aspectRatio: "Reserves layout space before the image loads.",
@@ -571,6 +581,8 @@ const requiredParameters: Record<string, readonly string[]> = {
   LatestPostCard: ["post"],
   SearchResultCard: ["result"],
   ResponsiveImage: ["image"],
+  Avatar: ["name"],
+  InlineEmoji: ["image"],
   ChatThread: ["messages"],
 };
 
@@ -589,7 +601,6 @@ const adapterOverrides: Record<string, readonly Adapter[]> = {
   "limit/defaultDuration": ["React", "HTML"],
   "viewport/position": ["Svelte", "HTML"],
   brandContent: ["Svelte"],
-  headingLevel: ["React", "HTML"],
   fit: ["Svelte", "HTML"],
   priority: ["Svelte", "HTML"],
 };
@@ -622,15 +633,6 @@ const componentAdapterOverrides: Record<string, Record<string, readonly Adapter[
   Navbar: {
     brandContent: ["Svelte"],
   },
-  PostCard: {
-    headingLevel: ["React", "HTML"],
-  },
-  LatestPostCard: {
-    headingLevel: ["React", "HTML"],
-  },
-  SearchResultCard: {
-    headingLevel: ["React", "HTML"],
-  },
   ResponsiveImage: {
     fit: ["Svelte", "HTML"],
     priority: ["Svelte", "HTML"],
@@ -643,6 +645,9 @@ const componentParameterTypes: Record<string, Record<string, string>> = {
   },
   Heading: {
     size: '"sm" | "md" | "lg" | "xl" | "2xl"',
+  },
+  Avatar: {
+    loading: '"eager" | "lazy"',
   },
   Badge: {
     variant: '"soft" | "solid" | "outline" (Svelte)',
@@ -663,7 +668,7 @@ const componentParameterDefaults: Record<string, Record<string, string>> = {
   SkipLink: {
     "targetId/href": '"main-content" / "#main-content"',
   },
-  Heading: { size: 'semantic default for level / "lg"' },
+  Heading: { size: "semantic default for level" },
   Container: { size: '"lg" (React) / "default" (Svelte)' },
   Section: { "spacing/surface": '"lg" / "canvas" (React)' },
   Inline: { align: '"center"' },
@@ -684,9 +689,12 @@ const componentParameterDefaults: Record<string, Record<string, string>> = {
   },
   ToastViewport: { label: '"Notifications"', closeLabel: '"Dismiss notification" (React)' },
   Navbar: { menuLabel: '"Navigation" / "Main navigation"' },
-  LatestPostCard: { eyebrow: '"Latest post"', headingLevel: "2 (React)" },
-  PostCard: { headingLevel: "2 (React)" },
-  SearchResultCard: { headingLevel: "2 (React)" },
+  LatestPostCard: { eyebrow: '"Latest post"', headingLevel: "2" },
+  PostCard: { headingLevel: "2" },
+  SearchResultCard: { headingLevel: "2" },
+  Avatar: { size: '"md"', loading: '"lazy"', "referrerPolicy/referrerpolicy": '"no-referrer"' },
+  InlineEmoji: { "referrerPolicy/referrerpolicy": '"no-referrer"' },
+  MediaGrid: { as: '"ul"' },
   ChatThread: { label: '"Conversation"' },
 };
 
@@ -741,6 +749,9 @@ const parameterExamples: Record<string, string> = {
   headingLevel: "2",
   eyebrow: '"Latest post"',
   query: '"design system"',
+  name: '"Ada Lovelace"',
+  alt: '"Ada Lovelace"',
+  "referrerPolicy/referrerpolicy": '"no-referrer"',
   "data-image": 'data-image="true"',
 };
 
@@ -760,6 +771,12 @@ const componentParameterExamples: Record<string, Record<string, string>> = {
   },
   ResponsiveImage: {
     caption: '"The dashboard in light and dark themes."',
+  },
+  Avatar: {
+    image: "{avatar}",
+  },
+  InlineEmoji: {
+    image: "{emoji}",
   },
 };
 
@@ -815,6 +832,7 @@ function parameterExample(component: string, name: string): string {
   if (name === "align") return '"center"';
   if (name === "justify") return '"between"';
   if (name === "fit") return '"cover"';
+  if (name === "alt") return '"Accessible description"';
   if (name.includes("Label") || name === "label") return '"Accessible label"';
   if (["items", "items/tabs", "options/children", "entries", "links", "groups", "messages"].includes(name))
     return `{${name.split("/")[0]}}`;
@@ -845,6 +863,7 @@ const stateOverrides: Record<string, readonly string[]> = {
   ThemeProvider: ["light", "dark", "system"],
   ThemeScript: ["before paint", "storage unavailable"],
   ThemeToggle: ["light", "dark", "system", "focus-visible"],
+  AppShell: ["short content", "sticky footer", "overflowing content"],
   Button: ["primary", "secondary", "ghost", "danger", "loading", "disabled"],
   TextField: ["default", "focus", "disabled", "error"],
   Textarea: ["default", "focus", "disabled", "error"],
@@ -866,6 +885,9 @@ const stateOverrides: Record<string, readonly string[]> = {
   Tooltip: ["closed", "hover", "focus", "Escape"],
   ToastProvider: ["empty", "queued", "dismissed"],
   ToastViewport: ["polite", "danger alert", "dismissed"],
+  Avatar: ["responsive image", "initials fallback", "sm", "md", "lg", "decorative"],
+  InlineEmoji: ["named", "decorative", "inline alignment"],
+  MediaGrid: ["one item", "two columns", "image/video/audio"],
   Sticker: ["label", "image", "attributed image"],
 };
 
@@ -874,6 +896,7 @@ const reactUsage: Record<string, string> = {
   ThemeScript: "<ThemeScript nonce={nonce} />",
   ThemeToggle: "<ThemeToggle />",
   SkipLink: '<SkipLink targetId="content" />',
+  AppShell: "<AppShell><Header /><main>Content</main><Footer /></AppShell>",
   Link: '<Link href="/guide">Guide</Link>',
   IconButton: '<IconButton label="Add" icon={Plus} />',
   Field: '<Field label="Email"><input /></Field>',
@@ -902,6 +925,9 @@ const reactUsage: Record<string, string> = {
   LatestPostCard: "<LatestPostCard post={post} />",
   SearchResultCard: "<SearchResultCard result={post} />",
   ResponsiveImage: "<ResponsiveImage image={image} />",
+  Avatar: '<Avatar image={avatar} name="Ada Lovelace" />',
+  InlineEmoji: '<InlineEmoji image={emoji} alt="Sparkles" />',
+  MediaGrid: "<MediaGrid>{mediaItems}</MediaGrid>",
   ChatThread: "<ChatThread messages={messages} />",
   Sticker:
     '<figure><Sticker data-image="true"><img src="/sticker.webp" alt="A delighted fox" /></Sticker><figcaption>Source: …</figcaption></figure>',
@@ -935,6 +961,7 @@ const nativeUsage: Record<string, string> = {
   ThemeScript: "<script>/* getThemeScript() */</script>",
   ThemeToggle: '<button class="cf-theme-toggle" data-cf-theme-toggle>Theme</button>',
   SkipLink: '<a class="cf-skip-link" href="#content">Skip to content</a>',
+  AppShell: '<div class="cf-app-shell"><header>…</header><main>…</main><footer>…</footer></div>',
   Heading: '<h2 class="cf-heading" data-level="2">Title</h2>',
   Text: '<p class="cf-text" data-tone="muted">Metadata</p>',
   Link: '<a class="cf-link" href="/guide">Guide</a>',
@@ -978,6 +1005,9 @@ const nativeUsage: Record<string, string> = {
   LatestPostCard: '<article class="cf-latest-post-card">…</article>',
   SearchResultCard: '<article class="cf-search-result-card">…</article>',
   ResponsiveImage: '<img class="cf-responsive-image" src="image.jpg" alt="Description" />',
+  Avatar: '<span class="cf-avatar" data-size="md"><img src="avatar.jpg" alt="Ada Lovelace" /></span>',
+  InlineEmoji: '<img class="cf-inline-emoji" src="sparkles.webp" alt="Sparkles" width="24" height="24" />',
+  MediaGrid: '<ul class="cf-media-grid"><li><img src="image.jpg" alt="Description" /></li></ul>',
   ChatThread: '<ol class="cf-chat-thread">…</ol>',
   Sticker:
     '<figure><span class="cf-sticker" data-image="true"><img src="/sticker.webp" alt="A delighted fox" /></span><figcaption>Source: …</figcaption></figure>',

@@ -3,6 +3,8 @@ import { renderToString } from "react-dom/server";
 import { describe, expect, it } from "vitest";
 import {
   Alert,
+  AppShell,
+  Avatar,
   BlueLine,
   Button,
   Captcha,
@@ -11,8 +13,10 @@ import {
   Checkbox,
   EmptyState,
   IconButton,
+  InlineEmoji,
   LatestPostCard,
   Navbar,
+  MediaGrid,
   Pagination,
   PostCard,
   SearchResultCard,
@@ -178,6 +182,27 @@ describe("static components", () => {
     expect(screen.getByRole("link", { name: "Hello" })).toHaveAttribute("href", "/hello");
   });
 
+  it("renders application and portable media foundations", () => {
+    const { container } = render(
+      <AppShell>
+        <main>Main content</main>
+        <footer>Footer</footer>
+        <Avatar name="Egor Ternovoi" image={{ src: "/avatar.webp", alt: "Egor" }} />
+        <Avatar name="Reader Name" alt="Reader profile" />
+        <InlineEmoji image={{ src: "/wave.webp", alt: ":wave:", width: 20, height: 20 }} />
+        <MediaGrid aria-label="Attachments">
+          <li>Attachment</li>
+        </MediaGrid>
+      </AppShell>,
+    );
+
+    expect(container.querySelector(".cf-app-shell > main")).toHaveTextContent("Main content");
+    expect(container.querySelector(".cf-avatar > img")).toHaveAttribute("src", "/avatar.webp");
+    expect(screen.getByRole("img", { name: "Reader profile" })).toHaveTextContent("RN");
+    expect(container.querySelector(".cf-inline-emoji")).toHaveAttribute("width", "20");
+    expect(screen.getByRole("list", { name: "Attachments" })).toHaveClass("cf-media-grid");
+  });
+
   it("aligns Card variants, padding, and linked surfaces with the CSS contract", () => {
     render(
       <Card href="/card" variant="raised" padding="lg" target="_blank">
@@ -198,7 +223,10 @@ describe("static components", () => {
       description: "Shared package model",
       published: "19 July 2026",
       publishedAt: "2026-07-19",
+      updated: "20 July 2026",
+      updatedAt: "2026-07-20",
       readingTime: "4 min",
+      tags: ["design systems"],
       cover: { src: "/cover.webp", alt: "Cover", srcset: "/cover.webp 1x" },
     };
     const { container } = render(
@@ -218,11 +246,10 @@ describe("static components", () => {
       "Shared package model",
     );
     expect(container.querySelector(".cf-search-result-card__title mark")).toHaveTextContent("design");
+    expect(container.querySelector(".cf-search-result-card__tags mark")).toHaveTextContent("design");
     expect(container.querySelector(".cf-search-result-card .cf-post-card__content")).toBeNull();
-    for (const time of container.querySelectorAll("time")) {
-      expect(time).toHaveAttribute("datetime", "2026-07-19");
-      expect(time).toHaveTextContent("19 July 2026");
-    }
+    expect(container.querySelectorAll('time[datetime="2026-07-19"]')).toHaveLength(3);
+    expect(container.querySelectorAll('time[datetime="2026-07-20"]')).toHaveLength(3);
   });
 
   it("renders chat avatars without adding accessible noise", () => {
@@ -236,6 +263,14 @@ describe("static components", () => {
             body: "Image avatar",
             avatar: { src: "/avatar.webp", alt: "Reader avatar", width: 40, height: 40 },
           },
+          {
+            id: "link",
+            author: "cofob",
+            text: "Source code",
+            link: "https://example.com/source",
+            linkLabel: "Open source",
+            linkExternal: true,
+          },
         ]}
       />,
     );
@@ -243,5 +278,9 @@ describe("static components", () => {
     expect(container.querySelector("span.cf-chat__avatar")).toHaveTextContent("C");
     expect(container.querySelector("img.cf-chat__avatar")).toHaveAttribute("src", "/avatar.webp");
     expect(container.querySelector("img.cf-chat__avatar")).toHaveAttribute("alt", "");
+    expect(screen.getByRole("link", { name: "Open source" })).toHaveAttribute("target", "_blank");
+    expect(screen.getByRole("link", { name: "Open source" })).toHaveAttribute("rel", "noopener noreferrer");
+    expect(container.querySelector(".cf-chat__bubble")).toHaveTextContent("Text avatar");
+    expect(container.querySelectorAll(".cf-chat__bubble")[2]).toHaveTextContent("Source code");
   });
 });

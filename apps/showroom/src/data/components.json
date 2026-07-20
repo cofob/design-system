@@ -24,6 +24,11 @@
         "interactive": true
       },
       {
+        "name": "AppShell",
+        "description": "Full-height application shell with a sticky-footer main region.",
+        "interactive": false
+      },
+      {
         "name": "Heading",
         "description": "Responsive heading hierarchy from h1 through h6.",
         "interactive": false
@@ -210,6 +215,21 @@
       {
         "name": "ResponsiveImage",
         "description": "Intrinsic image with srcset and loading controls.",
+        "interactive": false
+      },
+      {
+        "name": "Avatar",
+        "description": "Responsive avatar image with accessible initials fallback.",
+        "interactive": false
+      },
+      {
+        "name": "InlineEmoji",
+        "description": "Semantically labelled inline emoji image aligned with text.",
+        "interactive": false
+      },
+      {
+        "name": "MediaGrid",
+        "description": "Responsive one- or two-column list for image, video, and audio media.",
         "interactive": false
       },
       {

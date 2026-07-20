@@ -11,6 +11,8 @@ const post: DS.PostSummary = {
   excerpt: "A practical note about content-first design.",
   published: "19 July 2026",
   publishedAt: "2026-07-19",
+  updated: "20 July 2026",
+  updatedAt: "2026-07-20",
   readingTime: "4 min read",
   tags: ["design", "css"],
 };
@@ -119,6 +121,24 @@ export function ReactComponentPreview({ name }: Props) {
             </p>
           </div>
         </div>
+      );
+    case "AppShell":
+      return (
+        <DS.AppShell style={{ minBlockSize: "18rem" }}>
+          <header>
+            <DS.Text size="sm" tone="muted">
+              Header
+            </DS.Text>
+          </header>
+          <div style={{ flex: "1 0 auto" }}>
+            <DS.Heading level={3}>Main content grows</DS.Heading>
+          </div>
+          <footer>
+            <DS.Text size="sm" tone="muted">
+              Sticky footer
+            </DS.Text>
+          </footer>
+        </DS.AppShell>
       );
     case "Heading":
       return (
@@ -568,6 +588,36 @@ export function ReactComponentPreview({ name }: Props) {
           caption="A responsive image with intrinsic dimensions."
         />
       );
+    case "Avatar":
+      return (
+        <DS.Inline gap="sm">
+          <DS.Avatar image={lightImage} name="Ada Lovelace" alt="Ada Lovelace" size="lg" />
+          <DS.Avatar name="Grace Hopper" />
+        </DS.Inline>
+      );
+    case "InlineEmoji":
+      return (
+        <DS.Text>
+          Semantic inline image <DS.InlineEmoji image={lightImage} alt="Blue landscape" /> stays aligned with
+          text.
+        </DS.Text>
+      );
+    case "MediaGrid":
+      return (
+        <DS.MediaGrid>
+          <li>
+            <img
+              src={lightImage.src}
+              alt={lightImage.alt}
+              width={lightImage.width}
+              height={lightImage.height}
+            />
+          </li>
+          <li>
+            <img src={darkImage.src} alt={darkImage.alt} width={darkImage.width} height={darkImage.height} />
+          </li>
+        </DS.MediaGrid>
+      );
     case "ChatThread":
       return (
         <DS.ChatThread
@@ -576,7 +626,10 @@ export function ReactComponentPreview({ name }: Props) {
             {
               id: "two",
               author: "reader",
-              body: "Then every adapter stays aligned.",
+              text: "Then every adapter stays aligned.",
+              link: "https://cofob.dev/blog",
+              linkLabel: "Read the implementation notes",
+              linkExternal: true,
               own: true,
               timestamp: "19:20",
             },

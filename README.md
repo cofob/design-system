@@ -13,7 +13,7 @@ The system uses authored semantic CSS rather than utility generation or CSS-in-J
 | `@cofob/design-system-svelte`   | Svelte 5 components compatible with SvelteKit 2                                                          |
 | `@cofob/design-system-showroom` | Private Astro application deployed to [design.cofob.dev](https://design.cofob.dev)                       |
 
-All public packages begin at `0.1.0`, share a fixed Changesets version, and are published to GitHub Packages.
+All public packages share a fixed Changesets version and are published to GitHub Packages.
 
 ## Requirements
 
