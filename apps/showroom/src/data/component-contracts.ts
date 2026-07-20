@@ -390,7 +390,7 @@ const parameterTypes: Record<string, string> = {
   placeholder: "string",
   "checked/defaultChecked": "boolean; controlled or initial state",
   value: "string | number",
-  options: "readonly component-specific option records[]",
+  options: "readonly component-specific option records[] | component-specific options object",
   "inputValue/defaultInputValue": "string; controlled or initial visible query",
   "files/defaultFiles": "readonly File[]; controlled or initial selection",
   accept: "native file accept string",
@@ -518,7 +518,6 @@ const parameterTypes: Record<string, string> = {
   "enabled/defaultEnabled": "boolean; controlled or initial global state",
   onEnabledChange: "(enabled: boolean) => void",
   source: "Source",
-  options: "Options",
   fallbackHref: "string",
   player: "Player (bindable in Svelte)",
   onPlayerReady: "(player: Player) => void",
@@ -645,7 +644,7 @@ const parameterDescriptions: Record<string, string> = {
   "checked/defaultChecked":
     "Use checked/bind:checked for controlled state or defaultChecked for initial state.",
   value: "Selected or reported native value.",
-  options: "Ordered choices with values, labels, descriptions, and disabled state.",
+  options: "Component-specific choices or configuration options.",
   "inputValue/defaultInputValue":
     "Controls or initializes the visible autocomplete query independently of its value.",
   "files/defaultFiles": "Controls or initializes the selected File records.",
@@ -778,7 +777,6 @@ const parameterDescriptions: Record<string, string> = {
     "Controls the persisted document-wide data-cf-animated-stickers flag. Disabled mode unloads WebM and restores each SVG/WebP first frame; ordinary static stickers are unchanged.",
   onEnabledChange: "Runs after the global animated sticker preference changes through this control.",
   source: "Recording URL, URL configuration, or in-memory recording data passed to asciinema-player.",
-  options: "Complete upstream player options; the wrapper supplies the cofob theme when theme is omitted.",
   fallbackHref:
     "Optional validated application route or direct recording link shown before mounting and on load failure.",
   player:
@@ -880,6 +878,7 @@ const componentAdapterOverrides: Record<string, Record<string, readonly Adapter[
 
 const componentParameterTypes: Record<string, Record<string, string>> = {
   AsciinemaPlayer: {
+    options: "Options",
     labels: "Partial<AsciinemaPlayerLabels>",
     label: "string",
   },
