@@ -71,6 +71,12 @@ describe("application and publishing CSS contracts", () => {
     expect(componentStyles).toMatch(/\.cf-footer\s*\{[^}]*padding-inline:\s*var\(--cf-space-4\)/s);
   });
 
+  it("keeps alert blocks vertically compact across every tone", () => {
+    expect(componentStyles).toMatch(
+      /\.cf-alert\s*\{[^}]*padding:\s*var\(--cf-space-3\) var\(--cf-space-4\)/s,
+    );
+  });
+
   it("supports narrow, default, and full prose measures", () => {
     expect(componentStyles).toMatch(
       /\.cf-prose\s*\{[^}]*inline-size:\s*100%[^}]*max-inline-size:\s*var\(--cf-content-narrow\)/s,
