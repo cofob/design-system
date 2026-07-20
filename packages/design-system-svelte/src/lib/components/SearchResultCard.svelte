@@ -1,9 +1,9 @@
 <script lang="ts">
-  import type { HTMLAttributes } from "svelte/elements";
+  import type { HTMLAnchorAttributes } from "svelte/elements";
   import { cx } from "../internal.js";
   import type { PostSummary } from "../types.js";
 
-  interface Props extends Omit<HTMLAttributes<HTMLElement>, "title"> {
+  interface Props extends Omit<HTMLAnchorAttributes, "href" | "title"> {
     result: PostSummary;
     query?: string;
     headingLevel?: 2 | 3 | 4;
@@ -31,7 +31,13 @@
   }
 </script>
 
-<article class={cx("cf-search-result-card", className)} data-query={query || undefined} {...rest}>
+<a
+  class={cx("cf-search-result-card", className)}
+  href={result.href}
+  aria-label={result.title}
+  data-query={query || undefined}
+  {...rest}
+>
   {#if dateLabel || updatedDateLabel || result.readingTime}
     <p class="cf-search-result-card__meta">
       {#if dateLabel}<span>Published <time datetime={dateTime}>{dateLabel}</time></span
@@ -47,10 +53,8 @@
     </p>
   {/if}
   <svelte:element this={HeadingElement} class="cf-search-result-card__title">
-    <a href={result.href}
-      >{#each parts(result.title) as part}{#if part.match}<mark>{part.value}</mark
-          >{:else}{part.value}{/if}{/each}</a
-    >
+    {#each parts(result.title) as part}{#if part.match}<mark>{part.value}</mark
+        >{:else}{part.value}{/if}{/each}
   </svelte:element>
   {#if description}
     <p class="cf-search-result-card__description">
@@ -67,4 +71,4 @@
       {/each}
     </div>
   {/if}
-</article>
+</a>

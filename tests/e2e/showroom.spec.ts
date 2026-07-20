@@ -490,26 +490,45 @@ test("ChatThread groups consecutive messages from the same sender", async ({ pag
   }
 });
 
-test("LatestPostCard uses its full surface as the only link", async ({ page }) => {
-  await page.goto("/components/latest-post-card/");
+test("Post cards use their full surfaces as their only links", async ({ page }) => {
+  const cases = [
+    {
+      path: "/components/post-card/",
+      selector: "a.cf-post-card",
+      clickTarget: ".cf-post-card__excerpt",
+    },
+    {
+      path: "/components/latest-post-card/",
+      selector: "a.cf-latest-post-card",
+      clickTarget: ".cf-latest-post-card__description",
+    },
+    {
+      path: "/components/search-result-card/",
+      selector: "a.cf-search-result-card",
+      clickTarget: ".cf-search-result-card__description",
+    },
+  ] as const;
 
-  for (const framework of frameworkNames) {
-    const panel = await selectFramework(page, framework);
-    const card = panel.locator("a.cf-latest-post-card");
-    await expect(card).toHaveCount(1);
-    await expect(card).toHaveAttribute("href", "#post");
-    await expect(card).toHaveAttribute("aria-label", "Building a calmer interface");
-    await expect(card.locator("a")).toHaveCount(0);
-    await card.locator(".cf-latest-post-card__description").click();
+  for (const item of cases) {
+    await page.goto(item.path);
+    for (const framework of frameworkNames) {
+      const panel = await selectFramework(page, framework);
+      const card = panel.locator(item.selector);
+      await expect(card).toHaveCount(1);
+      await expect(card).toHaveAttribute("href", "#post");
+      await expect(card).toHaveAttribute("aria-label", "Building a calmer interface");
+      await expect(card.locator("a")).toHaveCount(0);
+      await card.locator(item.clickTarget).click();
+      await expect(page).toHaveURL(/#post$/);
+      await page.evaluate(() => history.replaceState(null, "", location.pathname));
+    }
+
+    const card = page.locator(`[data-framework-panel="svelte"] ${item.selector}`);
+    await card.focus();
+    await expect(card).toBeFocused();
+    await page.keyboard.press("Enter");
     await expect(page).toHaveURL(/#post$/);
-    await page.evaluate(() => history.replaceState(null, "", location.pathname));
   }
-
-  const card = page.locator('[data-framework-panel="svelte"] a.cf-latest-post-card');
-  await card.focus();
-  await expect(card).toBeFocused();
-  await page.keyboard.press("Enter");
-  await expect(page).toHaveURL(/#post$/);
 });
 
 test("Avatar component surfaces are borderless", async ({ page }) => {

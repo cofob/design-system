@@ -1014,7 +1014,7 @@ const renderTerminalOutput = (output: string) => `<code>${escapeHtml(output)}</c
   }
   {
     name === "PostCard" && (
-      <article class="cf-post-card">
+      <a class="cf-post-card" href="#post" aria-label="Building a calmer interface">
         <div class="cf-post-card__content">
           <>
             <p class="cf-post-card__meta">
@@ -1026,9 +1026,7 @@ const renderTerminalOutput = (output: string) => `<code>${escapeHtml(output)}</c
               </span>
               <span>4 min read</span>
             </p>
-            <h2 class="cf-post-card__title">
-              <a href="#post">Building a calmer interface</a>
-            </h2>
+            <h2 class="cf-post-card__title">Building a calmer interface</h2>
             <p class="cf-post-card__excerpt">A practical note about content-first design.</p>
             <div class="cf-post-card__tags">
               <>
@@ -1038,7 +1036,7 @@ const renderTerminalOutput = (output: string) => `<code>${escapeHtml(output)}</c
             </div>
           </>
         </div>
-      </article>
+      </a>
     )
   }
   {
@@ -1068,7 +1066,12 @@ const renderTerminalOutput = (output: string) => `<code>${escapeHtml(output)}</c
   }
   {
     name === "SearchResultCard" && (
-      <article class="cf-search-result-card" data-query="design">
+      <a
+        class="cf-search-result-card"
+        href="#post"
+        aria-label="Building a calmer interface"
+        data-query="design"
+      >
         <p class="cf-search-result-card__meta">
           Published <time datetime="2026-07-19">19 July 2026</time>
           <span class="cf-post-meta__separator" aria-hidden="true">
@@ -1080,9 +1083,7 @@ const renderTerminalOutput = (output: string) => `<code>${escapeHtml(output)}</c
           </span>
           4 min read
         </p>
-        <h2 class="cf-search-result-card__title">
-          <a href="#post">Building a calmer interface</a>
-        </h2>
+        <h2 class="cf-search-result-card__title">Building a calmer interface</h2>
         <p class="cf-search-result-card__description">
           A practical note about content-first <mark>design</mark>.
         </p>
@@ -1092,7 +1093,7 @@ const renderTerminalOutput = (output: string) => `<code>${escapeHtml(output)}</c
           </span>
           <span class="cf-tag">css</span>
         </div>
-      </article>
+      </a>
     )
   }
   {

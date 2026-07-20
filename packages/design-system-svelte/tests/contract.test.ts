@@ -40,6 +40,7 @@ import PostCard from "../src/lib/components/PostCard.svelte";
 import Popover from "../src/lib/components/Popover.svelte";
 import Prose from "../src/lib/components/Prose.svelte";
 import ResponsiveImage from "../src/lib/components/ResponsiveImage.svelte";
+import SearchResultCard from "../src/lib/components/SearchResultCard.svelte";
 import Select from "../src/lib/components/Select.svelte";
 import Switch from "../src/lib/components/Switch.svelte";
 import Table from "../src/lib/components/Table.svelte";
@@ -497,6 +498,31 @@ describe("Svelte adapter contract", () => {
     expect(output.body).not.toContain("<article");
     expect(output.body.match(/<a(?:\s|>)/g)).toHaveLength(1);
     expect(output.body).toContain('<span class="cf-link" aria-hidden="true">Read article');
+  });
+
+  it("renders post and search result cards as single accessible anchors", () => {
+    const post = {
+      href: "/post",
+      title: "Canonical design",
+      description: "Portable description",
+      cover: { src: "/cover.webp", alt: "Cover" },
+    };
+    const postCard = render(PostCard, { props: { post, target: "_blank" } });
+    const searchResultCard = render(SearchResultCard, { props: { result: post, query: "design" } });
+
+    expect(postCard.body).toContain(
+      '<a class="cf-post-card" href="/post" aria-label="Canonical design" target="_blank">',
+    );
+    expect(postCard.body).not.toContain("<article");
+    expect(postCard.body.match(/<a(?:\s|>)/g)).toHaveLength(1);
+    expect(postCard.body).toContain('<span class="cf-post-card__media"');
+    expect(searchResultCard.body).toContain(
+      '<a class="cf-search-result-card" href="/post" aria-label="Canonical design" data-query="design">',
+    );
+    expect(searchResultCard.body).not.toContain("<article");
+    expect(searchResultCard.body.match(/<a(?:\s|>)/g)).toHaveLength(1);
+    expect(searchResultCard.body).toContain("Canonical ");
+    expect(searchResultCard.body).toContain("<mark>design</mark>");
   });
 
   it("renders theme-aware image layers and preserves canonical dates", () => {

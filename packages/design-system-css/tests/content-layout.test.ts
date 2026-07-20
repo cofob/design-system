@@ -55,12 +55,16 @@ describe("application and publishing CSS contracts", () => {
     expect(componentStyles).toContain('.cf-chat__row:not([data-group-end="true"]) .cf-chat__bubble');
   });
 
-  it("keeps avatar surfaces borderless and the latest post keyboard-visible", () => {
+  it("keeps avatar surfaces borderless and linked post cards keyboard-visible", () => {
     const avatarBlock = componentStyles.match(/\.cf-avatar\s*\{([^}]*)\}/s)?.[1] ?? "";
     const chatAvatarBlock = componentStyles.match(/\.cf-chat__avatar\s*\{([^}]*)\}/s)?.[1] ?? "";
     expect(avatarBlock).not.toMatch(/(^|\n)\s*border\s*:/);
     expect(chatAvatarBlock).not.toMatch(/(^|\n)\s*border\s*:/);
+    expect(componentStyles).toContain(".cf-post-card:focus-visible");
     expect(componentStyles).toContain(".cf-latest-post-card:focus-visible");
+    expect(componentStyles).toContain(".cf-search-result-card:focus-visible");
+    expect(componentStyles).not.toContain(".cf-post-card__title a");
+    expect(componentStyles).not.toContain(".cf-search-result-card__title a");
   });
 
   it("keeps footer content inset from narrow viewport edges", () => {

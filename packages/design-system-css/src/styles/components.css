@@ -2432,7 +2432,7 @@
   }
 
   a.cf-post-card {
-    display: block;
+    display: grid;
     color: inherit;
     text-decoration: none;
   }
@@ -2489,13 +2489,8 @@
     line-height: var(--cf-line-height-snug);
   }
 
-  .cf-post-card__title a {
-    color: inherit;
-    text-decoration: none;
-  }
-
-  .cf-post-card:hover .cf-post-card__title a,
-  .cf-post-card:focus-within .cf-post-card__title a {
+  .cf-post-card:hover .cf-post-card__title,
+  .cf-post-card:focus-visible .cf-post-card__title {
     text-decoration: underline;
     text-decoration-color: var(--cf-color-marker);
     text-decoration-thickness: 0.18em;
@@ -2615,6 +2610,7 @@
   }
 
   .cf-search-result-card:hover,
+  .cf-search-result-card:focus-visible,
   .cf-search-result-card:focus-within {
     border-color: var(--cf-color-border-strong);
     background: var(--cf-color-surface);
@@ -2632,13 +2628,8 @@
     line-height: var(--cf-line-height-snug);
   }
 
-  .cf-search-result-card__title a {
-    color: inherit;
-    text-decoration: none;
-  }
-
-  .cf-search-result-card:hover .cf-search-result-card__title a,
-  .cf-search-result-card:focus-within .cf-search-result-card__title a {
+  .cf-search-result-card:hover .cf-search-result-card__title,
+  .cf-search-result-card:focus-visible .cf-search-result-card__title {
     text-decoration: underline;
     text-decoration-color: var(--cf-color-marker);
     text-decoration-thickness: 0.14em;

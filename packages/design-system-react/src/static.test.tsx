@@ -187,8 +187,21 @@ describe("static components", () => {
   });
 
   it("renders content models", () => {
-    render(<PostCard post={{ href: "/hello", title: "Hello", tags: ["design"] }} />);
-    expect(screen.getByRole("link", { name: "Hello" })).toHaveAttribute("href", "/hello");
+    const { container } = render(
+      <>
+        <PostCard post={{ href: "/hello", title: "Hello", tags: ["design"] }} target="_blank" />
+        <SearchResultCard result={{ href: "/search", title: "Search result" }} query="result" />
+      </>,
+    );
+    const postCard = container.querySelector("a.cf-post-card");
+    expect(postCard).toHaveAttribute("href", "/hello");
+    expect(postCard).toHaveAttribute("aria-label", "Hello");
+    expect(postCard).toHaveAttribute("target", "_blank");
+    expect(postCard?.querySelectorAll("a")).toHaveLength(0);
+    const searchResultCard = container.querySelector("a.cf-search-result-card");
+    expect(searchResultCard).toHaveAttribute("href", "/search");
+    expect(searchResultCard).toHaveAttribute("aria-label", "Search result");
+    expect(searchResultCard?.querySelectorAll("a")).toHaveLength(0);
   });
 
   it("renders application and portable media foundations", () => {
@@ -250,6 +263,10 @@ describe("static components", () => {
       "srcset",
       "/cover.webp 1x",
     );
+    const postCard = container.querySelector("a.cf-post-card");
+    expect(postCard).toHaveAttribute("href", "/canonical");
+    expect(postCard).toHaveAttribute("aria-label", "Canonical design");
+    expect(postCard?.querySelectorAll("a")).toHaveLength(0);
     expect(container.querySelector(".cf-latest-post-card__title")).toHaveTextContent("Canonical design");
     expect(container.querySelector(".cf-latest-post-card__description")).toHaveTextContent(
       "Shared package model",
@@ -259,6 +276,10 @@ describe("static components", () => {
     expect(latestPostCard).toHaveAttribute("aria-label", "Canonical design");
     expect(latestPostCard).toHaveAttribute("target", "_blank");
     expect(latestPostCard?.querySelectorAll("a")).toHaveLength(0);
+    const searchResultCard = container.querySelector("a.cf-search-result-card");
+    expect(searchResultCard).toHaveAttribute("href", "/canonical");
+    expect(searchResultCard).toHaveAttribute("aria-label", "Canonical design");
+    expect(searchResultCard?.querySelectorAll("a")).toHaveLength(0);
     expect(container.querySelector(".cf-search-result-card__title mark")).toHaveTextContent("design");
     expect(container.querySelector(".cf-search-result-card__tags mark")).toHaveTextContent("design");
     expect(container.querySelector(".cf-search-result-card .cf-post-card__content")).toBeNull();

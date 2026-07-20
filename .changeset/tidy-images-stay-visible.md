@@ -7,6 +7,7 @@
 Keep `ResponsiveImage` visible in dark themes when no `darkImage` artwork is provided, and visually group
 consecutive `ChatThread` messages from the same sender while preserving per-message timestamps and accessible
 sender context. Make the entire `LatestPostCard` an accessible link and remove borders from avatar surfaces.
+Make `PostCard` and `SearchResultCard` single accessible links so their complete surfaces navigate to the post.
 Keep `Footer` content inset from viewport edges on narrow screens.
 Add explicit narrow, default, and full width choices to `Prose` for responsive article layouts.
 Reduce large `Section` spacing at tablet widths so collapsed navigation stays close to page content.

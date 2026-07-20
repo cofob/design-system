@@ -1135,7 +1135,7 @@ export function ResponsiveImage({
   );
 }
 
-export interface PostCardProps extends HTMLAttributes<HTMLElement> {
+export interface PostCardProps extends Omit<AnchorHTMLAttributes<HTMLAnchorElement>, "href" | "title"> {
   post: PostSummary;
   headingLevel?: 2 | 3 | 4;
 }
@@ -1200,9 +1200,9 @@ function PostCardBody({ post, headingLevel = 2 }: Pick<PostCardProps, "post" | "
   return (
     <>
       {image ? (
-        <a className="cf-post-card__media" href={post.href} tabIndex={-1} aria-hidden="true">
+        <span className="cf-post-card__media" aria-hidden="true">
           <PostImage image={image} className="cf-post-card__cover" alt="" />
-        </a>
+        </span>
       ) : null}
       <div className="cf-post-card__content">
         {published || updated || post.readingTime ? (
@@ -1221,7 +1221,7 @@ function PostCardBody({ post, headingLevel = 2 }: Pick<PostCardProps, "post" | "
           </p>
         ) : null}
         <Heading level={headingLevel} className="cf-post-card__title">
-          <a href={post.href}>{post.title}</a>
+          {post.title}
         </Heading>
         {description ? (
           <Text tone="muted" className="cf-post-card__excerpt">
@@ -1244,9 +1244,9 @@ function PostCardBody({ post, headingLevel = 2 }: Pick<PostCardProps, "post" | "
 
 export function PostCard({ post, headingLevel = 2, className, ...props }: PostCardProps) {
   return (
-    <article className={cx("cf-post-card", className)} {...props}>
+    <a className={cx("cf-post-card", className)} href={post.href} aria-label={post.title} {...props}>
       <PostCardBody post={post} headingLevel={headingLevel} />
-    </article>
+    </a>
   );
 }
 
@@ -1344,7 +1344,13 @@ export function SearchResultCard({
   const updated = postUpdatedDateLabel(result);
   const description = postDescription(result);
   return (
-    <article className={cx("cf-search-result-card", className)} data-query={query || undefined} {...props}>
+    <a
+      className={cx("cf-search-result-card", className)}
+      href={result.href}
+      aria-label={result.title}
+      data-query={query || undefined}
+      {...props}
+    >
       {published || updated || result.readingTime ? (
         <p className="cf-search-result-card__meta">
           {published ? (
@@ -1371,7 +1377,7 @@ export function SearchResultCard({
         </p>
       ) : null}
       <Heading level={headingLevel} className="cf-search-result-card__title">
-        <a href={result.href}>{highlightText(result.title, query)}</a>
+        {highlightText(result.title, query)}
       </Heading>
       {description ? (
         <p className="cf-search-result-card__description">{highlightText(description, query)}</p>
@@ -1385,7 +1391,7 @@ export function SearchResultCard({
           ))}
         </div>
       ) : null}
-    </article>
+    </a>
   );
 }
 
