@@ -63,6 +63,6 @@
     "stylelint-config-standard": "^39.0.0",
     "typescript": "^6.0.3",
     "typescript-eslint": "^8.63.0",
-    "wrangler": "^4.110.0"
+    "wrangler": "^4.114.0"
   }
 }
