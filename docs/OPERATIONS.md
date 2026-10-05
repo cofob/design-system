@@ -22,7 +22,7 @@ The release workflow publishes to npm after GitHub Packages when no changesets r
 
 For first-time setup:
 
-1. Create the `cofob2` npm organization, or use the npm account named `cofob2`.
+1. Create the `cofob2` npm organization, or use the npm account named `cofob2`. Enable two-factor authentication on the publication account.
 2. Run `npm ci`, `npm run build`, and `npm run publish:npm -- --dry-run`. The last command prints the six prepared archive paths and keeps them in a temporary directory.
 3. If the packages do not exist on npm, run `npm login --registry=https://registry.npmjs.org/`. Publish each prepared archive with `npm publish /absolute/path/to/archive.tgz --ignore-scripts --access public --registry=https://registry.npmjs.org/`, in the printed order.
 4. Open each package's npm settings and add a GitHub Actions trusted publisher: owner `cofob`, repository `design-system`, workflow filename `release.yml`, no environment. Enable direct `npm publish`.
