@@ -16,14 +16,14 @@ The system uses authored semantic CSS rather than utility generation or CSS-in-J
 | `@cofob/design-system-asciinema-player` | SSR-safe Native, React, and Svelte adapters for Asciinema Player                                         |
 | `@cofob/design-system-showroom`         | Private Astro application deployed to [design.cofob.dev](https://design.cofob.dev)                       |
 
-The four UI and runtime packages share a fixed Changesets version. The two asset packages are versioned independently. All public packages are published to GitHub Packages.
+The four UI and runtime packages share a fixed Changesets version. The two asset packages are versioned independently. All public packages are published to GitHub Packages as `@cofob/design-system-*` and to npm as `@cofob2/design-system-*`, with the same versions and exports.
 
 ## Requirements
 
 - Node.js 24.11 or newer
 - npm 11
 - FFmpeg with `libvpx-vp9` when converting Telegram `.tgs` stickers
-- A classic GitHub token with `read:packages` for installing from GitHub Packages
+- For GitHub Packages only: a classic GitHub token with `read:packages`
 
 Configure the `@cofob` scope without committing a token:
 
@@ -33,6 +33,19 @@ Configure the `@cofob` scope without committing a token:
 ```
 
 ## Install
+
+For npm, use the `@cofob2` scope in package names and imports. No GitHub token or registry configuration is required:
+
+```sh
+npm install @cofob2/design-system-css @cofob2/design-system-react lucide-react
+```
+
+```ts
+import "@cofob2/design-system-css/index.css";
+import { Button } from "@cofob2/design-system-react";
+```
+
+The examples below use GitHub Packages. Replace `@cofob/` with `@cofob2/` to use npm.
 
 Native HTML, CSS, and optional vanilla controllers:
 

@@ -28,7 +28,7 @@
     "format": "prettier --write .",
     "format:check": "prettier --check .",
     "test": "npm run test:unit && npm run test:e2e",
-    "test:unit": "npm run test --workspaces --if-present",
+    "test:unit": "node --test scripts/publish-npm.test.mjs && npm run test --workspaces --if-present",
     "test:e2e": "playwright test --grep-invert @visual",
     "test:a11y": "playwright test --grep @a11y",
     "test:visual": "playwright test --grep @visual",
@@ -44,6 +44,7 @@
     "changeset": "changeset",
     "version-packages": "changeset version",
     "release": "npm run build && changeset publish",
+    "publish:npm": "node scripts/publish-npm.mjs",
     "deploy:showroom": "npm run build --workspace @cofob/design-system-css && npm run build --workspace @cofob/design-system-react && npm run build --workspace @cofob/design-system-svelte && npm run build --workspace @cofob/design-system-asciinema-player && npm run build --workspace @cofob/design-system-assets && npm run build --workspace @cofob/design-system-stickers && npm run build --workspace @cofob/design-system-showroom && wrangler pages deploy apps/showroom/dist --project-name cofob-design-system --branch main"
   },
   "devDependencies": {
