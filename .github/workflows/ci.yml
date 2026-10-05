@@ -39,6 +39,7 @@ jobs:
       - run: npm ci
       - run: npm run build --workspace @cofob/design-system-assets
       - run: npm run build --workspace @cofob/design-system-css
+      - run: npm run build --workspace @cofob/design-system-asciinema-player
       - run: npm run build --workspace @cofob/design-system-react
       - run: npm run build --workspace @cofob/design-system-svelte
       - run: npm run build --workspace @cofob/design-system-stickers
