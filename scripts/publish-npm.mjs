@@ -44,6 +44,7 @@ export function isPublished(manifest, execute = run, targetRegistry = registry) 
     `${manifest.name}@${manifest.version}`,
     "version",
     "--json",
+    "--prefer-online",
     "--registry",
     targetRegistry,
   ]);
