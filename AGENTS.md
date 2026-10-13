@@ -127,9 +127,12 @@ npm run check:packages
 
 ## Releases and deployment
 
-- The three public packages are a fixed Changesets group and must be versioned together.
+- The CSS, React, Svelte, and Asciinema Player packages are a fixed Changesets group and must be versioned
+  together. The assets and stickers packages are versioned independently.
 - Add a changeset for publishable user-facing changes; do not edit package versions by hand.
-- Packages publish to GitHub Packages under the `@cofob` scope.
+- The release workflow publishes every package to GitHub Packages under the `@cofob` scope and, through
+  `scripts/publish-npm.mjs`, to the public npm registry under the `@cofob2` scope with the same versions. Source
+  workspaces keep the `@cofob` scope; see `docs/OPERATIONS.md` for npm trusted publishing.
 - The showroom deploys to Cloudflare Pages project `cofob-design-system`; `main` is production and pull requests
   use branch previews.
 - Never print or commit access tokens, Wrangler credentials, package registry credentials, or environment files.
