@@ -1,5 +1,13 @@
 # @cofob/design-system-svelte
 
+## 0.5.1
+
+### Patch Changes
+
+- 494b1c5: Also publish packages to npm under the `@cofob2` scope.
+- Updated dependencies [494b1c5]
+  - @cofob/design-system-css@0.5.1
+
 ## 0.5.0
 
 ### Minor Changes

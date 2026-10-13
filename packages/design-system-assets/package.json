@@ -1,6 +1,6 @@
 {
   "name": "@cofob/design-system-assets",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "description": "Build-time asset converters for the cofob design system.",
   "type": "module",
   "sideEffects": false,
