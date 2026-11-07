@@ -2071,3 +2071,58 @@ test("@visual every React and Svelte component remains stable in both themes", a
     await expect(page).toHaveScreenshot(`components-${adapter}-dark.png`, { fullPage: true });
   }
 });
+
+test("llms.txt exposes the index and Markdown sub-pages", async ({ page, request }) => {
+  test.setTimeout(120_000);
+
+  const indexResponse = await request.get("/llms.txt");
+  expect(indexResponse.ok()).toBe(true);
+  expect(indexResponse.headers()["content-type"]).toContain("text/plain");
+  const indexBody = await indexResponse.text();
+  expect(indexBody.startsWith("# cofob Design System")).toBe(true);
+  expect(indexBody).toContain("> A content-first design language and component system");
+  expect(indexBody).toContain("## Sticker packs");
+  expect(indexBody).toContain("## Optional");
+
+  for (const group of componentGroups) {
+    for (const component of group.components) {
+      const slug = component.name.replaceAll(/([a-z0-9])([A-Z])/g, "$1-$2").toLowerCase();
+      expect(indexBody).toContain(`/llms/components/${slug}.md`);
+    }
+  }
+
+  await page.goto("/components/button/");
+  await expect(page.locator('link[rel="alternate"][type="text/markdown"]')).toHaveAttribute(
+    "href",
+    "https://design.cofob.dev/llms/components/button.md",
+  );
+  await expect(page.locator('link[rel="describedby"]')).toHaveAttribute(
+    "href",
+    "https://design.cofob.dev/llms.txt",
+  );
+
+  await page.goto("/");
+  await expect(page.locator('link[rel="alternate"][type="text/markdown"]')).toHaveAttribute(
+    "href",
+    "https://design.cofob.dev/llms/index.md",
+  );
+
+  const pageResponse = await request.get("/llms/components/button.md");
+  expect(pageResponse.ok()).toBe(true);
+  expect(pageResponse.headers()["content-type"]).toContain("text/markdown");
+  const pageBody = await pageResponse.text();
+  expect(pageBody).toContain("# Button");
+  expect(pageBody).toContain("```tsx");
+  expect(pageBody).toContain("https://design.cofob.dev/");
+  expect(pageBody).not.toContain("data-framework-preview");
+  expect(pageBody).not.toContain("data-cf-copy");
+
+  const fullResponse = await request.get("/llms-full.txt");
+  expect(fullResponse.ok()).toBe(true);
+  const fullBody = await fullResponse.text();
+  expect(fullBody).toContain("# Button");
+  expect(fullBody).toContain("## Authenticate npm");
+
+  const missingResponse = await request.get("/llms/components/does-not-exist.md");
+  expect(missingResponse.status()).toBe(404);
+});

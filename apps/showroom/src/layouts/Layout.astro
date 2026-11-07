@@ -18,6 +18,9 @@ const pageTitle = title === "cofob Design System" ? title : `${title} — cofob 
 const canonicalUrl = new URL(pathname, Astro.site);
 const socialImagePath = pathname === "/" ? "/og/index.png" : `/og${pathname.replace(/\/$/, "")}.png`;
 const socialImageUrl = new URL(socialImagePath, Astro.site);
+const markdownPath = pathname === "/" ? "/llms/index.md" : `/llms${pathname.replace(/\/$/, "")}.md`;
+const markdownUrl = new URL(markdownPath, Astro.site);
+const llmsUrl = new URL("/llms.txt", Astro.site);
 const prehydrateThemeControlsScript = `document.addEventListener("DOMContentLoaded",()=>{const r=document.documentElement,p=r.dataset.themePreference;if(p!=="light"&&p!=="dark"&&p!=="system")return;const b=document.querySelector("[data-showroom-theme]"),v=b?.querySelector("[data-showroom-theme-value]"),m=document.querySelector('meta[name="theme-color"]'),o=["system","light","dark"],n={system:"System",light:"Light",dark:"Dark"},x=o[(o.indexOf(p)+1)%o.length]??"system";if(!b)return;b.dataset.preference=p;b.dataset.theme=r.dataset.theme??"dark";if(v)v.textContent=p;if(m)m.setAttribute("content",r.dataset.theme==="dark"?"#09090b":"#ffffff");b.setAttribute("aria-label",n[p]+" theme. Switch to "+n[x].toLowerCase()+" theme.")},{once:true});`;
 const themeScript = `(()=>{try{const k="cf-theme",v=localStorage.getItem(k);if(v!=="light"&&v!=="dark"&&v!=="system")localStorage.setItem(k,"dark")}catch{}})();${getThemeScript()};${prehydrateThemeControlsScript}`;
 
@@ -40,6 +43,8 @@ const links = [
     <meta name="description" content={description} />
     <meta name="theme-color" content="#09090b" />
     <link rel="canonical" href={canonicalUrl} />
+    <link rel="alternate" type="text/markdown" href={markdownUrl} />
+    <link rel="describedby" href={llmsUrl} />
     <meta property="og:type" content="website" />
     <meta property="og:site_name" content="cofob Design System" />
     <meta property="og:title" content={pageTitle} />
